@@ -9,17 +9,28 @@ package model;
  * @author BuiNgocLinh
  */
 public class Grade {
+
     private int id;
     private String name;
     private String description;
+    private int teacher_id;
 
     public Grade() {
     }
 
-    public Grade(int id, String name, String description) {
+    public Grade(int id, String name, String description, int teacher_id) {
         this.id = id;
         this.name = name;
         this.description = description;
+        this.teacher_id = teacher_id;
+    }
+
+    public int getTeacher_id() {
+        return teacher_id;
+    }
+
+    public void setTeacher_id(int teacher_id) {
+        this.teacher_id = teacher_id;
     }
 
     public int getId() {
@@ -45,6 +56,5 @@ public class Grade {
     public void setDescription(String description) {
         this.description = description;
     }
-    
-    
+
 }

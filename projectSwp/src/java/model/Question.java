@@ -1,26 +1,17 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model;
 
-/**
- *
- * @author BuiNgocLinh
- */
 public class Question {
-
     private int id;
-    private String name;
+    private String question; // Trước đây là name
     private int image_id;
     private int lesson_id;
 
     public Question() {
     }
 
-    public Question(int id, String name, int image_id, int lesson_id) {
+    public Question(int id, String question, int image_id, int lesson_id) {
         this.id = id;
-        this.name = name;
+        this.question = question;
         this.image_id = image_id;
         this.lesson_id = lesson_id;
     }
@@ -29,32 +20,31 @@ public class Question {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public String getQuestion() {
+        return question;
     }
 
     public int getImage_id() {
         return image_id;
     }
 
-    public void setImage_id(int image_id) {
-        this.image_id = image_id;
-    }
-
     public int getLesson_id() {
         return lesson_id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setQuestion(String question) {
+        this.question = question;
+    }
+
+    public void setImage_id(int image_id) {
+        this.image_id = image_id;
     }
 
     public void setLesson_id(int lesson_id) {
         this.lesson_id = lesson_id;
     }
-
 }

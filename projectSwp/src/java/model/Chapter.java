@@ -11,16 +11,16 @@ package model;
 public class Chapter {
     private int id;
     private String name;
-    private String desciption;
+    private String description;
     private int subject_id;
 
     public Chapter() {
     }
 
-    public Chapter(int id, String name, String desciption, int subject_id) {
+    public Chapter(int id, String name, String description, int subject_id) {
         this.id = id;
         this.name = name;
-        this.desciption = desciption;
+        this.description = description;
         this.subject_id = subject_id;
     }
 
@@ -40,12 +40,12 @@ public class Chapter {
         this.name = name;
     }
 
-    public String getDesciption() {
-        return desciption;
+    public String getDescription() {
+        return description;
     }
 
-    public void setDesciption(String desciption) {
-        this.desciption = desciption;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public int getSubject_id() {
@@ -55,6 +55,9 @@ public class Chapter {
     public void setSubject_id(int subject_id) {
         this.subject_id = subject_id;
     }
-    
-    
+
+    @Override
+    public String toString() {
+        return "Chapter{" + "id = " + id + ", name = " + name + ", description = " + description + ", subject_id = " + subject_id + '}';
+    }
 }

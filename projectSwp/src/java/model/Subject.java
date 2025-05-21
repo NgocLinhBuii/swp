@@ -4,10 +4,7 @@
  */
 package model;
 
-/**
- *
- * @author BuiNgocLinh
- */
+
 public class Subject {
     private int id;
     private String name;

@@ -8,15 +8,15 @@ package model;
  *
  * @author BuiNgocLinh
  */
-public class Invoice_line {
+public class InvoiceLine {
 
     private int invoice_id;
     private int package_id;
 
-    public Invoice_line() {
+    public InvoiceLine() {
     }
 
-    public Invoice_line(int invoice_id, int package_id) {
+    public InvoiceLine(int invoice_id, int package_id) {
         this.invoice_id = invoice_id;
         this.package_id = package_id;
     }

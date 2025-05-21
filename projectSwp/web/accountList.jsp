@@ -30,6 +30,7 @@
                 <th>Sex</th>
                 <th>DOB</th>
                 <th>Image ID</th>
+                <th></th>
             </tr>
             <c:forEach var="acc" items="${requestScope.accountList}">
                 <tr>
@@ -41,6 +42,8 @@
                     <td>${acc.sex}</td>
                     <td>${acc.dob}</td>
                     <td>${acc.image_id}</td>
+                    <td>sua xoa</td>
+
                 </tr>
             </c:forEach>
         </table>

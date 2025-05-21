@@ -68,7 +68,7 @@ public class AccountController extends HttpServlet {
 
         Account account = new Account();
         account.setEmail(email);
-        account.setPassword(password);  // Bạn nên mã hóa password trước khi lưu
+        account.setPassword(password);
         account.setStatus(status);
         account.setRole(role);
         account.setFull_name(full_name);

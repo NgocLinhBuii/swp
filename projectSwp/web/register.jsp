@@ -76,6 +76,19 @@
                         <label for="name">Confirm Password</label>
                         <input type="password" name="password" placeholder="Confirm Password">
                     </div>
+                    <div class="form-input">
+                        <label for="name">Date of birth</label>
+                        <input type="date" name="dob" placeholder="Date of birth">
+                    </div>
+                    <div class="form-input">
+                        <label for="name">Sex</label>
+                        <input type=radio name="sex"> Male <input type=radio name="sex"> Female
+
+                    </div>
+                    <div class="form-input">
+                        <label for="name">Avatar</label>
+                        <input type=file name="avatar"> Avatar
+                    </div>
                     <div class="form-input pt-30">
                         <input type="submit" name="submit" value="Registration">
                     </div>

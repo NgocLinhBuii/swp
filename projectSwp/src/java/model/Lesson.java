@@ -55,6 +55,12 @@ public class Lesson {
     public void setChapter_id(int chapter_id) {
         this.chapter_id = chapter_id;
     }
+
+    @Override
+    public String toString() {
+        return "Lesson{" + "id=" + id + ", name=" + name + ", content=" + content + ", chapter_id=" + chapter_id + '}';
+    }
+    
     
     
 }

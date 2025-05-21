@@ -1,6 +1,5 @@
 package DAO;
 
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -8,7 +7,7 @@ import java.sql.SQLException;
 //Kết nối DB // đổi lại thành connectionMysql
 public class DBContext {
 
-    Connection connection;
+    protected Connection connection;
     private static final String URL = "jdbc:mysql://localhost:3306/db-script";
     private static final String USERNAME = "root";
     private static final String PASSWORD = "1234";

@@ -5,15 +5,17 @@
 package controller;
 
 import DAO.AccountDAO;
-import com.microsoft.sqlserver.jdbc.SQLServerException;
+import DAO.StudentDAO;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.Account;
+import model.Student;
 
 /**
  *
@@ -31,34 +33,150 @@ public class LoginController extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-    private AccountDAO accountDAO = new AccountDAO();
-
+//    @Override
+//    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+//        req.getRequestDispatcher("login.jsp").forward(req, resp);
+//    }
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.getRequestDispatcher("login.jsp").forward(req, resp);
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+
+        loadCookies(request);
+        request.getRequestDispatcher("login.jsp").forward(request, response);
     }
 
+    /**
+     * Handles the HTTP <code>POST</code> method.
+     *
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String email = req.getParameter("email");
-        String password = req.getParameter("password");
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String userType = request.getParameter("userType");
+        String email = request.getParameter("email");
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
+        String remember = request.getParameter("remember_me");
 
-        try {
-            Account account = accountDAO.findByEmailAndPassword(email, password);
-            if (account != null) {
-                // login thành công -> lưu session
-                HttpSession session = req.getSession();
-                session.setAttribute("account", account);
-                resp.sendRedirect("/accounts"); // hoặc trang chính sau login
-            } else {
-                // login thất bại
-                req.setAttribute("error", "Invalid email or password!");
-                req.getRequestDispatcher("login.jsp").forward(req, resp);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            req.setAttribute("error", "Database error!");
-            req.getRequestDispatcher("login.jsp").forward(req, resp);
+        handleCookies(response, email, password, remember, userType);
+        handleLogin(request, response, userType, email, username, password);
+    }
+
+    private void handleCookies(HttpServletResponse response, String email, String password, String remember, String userType) {
+        Cookie[] cookies = {
+            new Cookie("email", email),
+            new Cookie("password", password),
+            new Cookie("remember", remember),
+            new Cookie("userType", userType)
+        };
+
+        int maxAge = (remember != null) ? 60 * 60 * 24 * 365 : 0; // 1 năm nếu remember được chọn, ngược lại xóa cookie
+        for (Cookie cookie : cookies) {
+            cookie.setMaxAge(maxAge);
+            response.addCookie(cookie);
         }
     }
+
+    private void loadCookies(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("userType".equals(cookie.getName())) {
+                    request.setAttribute("userType", cookie.getValue());
+                }
+            }
+        }
+    }
+
+    private void handleLogin(HttpServletRequest request, HttpServletResponse response, String userType, String email, String username, String password)
+            throws ServletException, IOException {
+        AccountDAO accountDAO = new AccountDAO();
+        StudentDAO studentDAO = new StudentDAO();
+        HttpSession session = request.getSession();
+        session.setMaxInactiveInterval(600);
+
+        if ("account".equalsIgnoreCase(userType)) {
+            Account account = accountDAO.checkLogin(email, password);
+            if (account != null) {
+                session.setAttribute("account", account);
+                session.setAttribute("role", account.getRole());
+
+                if (password.length() == 5) {
+                    response.sendRedirect(request.getContextPath() + "/changePassword");
+                    return;
+                }
+
+                redirectBasedOnRole(response, request, account.getRole());
+                return;
+            }
+        } else if ("student".equalsIgnoreCase(userType)) {
+            Student student = studentDAO.checkLogin(username, password);
+            if (student != null) {
+                session.setAttribute("student", student);
+                session.setAttribute("role", "student");
+
+                if (password.length() == 5) {
+                    response.sendRedirect(request.getContextPath() + "/changePassword");
+                    return;
+                }
+
+                redirectBasedOnRole(response, request, "student");
+                return;
+            }
+        }
+
+        handleLoginFailure(request, response, userType, email, password);
+    }
+
+    private void redirectBasedOnRole(HttpServletResponse response, HttpServletRequest request, String role) throws IOException {
+        switch (role) {
+            case "admin":
+                redirectToPage(response, request, "/admin/home");
+                break;
+            case "teacher":
+                redirectToPage(response, request, "/teacher/home");
+                break;
+            case "user":
+                redirectToPage(response, request, "/user/home");
+                break;
+            case "student":
+                redirectToPage(response, request, "/student/home");
+                break;
+            default:
+                redirectToPage(response, request, "error-403");
+                break;
+        }
+    }
+
+    private void redirectToPage(HttpServletResponse response, HttpServletRequest request, String page) throws IOException {
+        response.sendRedirect(request.getContextPath() + page);
+    }
+
+    private void handleLoginFailure(HttpServletRequest request, HttpServletResponse response, String userType, String email, String password)
+            throws ServletException, IOException {
+        request.setAttribute("userType", userType);
+        request.setAttribute("email", email);
+        request.setAttribute("password", password);
+        request.setAttribute("error", "Email or Password fail");
+        request.getRequestDispatcher("login.jsp").forward(request, response);
+    }
+
+    /**
+     * Returns a short description of the servlet.
+     *
+     * @return a String containing servlet description
+     */
+    @Override
+    public String getServletInfo() {
+        return "Short description";
+    }// </editor-fold>
+
 }
