@@ -103,9 +103,11 @@ public class LoginController extends HttpServlet {
         HttpSession session = request.getSession();
         session.setMaxInactiveInterval(600);
 
-        if ("account".equalsIgnoreCase(userType)) {
+        if ("admin".equalsIgnoreCase(userType)
+                || "teacher".equalsIgnoreCase(userType)
+                || "parent".equalsIgnoreCase(userType)) {
             Account account = accountDAO.checkLogin(email, password);
-            if (account != null) {
+            if (account != null && account.getRole().equalsIgnoreCase(userType)) {
                 session.setAttribute("account", account);
                 session.setAttribute("role", account.getRole());
 
@@ -139,16 +141,16 @@ public class LoginController extends HttpServlet {
     private void redirectBasedOnRole(HttpServletResponse response, HttpServletRequest request, String role) throws IOException {
         switch (role) {
             case "admin":
-                redirectToPage(response, request, "/admin/home");
+                redirectToPage(response, request, "/admin");
                 break;
             case "teacher":
-                redirectToPage(response, request, "/teacher/home");
+                redirectToPage(response, request, "/teacher/home.jsp");
                 break;
-            case "user":
-                redirectToPage(response, request, "/user/home");
+            case "parent":
+                redirectToPage(response, request, "/user/home.jsp");
                 break;
             case "student":
-                redirectToPage(response, request, "/student/home");
+                redirectToPage(response, request, "/student/home.jsp");
                 break;
             default:
                 redirectToPage(response, request, "error-403");

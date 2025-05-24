@@ -5,10 +5,13 @@
 package controller;
 
 import DAO.AccountDAO;
+import DAO.ImageDAO;
+import config.FileUploadUlti;
 import jakarta.servlet.RequestDispatcher;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,78 +19,223 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import model.Account;
+import model.Image;
 
 /**
  *
  * @author BuiNgocLinh
  */
-@WebServlet("/accounts")
+@MultipartConfig
+@WebServlet(name = "AccountController", urlPatterns = {"/admin"})
 public class AccountController extends HttpServlet {
 
     private AccountDAO accountDAO = new AccountDAO();
+    private ImageDAO ImageDAO = new ImageDAO(accountDAO.getConnection());
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String email = req.getParameter("email");
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String action = request.getParameter("action");
+        if (action == null) {
+            List<Account> accountList = null;
+            try {
+                accountList = accountDAO.findAll();
+            } catch (SQLException ex) {
+                Logger.getLogger(AccountController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            request.setAttribute("accountList", accountList);
+            request.getRequestDispatcher("/admin/home.jsp").forward(request, response);
+            return;
+        }
 
         try {
-            List<Account> accountList;
-            if (email != null && !email.trim().isEmpty()) {
-                accountList = accountDAO.findByEmail(email.trim());
-                if (accountList == null || accountList.isEmpty()) {
-                    req.setAttribute("error", "Không tìm thấy tài khoản nào với email: " + email.trim());
-                }
-            } else {
-                accountList = accountDAO.findAll();
+            switch (action) {
+                case "listAccount":
+                    listAccounts(request, response);
+                    break;
+                case "viewProfile":
+                    viewProfile(request, response);
+                    break;
+                case "createAccount":
+                    showCreateForm(request, response);
+                    break;
+                case "editAccount":
+                    showEditForm(request, response);
+                    break;
+                case "deleteAccount":
+                    deleteAccount(request, response);
+                    break;
+                case "searchAccount":
+                    searchAccount(request, response);
+                    break;
+                default:
+                    response.sendRedirect("/index.html");
+                    break;
             }
-            req.setAttribute("accountList", accountList);
         } catch (SQLException e) {
-            e.printStackTrace();
-            req.setAttribute("error", "Error when retrieving accounts");
+            throw new ServletException(e);
         }
-        RequestDispatcher dispatcher = req.getRequestDispatcher("accountList.jsp");
-        dispatcher.forward(req, resp);
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String email = req.getParameter("email");
-        String password = req.getParameter("password");
-        String status = req.getParameter("status");
-        String role = req.getParameter("role");
-        String full_name = req.getParameter("full_name");
-        Integer sex = (req.getParameter("sex") != null && !req.getParameter("sex").isEmpty()) ? Integer.parseInt(req.getParameter("sex")) : null;
-        String dobStr = req.getParameter("dob");
-        LocalDate dob = null;
-
-        if (dobStr != null && !dobStr.isEmpty()) {
-            dob = LocalDate.parse(dobStr);
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String action = request.getParameter("action");
+        if (action == null) {
+            response.sendRedirect("admin");
+            return;
         }
-        Integer image_id = (req.getParameter("image_id") != null && !req.getParameter("image_id").isEmpty()) ? Integer.parseInt(req.getParameter("image_id")) : null;
+        try {
+            switch (action) {
+                case "createAccount":
+                    insertAccount(request, response);
+                    break;
+                case "editAccount":
+                    updateAccount(request, response);
+                    break;
+                default:
+                    response.sendRedirect("admin");
+                    break;
+            }
+        } catch (SQLException e) {
+            throw new ServletException(e);
+        }
+    }
+
+    private void listAccounts(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, ServletException, IOException {
+        List<Image> imageList = ImageDAO.findAll();
+        List<Account> accountList = accountDAO.findAll();
+        request.setAttribute("imageList", imageList);
+        request.setAttribute("accountList", accountList);
+        request.getRequestDispatcher("/accountList.jsp").forward(request, response);
+    }
+
+    private void viewProfile(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, ServletException, IOException {
+        List<Image> imageList = ImageDAO.findAll();
+        int id = Integer.parseInt(request.getParameter("id"));
+        Account accountView = accountDAO.viewProfile(id);
+        request.setAttribute("imageList", imageList);
+        request.setAttribute("view", accountView);
+        request.getRequestDispatcher("profileAccount.jsp").forward(request, response);
+    }
+
+    private void showCreateForm(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        request.getRequestDispatcher("/accountForm.jsp").forward(request, response);
+    }
+
+    private void showEditForm(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, ServletException, IOException {
+        int id = Integer.parseInt(request.getParameter("id"));
+        Account account = accountDAO.findById(id);
+        Image image = ImageDAO.findImageById(account.getImage_id());
+        request.setAttribute("account", account);
+        request.setAttribute("image", image);
+        request.getRequestDispatcher("/accountForm.jsp").forward(request, response);
+    }
+
+    private void insertAccount(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, IOException, ServletException {
+        Account account = getAccountFromRequest(request);
+        String avatarName = "avatar_" + System.currentTimeMillis();
+
+        String imgURL = FileUploadUlti.uploadAvatarImage(request, avatarName);
+
+        if (imgURL != null) {
+            Image image = new Image();
+            image.setImage_data(imgURL);
+
+            ImageDAO imageDAO = new ImageDAO(accountDAO.getConnection());
+            int imageId = imageDAO.insertImage(image);
+            if (imageId > 0) {
+                account.setImage_id(imageId);
+            }
+        }
+        boolean inserted = accountDAO.insert(account);
+        if (inserted) {
+            response.sendRedirect("admin?action=listAccount");
+        } else {
+            request.setAttribute("error", "Failed to insert account");
+            request.getRequestDispatcher("/accountForm.jsp").forward(request, response);
+        }
+    }
+
+    private void updateAccount(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, IOException, ServletException {
+        Account account = getAccountFromRequest(request);
+        String avatarName = "avatar_" + System.currentTimeMillis();
+        String imgURL = FileUploadUlti.uploadAvatarImage(request, avatarName);
+
+        if (imgURL != null) {
+            Image image = new Image();
+            image.setImage_data(imgURL);
+
+            ImageDAO imageDAO = new ImageDAO(accountDAO.getConnection());
+            int imageId = imageDAO.insertImage(image);
+            if (imageId > 0) {
+                account.setImage_id(imageId);
+            }
+        }
+        accountDAO.update(account);
+        response.sendRedirect("admin?action=listAccount");
+    }
+
+    private void deleteAccount(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, IOException {
+        int id = Integer.parseInt(request.getParameter("id"));
+//        accountDAO.deleteAccount(id);
+        response.sendRedirect("/accountList.jsp");
+    }
+
+    private void searchAccount(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, ServletException, IOException {
+        String email = request.getParameter("email");
+        List<Account> accountList;
+        if (email != null && !email.trim().isEmpty()) {
+            accountList = accountDAO.findByEmail(email.trim());
+            if (accountList == null || accountList.isEmpty()) {
+                request.setAttribute("error", "Không tìm thấy tài khoản nào với email: " + email.trim());
+            }
+        } else {
+            accountList = accountDAO.findAll();
+        }
+        List<Image> imageList = ImageDAO.findAll();
+        request.setAttribute("imageList", imageList);
+        request.setAttribute("accountList", accountList);
+        request.getRequestDispatcher("/accountList.jsp").forward(request, response);
+    }
+
+    private Account getAccountFromRequest(HttpServletRequest request) {
+        String idStr = request.getParameter("id");
+        int id = (idStr != null && !idStr.isEmpty()) ? Integer.parseInt(idStr) : 0;
+        String email = request.getParameter("email");
+        String password = request.getParameter("password");
+        String status = request.getParameter("status");
+        String role = request.getParameter("role");
+        String fullName = request.getParameter("full_name");
+        Integer sex = (request.getParameter("sex") != null && !request.getParameter("sex").isEmpty())
+                ? Integer.parseInt(request.getParameter("sex")) : null;
+        String dobStr = request.getParameter("dob");
+        LocalDate dob = (dobStr != null && !dobStr.isEmpty()) ? LocalDate.parse(dobStr) : null;
+        Integer imageId = (request.getParameter("image_id") != null && !request.getParameter("image_id").isEmpty())
+                ? Integer.parseInt(request.getParameter("image_id")) : null;
 
         Account account = new Account();
+        account.setId(id);
         account.setEmail(email);
         account.setPassword(password);
         account.setStatus(status);
         account.setRole(role);
-        account.setFull_name(full_name);
+        account.setFull_name(fullName);
         account.setSex(sex);
         account.setDob(dob);
-        account.setImage_id(image_id);
+        account.setImage_id(imageId);
 
-        try {
-            boolean inserted = accountDAO.insert(account);
-            if (inserted) {
-                resp.sendRedirect("accounts?email=" + email);
-            } else {
-                req.setAttribute("error", "Failed to insert account");
-                req.getRequestDispatcher("register.jsp").forward(req, resp);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            req.setAttribute("error", "SQL Error");
-            req.getRequestDispatcher("register.jsp").forward(req, resp);
-        }
+        return account;
     }
 }

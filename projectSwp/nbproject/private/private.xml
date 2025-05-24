@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-private xmlns="http://www.netbeans.org/ns/project-private/1">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group>
+            <file>file:/D:/FUL/25_SU25/SWP391/projectswp-group6/projectSwp/src/java/DAO/TestDAO.java</file>
+            <file>file:/D:/FUL/25_SU25/SWP391/projectswp-group6/projectSwp/src/java/DAO/GradeDAO.java</file>
+            <file>file:/D:/FUL/25_SU25/SWP391/projectswp-group6/projectSwp/src/java/DAO/LessonDAO.java</file>
+            <file>file:/D:/FUL/25_SU25/SWP391/projectswp-group6/projectSwp/web/Subject/subject.jsp</file>
+            <file>file:/D:/FUL/25_SU25/SWP391/projectswp-group6/projectSwp/web/index.html</file>
+            <file>file:/D:/FUL/25_SU25/SWP391/projectswp-group6/projectSwp/web/login.jsp</file>
+            <file>file:/D:/FUL/25_SU25/SWP391/projectswp-group6/projectSwp/web/accountList.jsp</file>
+            <file>file:/D:/FUL/25_SU25/SWP391/projectswp-group6/projectSwp/src/java/config/GoogleLogin.java</file>
+            <file>file:/D:/FUL/25_SU25/SWP391/projectswp-group6/projectSwp/web/admin/home.jsp</file>
+            <file>file:/D:/FUL/25_SU25/SWP391/projectswp-group6/projectSwp/web/register.jsp</file>
+            <file>file:/D:/FUL/25_SU25/SWP391/projectswp-group6/projectSwp/web/Test/Test.jsp</file>
+            <file>file:/D:/FUL/25_SU25/SWP391/projectswp-group6/projectSwp/web/PackageSubject/packageSubject.jsp</file>
+            <file>file:/D:/FUL/25_SU25/SWP391/projectswp-group6/projectSwp/web/teacher/home.jsp</file>
+            <file>file:/D:/FUL/25_SU25/SWP391/projectswp-group6/projectSwp/src/java/controller/LessonController.java</file>
+            <file>file:/D:/FUL/25_SU25/SWP391/projectswp-group6/projectSwp/src/java/DAO/DBContext.java</file>
+            <file>file:/D:/FUL/25_SU25/SWP391/projectswp-group6/projectSwp/web/profileAccount.jsp</file>
+            <file>file:/D:/FUL/25_SU25/SWP391/projectswp-group6/projectSwp/src/java/controller/AccountController.java</file>
+            <file>file:/D:/FUL/25_SU25/SWP391/projectswp-group6/projectSwp/web/accountForm.jsp</file>
+            <file>file:/D:/FUL/25_SU25/SWP391/projectswp-group6/projectSwp/web/WEB-INF/web.xml</file>
+            <file>file:/D:/FUL/25_SU25/SWP391/projectswp-group6/projectSwp/web/student/home.jsp</file>
+            <file>file:/D:/FUL/25_SU25/SWP391/projectswp-group6/projectSwp/web/student/form.jsp</file>
+            <file>file:/D:/FUL/25_SU25/SWP391/projectswp-group6/projectSwp/web/question/addQuestion.jsp</file>
+            <file>file:/D:/FUL/25_SU25/SWP391/projectswp-group6/projectSwp/web/Invoice/Invoice.jsp</file>
+            <file>file:/D:/FUL/25_SU25/SWP391/projectswp-group6/projectSwp/src/java/DAO/QuestionDAO.java</file>
+            <file>file:/D:/FUL/25_SU25/SWP391/projectswp-group6/projectSwp/src/java/DAO/PackageSubjectDAO.java</file>
+            <file>file:/D:/FUL/25_SU25/SWP391/projectswp-group6/projectSwp/web/student/list.jsp</file>
+            <file>file:/D:/FUL/25_SU25/SWP391/projectswp-group6/projectSwp/web/question/questionList.jsp</file>
+            <file>file:/D:/FUL/25_SU25/SWP391/projectswp-group6/projectSwp/web/chapter/listChapter.jsp</file>
+            <file>file:/D:/FUL/25_SU25/SWP391/projectswp-group6/projectSwp/src/java/DAO/InvoiceDAO.java</file>
+            <file>file:/D:/FUL/25_SU25/SWP391/projectswp-group6/projectSwp/web/question/updateQuestion.jsp</file>
+            <file>file:/D:/FUL/25_SU25/SWP391/projectswp-group6/projectSwp/web/grade/gradeList.jsp</file>
+        </group>
+    </open-files>
+</project-private>

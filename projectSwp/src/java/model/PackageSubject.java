@@ -35,6 +35,11 @@ public class PackageSubject {
     public void setSubject_id(int subject_id) {
         this.subject_id = subject_id;
     }
+
+    @Override
+    public String toString() {
+        return "PackageSubject{" + "package_id=" + package_id + ", subject_id=" + subject_id + '}';
+    }
     
     
 }

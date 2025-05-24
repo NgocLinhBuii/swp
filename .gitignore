@@ -1,4 +1,11 @@
-/projectSwp/nbproject/private/
-/projectSwp/build/
-/WebApplication1/nbproject/private/
-/projectSwp/dist/
+/dist/
+/nbproject/private/
+/build/
+nbproject/build-impl.xml
+nbproject/genfiles.properties
+build/web/WEB-INF/classes/
+build/generated-sources/
+build/generated-web-pages/
+build/web/META-INF/
+*.war
+*.class
