@@ -22,16 +22,30 @@
             <tr>
                 <th>ID</th>
                 <th>Question</th>
-                <th>Image ID</th>
-                <th>Lesson ID</th>
+                <th>Image</th>
+                <th>Lesson Name</th>
                 <th>Actions</th>
             </tr>
             <c:forEach var="q" items="${questionList}">
                 <tr>
                     <td>${q.id}</td>
                     <td>${q.question}</td>
-                    <td>${q.image_id}</td>
-                    <td>${q.lesson_id}</td>
+                    <td>
+                        <c:forEach var="img" items="${images}">
+                            <c:if test="${img.id == q.image_id}">
+                                <img  src="${pageContext.request.contextPath}/${not empty img.image_data ? img.image_data : 'assets/img/question/cauhoi.jpg'}"
+                                     alt="Ảnh câu hỏi" width="100" height="100" class="img-thumbnail" />
+                            </c:if>
+                        </c:forEach>
+                    </td>
+
+                    <td>
+                        <c:forEach var="l" items="${les}">
+                            <c:if test="${q.lesson_id eq l.id}">
+                                ${l.name}
+                            </c:if>
+                        </c:forEach>
+                    </td>
                     <td>
                         <a href="Question?action=updateForm&id=${q.id}">Edit</a> |
                         <a href="Question?action=delete&id=${q.id}" onclick="return confirm('Are you sure?');">Delete</a>

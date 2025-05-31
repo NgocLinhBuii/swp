@@ -1,6 +1,7 @@
 package model;
 
 public class Question {
+
     private int id;
     private String question; // Trước đây là name
     private int image_id;
@@ -11,6 +12,12 @@ public class Question {
 
     public Question(int id, String question, int image_id, int lesson_id) {
         this.id = id;
+        this.question = question;
+        this.image_id = image_id;
+        this.lesson_id = lesson_id;
+    }
+
+    public Question(String question, int image_id, int lesson_id) {
         this.question = question;
         this.image_id = image_id;
         this.lesson_id = lesson_id;

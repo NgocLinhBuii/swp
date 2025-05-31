@@ -9,3 +9,4 @@ build/generated-web-pages/
 build/web/META-INF/
 *.war
 *.class
+/projectSwp/dist/

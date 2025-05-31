@@ -10,6 +10,8 @@ public class Subject {
     private String name;
     private String description;
     private int grade_id;
+  
+    
 
     public Subject() {
     }
@@ -51,6 +53,10 @@ public class Subject {
 
     public void setGrade_id(int grade_id) {
         this.grade_id = grade_id;
+    }
+
+    public void setGradeName(String string) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
     
     

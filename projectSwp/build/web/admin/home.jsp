@@ -55,7 +55,7 @@
                             <!-- Logo -->
                             <div class="col-xl-2 col-lg-2">
                                 <div class="logo">
-                                    <a href="index.html"><img src="assets/img/logo/logo.png" alt=""></a>
+                                    <a href="/admin"><img src="assets/img/logo/logo.png" alt=""></a>
                                 </div>
                             </div>
                             <div class="col-xl-10 col-lg-10">
@@ -64,9 +64,9 @@
                                     <div class="main-menu d-none d-lg-block">
                                         <nav>
                                             <ul id="navigation">                                                                                          
-                                                <li class="active" ><a href="index.html">Home</a></li>
-                                                <li><a href="courses.html">Courses</a></li>
-                                                <li><a href="about.html">About</a></li>
+                                                <li class="active" ><a href="/admin">Home</a></li>
+                                                <li><a href="#">Courses</a></li>
+                                                <li><a href="#">About</a></li>
                                                 <li><a href="#">Blog</a>
                                                     <ul class="submenu">
                                                         <li><a href="blog.html">Blog</a></li>
@@ -74,14 +74,14 @@
                                                         <li><a href="elements.html">Element</a></li>
                                                     </ul>
                                                 </li>
-                                                <li><a href="contact.html">Contact</a></li>
+                                                <li><a href="#">Contact</a></li>
                                                 <!--Button--> 
                                                 <li class="button-header"><a href="/subjects" class="btn btn3">subjects</a></li>
                                                 <li class="button-header"><a href="/Grade" class="btn btn3">Grades</a></li>
                                                 <li class="button-header"><a href="/Question" class="btn btn3">Questions</a></li>
                                                 <li class="button-header"><a href="/LessonURL" class="btn btn3">Lesson</a></li>
-                                                <li class="button-header"><a href="/invoice" class="btn btn3">invoice</a></li>
-                                                <li class="button-header"><a href="/student" class="btn btn3">Student</a></li>
+                                                <li class="button-header"><a href="invoice" class="btn btn3">invoice</a></li>
+                                                <!--<li class="button-header"><a href="/student" class="btn btn3">Student</a></li>-->
                                                 <li class="button-header"><a href="/admin?action=listAccount" class="btn btn3">List User</a></li>
                                                 <li class="button-header"><a href="/admin?action=viewProfile&id=${account.id}" class="btn btn3">View Profile</a></li>
                                                 <li class="button-header"><a href="/logout" class="btn btn3">Logout</a></li>

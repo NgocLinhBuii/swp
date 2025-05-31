@@ -1,28 +1,87 @@
-<%-- 
-    Document   : updateQuestion
-    Created on : May 21, 2025, 1:45:37 PM
-    Author     : ADMIN
---%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
 <html>
-<head><title>Update Question</title></head>
+<head>
+    <title>Update Question</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <style>
+        .error-msg {
+            color: red;
+            font-size: 0.875em;
+        }
+    </style>
+
+    <script>
+        function validateForm() {
+            let valid = true;
+
+            const form = document.forms["updateForm"];
+            const questionInput = form["question"];
+            const lessonSelect = form["lesson_id"];
+            const questionError = document.getElementById("questionError");
+            const lessonError = document.getElementById("lessonError");
+
+            // Reset error messages
+            questionError.textContent = "";
+            lessonError.textContent = "";
+
+            if (questionInput.value.trim() === "") {
+                questionError.textContent = "You must input the question.";
+                valid = false;
+            }
+
+            if (lessonSelect.value === "") {
+                lessonError.textContent = "You must select a lesson.";
+                valid = false;
+            }
+
+            return valid;
+        }
+    </script>
+</head>
 <body>
-<h2>Update Question</h2>
+<div class="container mt-5">
+    <h2 class="mb-4">Update Question</h2>
 
-<c:if test="${not empty question}">
-    <form method="post" action="Question">
+    <form name="updateForm" method="post" action="Question" onsubmit="return validateForm()">
         <input type="hidden" name="action" value="update" />
-        ID: <input type="number" name="id" value="${question.id}" readonly /><br/>
-        Question: <input type="text" name="question" value="${question.question}" required /><br/>
-        Image ID: <input type="number" name="image_id" value="${question.image_id}" /><br/>
-        Lesson ID: <input type="number" name="lesson_id" value="${question.lesson_id}" required /><br/>
-        <button type="submit">Update</button>
-    </form>
-</c:if>
 
-<br/>
-<a href="Question">Back to Question List</a>
+        <div class="mb-3">
+            <label class="form-label">ID</label>
+            <input type="number" name="id" class="form-control" value="${question.id}" readonly />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Question</label>
+            <input type="text" name="question" class="form-control" value="${question.question}" />
+            <span id="questionError" class="error-msg"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Image ID</label>
+            <input type="number" name="image_id" class="form-control" value="${question.image_id}" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Lesson</label>
+            <select name="lesson_id" class="form-select">
+                <option value="">-- Select Lesson --</option>
+                <c:forEach var="l" items="${les}">
+                    <option value="${l.id}" <c:if test="${l.id == question.lesson_id}">selected</c:if>>${l.name}</option>
+                </c:forEach>
+            </select>
+            <span id="lessonError" class="error-msg"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Update Question</button>
+        <a href="Question" class="btn btn-secondary ms-2">Back to Question List</a>
+    </form>
+</div>
+
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-

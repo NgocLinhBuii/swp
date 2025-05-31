@@ -4,8 +4,8 @@
  */
 package controller;
 
-import DAO.AccountDAO;
-import DAO.ImageDAO;
+import dal.AccountDAO;
+import dal.ImageDAO;
 import config.FileUploadUlti;
 import jakarta.servlet.RequestDispatcher;
 import java.io.IOException;
@@ -109,7 +109,10 @@ public class AccountController extends HttpServlet {
             throws SQLException, ServletException, IOException {
         List<Image> imageList = ImageDAO.findAll();
         List<Account> accountList = accountDAO.findAll();
+        Account account = getAccountFromRequest(request);
+
         request.setAttribute("imageList", imageList);
+        request.setAttribute("account", account);
         request.setAttribute("accountList", accountList);
         request.getRequestDispatcher("/accountList.jsp").forward(request, response);
     }
@@ -179,7 +182,14 @@ public class AccountController extends HttpServlet {
             int imageId = imageDAO.insertImage(image);
             if (imageId > 0) {
                 account.setImage_id(imageId);
+            } else {
+                // Nếu lưu ảnh mới thất bại, giữ image cũ
+                Account oldAccount = accountDAO.findById(account.getId());
+                account.setImage_id(oldAccount.getImage_id());
             }
+        } else {
+            Account oldAccount = accountDAO.findById(account.getId());
+            account.setImage_id(oldAccount.getImage_id());
         }
         accountDAO.update(account);
         response.sendRedirect("admin?action=listAccount");

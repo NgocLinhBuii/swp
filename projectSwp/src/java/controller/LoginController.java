@@ -4,8 +4,8 @@
  */
 package controller;
 
-import DAO.AccountDAO;
-import DAO.StudentDAO;
+import dal.AccountDAO;
+import dal.StudentDAO;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -147,7 +147,7 @@ public class LoginController extends HttpServlet {
                 redirectToPage(response, request, "/teacher/home.jsp");
                 break;
             case "parent":
-                redirectToPage(response, request, "/user/home.jsp");
+                redirectToPage(response, request, "/parent/home.jsp");
                 break;
             case "student":
                 redirectToPage(response, request, "/student/home.jsp");

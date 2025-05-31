@@ -24,6 +24,11 @@ public class Grade {
         this.description = description;
         this.teacher_id = teacher_id;
     }
+    public Grade( String name, String description, int teacher_id) {
+        this.name = name;
+        this.description = description;
+        this.teacher_id = teacher_id;
+    }
 
     public int getTeacher_id() {
         return teacher_id;

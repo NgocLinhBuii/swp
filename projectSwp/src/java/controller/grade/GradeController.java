@@ -1,12 +1,14 @@
 package controller.grade;
 
-import DAO.GradeDAO;
+import dal.GradeDAO;
+import dal.AccountDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import model.Grade;
+import model.Account;
 
 import java.io.IOException;
 import java.util.List;
@@ -20,23 +22,30 @@ public class GradeController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String action = request.getParameter("action");
-        if (action == null) action = "";
+        if (action == null) {
+            action = "";
+        }
 
         try {
             switch (action) {
                 case "addForm":
-                    // Chuyển sang trang thêm mới
+                    List<Account> teachers = new AccountDAO().findAll();
+                    request.setAttribute("accounts", teachers);
                     request.getRequestDispatcher("grade/addGrade.jsp").forward(request, response);
                     return;
 
                 case "updateForm":
-                    // Lấy id grade cần sửa
                     String idStr = request.getParameter("id");
                     if (idStr != null) {
                         int id = Integer.parseInt(idStr);
                         Grade grade = gradeDAO.getGradeById(id);
                         if (grade != null) {
                             request.setAttribute("grade", grade);
+
+                            // Lấy danh sách giáo viên để đưa vào form select
+                            List<Account> teacher = new AccountDAO().findAll();
+                            request.setAttribute("accounts", teacher);
+
                             request.getRequestDispatcher("grade/updateGrade.jsp").forward(request, response);
                             return;
                         } else {
@@ -45,11 +54,9 @@ public class GradeController extends HttpServlet {
                     } else {
                         request.setAttribute("error", "ID không hợp lệ");
                     }
-                    // Nếu lỗi thì load lại danh sách
                     break;
 
                 case "delete":
-                    // Xử lý xóa grade theo id rồi redirect về danh sách
                     String delIdStr = request.getParameter("id");
                     if (delIdStr != null) {
                         int delId = Integer.parseInt(delIdStr);
@@ -63,7 +70,6 @@ public class GradeController extends HttpServlet {
                     break;
 
                 default:
-                    // Xử lý tìm kiếm hoặc load danh sách
                     String name = request.getParameter("name");
                     List<Grade> gradeList;
                     if (name != null && !name.trim().isEmpty()) {
@@ -74,6 +80,9 @@ public class GradeController extends HttpServlet {
                     } else {
                         gradeList = gradeDAO.findAllFromGrade();
                     }
+                    AccountDAO acc = new AccountDAO();
+                    List<Account> accounts = acc.findAll();
+                    request.setAttribute("accounts", accounts);
                     request.setAttribute("gradeList", gradeList);
                     break;
             }
@@ -82,7 +91,6 @@ public class GradeController extends HttpServlet {
             request.setAttribute("error", "Lỗi khi xử lý yêu cầu: " + e.getMessage());
         }
 
-        // Mặc định quay lại trang danh sách
         request.getRequestDispatcher("grade/gradeList.jsp").forward(request, response);
     }
 
@@ -94,15 +102,20 @@ public class GradeController extends HttpServlet {
 
         try {
             if ("insert".equals(action)) {
-                int id = Integer.parseInt(request.getParameter("id"));
                 String name = request.getParameter("name");
                 String description = request.getParameter("description");
-                int teacherId = Integer.parseInt(request.getParameter("teacher_id"));
 
-                Grade grade = new Grade(id, name, description, teacherId);
+                String teacherIdStr = request.getParameter("teacher_id");
+                if (teacherIdStr == null || teacherIdStr.trim().isEmpty()) {
+                    request.setAttribute("error", "Bạn phải chọn giáo viên.");
+                    request.getRequestDispatcher("grade/addGrade.jsp").forward(request, response);
+                    return;
+                }
+                int teacherId = Integer.parseInt(teacherIdStr);
+
+                Grade grade = new Grade(name, description, teacherId);
                 gradeDAO.insert(grade);
                 request.setAttribute("message", "Grade inserted successfully");
-
             } else if ("update".equals(action)) {
                 int id = Integer.parseInt(request.getParameter("id"));
                 String name = request.getParameter("name");
@@ -119,16 +132,18 @@ public class GradeController extends HttpServlet {
                 request.setAttribute("message", "Grade deleted successfully");
             }
 
-            // Sau khi thao tác xong, load lại danh sách
+            // Sau khi thao tác xong, load lại danh sách grade và account
             List<Grade> gradeList = gradeDAO.findAllFromGrade();
-            request.setAttribute("gradeList", gradeList);
+            List<Account> accounts = new AccountDAO().findAll();
 
+            request.setAttribute("gradeList", gradeList);
+            request.setAttribute("accounts", accounts);
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("error", "Error while processing request: " + e.getMessage());
         }
 
-        // Forward về lại trang danh sách
+        // Trả về trang danh sách
         request.getRequestDispatcher("grade/gradeList.jsp").forward(request, response);
     }
 }

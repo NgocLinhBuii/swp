@@ -4,6 +4,7 @@
  */
 package model;
 
+import java.sql.Date;
 import java.time.LocalDate;
 
 /**
@@ -110,4 +111,7 @@ public class Account {
         this.image_id = image_id;
     }
 
+    public Date getFormattedDate() {
+        return Date.valueOf(dob);
+    }
 }

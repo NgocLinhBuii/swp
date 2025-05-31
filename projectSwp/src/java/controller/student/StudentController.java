@@ -4,10 +4,10 @@
  */
 package controller.student;
 
-import DAO.AccountDAO;
-import DAO.GradeDAO;
-import DAO.ImageDAO;
-import DAO.StudentDAO;
+import dal.AccountDAO;
+import dal.GradeDAO;
+import dal.ImageDAO;
+import dal.StudentDAO;
 import config.FileUploadUlti;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -51,6 +51,9 @@ public class StudentController extends HttpServlet {
 
         try {
             switch (action) {
+                case "search":
+                    searchStudents(request, response);
+                    break;
                 case "create":
                     showCreateForm(request, response);
                     break;
@@ -103,22 +106,32 @@ public class StudentController extends HttpServlet {
     }
 
     private void showCreateForm(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+            throws ServletException, IOException, SQLException {
+        List<Grade> gradeList = gradeDAO.findAllFromGrade();
+        List<Account> accList = accountDAO.findAll();
+        request.setAttribute("gradeList", gradeList);
+        request.setAttribute("accList", accList);
         request.getRequestDispatcher("/student/form.jsp").forward(request, response);
     }
 
     private void showEditForm(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, ServletException, IOException {
+        List<Grade> gradeList = gradeDAO.findAllFromGrade();
+        List<Account> accList = accountDAO.findAll();
         int id = Integer.parseInt(request.getParameter("id"));
         Student student = studentDAO.findById(id);
         Image image = ImageDAO.findImageById(student.getImage_id());
         request.setAttribute("student", student);
         request.setAttribute("image", image);
+        request.setAttribute("gradeList", gradeList);
+        request.setAttribute("accList", accList);
+
         request.getRequestDispatcher("/student/form.jsp").forward(request, response);
     }
 
     private void insertStudent(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, IOException {
+
         Student student = getStudentFromRequest(request);
         String avatarName = "avatar_" + System.currentTimeMillis();
 
@@ -140,6 +153,7 @@ public class StudentController extends HttpServlet {
 
     private void updateStudent(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, IOException {
+
         Student student = getStudentFromRequest(request);
         String avatarName = "avatar_" + System.currentTimeMillis();
         String imgURL = FileUploadUlti.uploadAvatarImage(request, avatarName);
@@ -166,6 +180,26 @@ public class StudentController extends HttpServlet {
         int id = Integer.parseInt(request.getParameter("id"));
         studentDAO.delete(id);
         response.sendRedirect("student");
+    }
+
+    private void searchStudents(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, ServletException, IOException {
+        String keyword = request.getParameter("keyword");
+        if (keyword == null) {
+            keyword = "";
+        }
+        List<Student> list = studentDAO.searchByKeyword(keyword);
+        List<Account> accList = accountDAO.findAll();
+        List<Grade> gradeList = gradeDAO.findAllFromGrade();
+        List<Image> imageList = ImageDAO.findAll();
+
+        request.setAttribute("students", list);
+        request.setAttribute("accList", accList);
+        request.setAttribute("gradeList", gradeList);
+        request.setAttribute("imageList", imageList);
+        request.setAttribute("keyword", keyword);
+
+        request.getRequestDispatcher("/student/list.jsp").forward(request, response);
     }
 
     private Student getStudentFromRequest(HttpServletRequest request) {

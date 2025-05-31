@@ -1,6 +1,7 @@
 package controller.question;
 
-import DAO.QuestionDAO;
+import dal.ImageDAO;
+import dal.QuestionDAO;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -9,11 +10,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import model.Question;
+import model.Lesson;
+import dal.LessonDAO;
+import model.Image;
 
 @WebServlet(name = "QuestionController", urlPatterns = {"/Question"})
 public class QuestionController extends HttpServlet {
 
     private QuestionDAO questionDAO = new QuestionDAO();
+    private ImageDAO imageDAO = new ImageDAO(questionDAO.getDBConnection());
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -26,6 +31,9 @@ public class QuestionController extends HttpServlet {
         try {
             switch (action) {
                 case "addForm":
+                    LessonDAO lessonDAO = new LessonDAO();
+                    List<Lesson> lessonList = lessonDAO.getAllLessons();
+                    request.setAttribute("les", lessonList);
                     request.getRequestDispatcher("question/addQuestion.jsp").forward(request, response);
                     return;
 
@@ -34,7 +42,12 @@ public class QuestionController extends HttpServlet {
                     if (idStr != null) {
                         int id = Integer.parseInt(idStr);
                         Question question = questionDAO.getQuestionById(id);
+
+                        LessonDAO lessonDAO2 = new LessonDAO();
+                        List<Lesson> lessonList2 = lessonDAO2.getAllLessons();
+
                         request.setAttribute("question", question);
+                        request.setAttribute("les", lessonList2);
                         request.getRequestDispatcher("question/updateQuestion.jsp").forward(request, response);
                         return;
                     }
@@ -46,18 +59,36 @@ public class QuestionController extends HttpServlet {
                     response.sendRedirect("Question");
                     return;
 
+                // Thay đoạn code hiện tại trong case default bằng:
                 default:
                     String keyword = request.getParameter("question");
                     List<Question> list;
                     if (keyword != null) {
-                        keyword = keyword.trim(); // loại bỏ khoảng trắng đầu cuối
+                        keyword = keyword.trim();
                     }
                     if (keyword != null && !keyword.isEmpty()) {
                         list = questionDAO.findByQuestion(keyword);
                     } else {
                         list = questionDAO.findAllQuestion();
                     }
+
+                    LessonDAO dao = new LessonDAO();
+                    List<Lesson> les = dao.getAllLessons();
+                    request.setAttribute("les", les);
                     request.setAttribute("questionList", list);
+
+                    // Xử lý image 
+                    try {
+                        List<Image> images = imageDAO.findAll();
+                        if (images != null && !images.isEmpty()) {
+                            request.setAttribute("images", images);
+                        } else {
+                            request.setAttribute("imageError", "Không tìm thấy dữ liệu ảnh");
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        request.setAttribute("imageError", "Lỗi khi tải dữ liệu ảnh: " + e.getMessage());
+                    }
                     break;
 
             }
@@ -75,15 +106,27 @@ public class QuestionController extends HttpServlet {
         String action = request.getParameter("action");
 
         try {
-            int id = Integer.parseInt(request.getParameter("id"));
             String questionText = request.getParameter("question");
-            int image_id = Integer.parseInt(request.getParameter("image_id"));
-            int lesson_id = Integer.parseInt(request.getParameter("lesson_id"));
-            Question q = new Question(id, questionText, image_id, lesson_id);
+
+            int image_id = 0;
+            int lesson_id = 0;
+
+            String imageIdStr = request.getParameter("image_id");
+            String lessonIdStr = request.getParameter("lesson_id");
+
+            if (imageIdStr != null && !imageIdStr.isEmpty()) {
+                image_id = Integer.parseInt(imageIdStr);
+            }
+            if (lessonIdStr != null && !lessonIdStr.isEmpty()) {
+                lesson_id = Integer.parseInt(lessonIdStr);
+            }
 
             if ("insert".equals(action)) {
+                Question q = new Question(questionText, image_id, lesson_id);
                 questionDAO.insert(q);
             } else if ("update".equals(action)) {
+                int id = Integer.parseInt(request.getParameter("id"));
+                Question q = new Question(id, questionText, image_id, lesson_id);
                 questionDAO.update(q);
             }
         } catch (Exception e) {
