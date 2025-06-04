@@ -233,7 +233,7 @@
                             </tbody>
                         </table>
 
-                        <a href="register.jsp" class="btn btn-success btn-sm">Add New Account</a>
+                        <a href="admin?action=createAccount" class="btn btn-success btn-sm">Add New Account</a>
                         <% if (session.getAttribute("account") != null) { %>
                         <a href="logout" class="btn btn-outline-secondary btn-sm ml-2">Logout</a>
                         <% } %>

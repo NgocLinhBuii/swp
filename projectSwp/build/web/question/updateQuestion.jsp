@@ -4,8 +4,13 @@
 <html>
 <head>
     <title>Update Question</title>
+
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../assets/css/nice-select.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+
+    <jsp:include page="../header.jsp" />
 
     <style>
         .error-msg {
@@ -24,7 +29,6 @@
             const questionError = document.getElementById("questionError");
             const lessonError = document.getElementById("lessonError");
 
-            // Reset error messages
             questionError.textContent = "";
             lessonError.textContent = "";
 
@@ -42,11 +46,12 @@
         }
     </script>
 </head>
-<body>
-<div class="container mt-5">
+
+<body class="bg-light">
+<div class="container mt-5 mb-5">
     <h2 class="mb-4">Update Question</h2>
 
-    <form name="updateForm" method="post" action="Question" onsubmit="return validateForm()">
+    <form name="updateForm" method="post" action="Question" enctype="multipart/form-data" onsubmit="return validateForm()">
         <input type="hidden" name="action" value="update" />
 
         <div class="mb-3">
@@ -61,8 +66,8 @@
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Image ID</label>
-            <input type="number" name="image_id" class="form-control" value="${question.image_id}" />
+            <label class="form-label">Upload New Image (optional)</label>
+            <input type="file" name="image_file" class="form-control" accept="image/*" />
         </div>
 
         <div class="mb-3">
@@ -81,7 +86,8 @@
     </form>
 </div>
 
-<!-- Bootstrap 5 JS -->
+<jsp:include page="../footer.jsp" />
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -80,12 +80,14 @@
                                                 <li class="button-header"><a href="/Grade" class="btn btn3">Grades</a></li>
                                                 <li class="button-header"><a href="/Question" class="btn btn3">Questions</a></li>
                                                 <li class="button-header"><a href="/LessonURL" class="btn btn3">Lesson</a></li>
+                                                <li class="button-header"><a href="/chapter" class="btn btn3">Chapter</a></li>
+                                                <li class="button-header"><a href="/study_package" class="btn btn3">Study Package</a></li>
                                                 <li class="button-header"><a href="invoice" class="btn btn3">invoice</a></li>
                                                 <!--<li class="button-header"><a href="/student" class="btn btn3">Student</a></li>-->
                                                 <li class="button-header"><a href="/admin?action=listAccount" class="btn btn3">List User</a></li>
                                                 <li class="button-header"><a href="/admin?action=viewProfile&id=${account.id}" class="btn btn3">View Profile</a></li>
                                                 <li class="button-header"><a href="/logout" class="btn btn3">Logout</a></li>
-                                                <li class="button-header"><a href="/register.jsp" class="btn btn3">Register</a></li>
+                                                <!--<li class="button-header"><a href="/register.jsp" class="btn btn3">Register</a></li>-->
 
                                             </ul>
                                         </nav>

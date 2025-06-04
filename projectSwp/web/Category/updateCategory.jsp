@@ -1,27 +1,153 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <html>
-<head><title>Update Category</title></head>
+<head>
+    <title>Update Category</title>
+
+    <!-- CSS Libraries -->
+    <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/css/owl.carousel.min.css">
+    <link rel="stylesheet" href="/assets/css/slicknav.css">
+    <link rel="stylesheet" href="/assets/css/flaticon.css">
+    <link rel="stylesheet" href="/assets/css/progressbar_barfiller.css">
+    <link rel="stylesheet" href="/assets/css/gijgo.css">
+    <link rel="stylesheet" href="/assets/css/animate.min.css">
+    <link rel="stylesheet" href="/assets/css/animated-headline.css">
+    <link rel="stylesheet" href="/assets/css/magnific-popup.css">
+    <link rel="stylesheet" href="/assets/css/fontawesome-all.min.css">
+    <link rel="stylesheet" href="/assets/css/themify-icons.css">
+    <link rel="stylesheet" href="/assets/css/slick.css">
+    <link rel="stylesheet" href="/assets/css/nice-select.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+        }
+
+        .page-wrapper {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-top: 80px;
+        }
+
+        main {
+            flex: 1;
+            padding: 20px;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 500px;
+            margin: auto;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            margin-top: 10px;
+            display: block;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin-top: 4px;
+            margin-bottom: 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 8px 16px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+
+        footer {
+            background-color: #f1f1f1;
+            padding: 10px 20px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
 <body>
-<h2>Update Category</h2>
+<div class="page-wrapper">
+    <jsp:include page="/Subject/header.jsp" />
+    <main>
+        <h2 style="text-align:center;">Update Category</h2>
 
-<c:if test="${empty category}">
-    <p style="color:red">Category not found!</p>
-    <a href="category">Back to Category List</a>
-</c:if>
+        <c:if test="${empty category}">
+            <p style="color:red; text-align:center;">Category not found!</p>
+            <a href="category">← Back to Category List</a>
+        </c:if>
 
-<c:if test="${not empty category}">
-    <form method="post" action="category">
-        <input type="hidden" name="action" value="update" />
-        ID (read-only): <input type="number" name="id" value="${category.id}" readonly /><br/>
-        Name: <input type="text" name="name" value="${category.name}" required /><br/>
-        Number of Questions: <input type="number" name="num_question" value="${category.num_question}" min="1" required /><br/>
-        Duration (minutes): <input type="number" name="duration" value="${category.duration}" min="1" required /><br/>
-        <button type="submit">Update Category</button>
-    </form>
-</c:if>
+        <c:if test="${not empty category}">
+            <form method="post" action="category">
+                <input type="hidden" name="action" value="update" />
 
-<br/>
-<a href="category">Back to Category List</a>
+                <label>ID (read-only):</label>
+                <input type="number" name="id" value="${category.id}" readonly />
+
+                <label>Name:</label>
+                <input type="text" name="name" value="${category.name}" required />
+
+                <label>Number of Questions:</label>
+                <input type="number" name="num_question" value="${category.num_question}" min="1" required />
+
+                <label>Duration (minutes):</label>
+                <input type="number" name="duration" value="${category.duration}" min="1" required />
+
+                <button type="submit">Update Category</button>
+            </form>
+        </c:if>
+
+        <a href="category">← Back to Category List</a>
+    </main>
+    <jsp:include page="/Subject/footer.jsp" />
+</div>
+
+<!-- JS Libraries -->
+<script src="${pageContext.request.contextPath}/assets/js/vendor/modernizr-3.5.0.min.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/vendor/jquery-1.12.4.min.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/popper.min.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/bootstrap.min.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/jquery.slicknav.min.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/owl.carousel.min.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/slick.min.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/wow.min.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/animated.headline.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/jquery.magnific-popup.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/gijgo.min.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/jquery.nice-select.min.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/jquery.sticky.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/jquery.barfiller.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/jquery.counterup.min.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/waypoints.min.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/jquery.countdown.min.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/hover-direction-snake.min.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/contact.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/jquery.form.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/jquery.validate.min.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/mail-script.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/jquery.ajaxchimp.min.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/plugins.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/main.js"></script>
 </body>
 </html>

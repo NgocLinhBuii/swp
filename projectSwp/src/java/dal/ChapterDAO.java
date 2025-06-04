@@ -7,7 +7,6 @@ package dal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import model.Account;
 import model.Chapter;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -40,7 +39,7 @@ public class ChapterDAO extends DBContext {
         }
         return list;
     }
-    
+
     //add them new chapter
     public int addChapter(Chapter chapter) {
         int n = 0;
@@ -59,7 +58,7 @@ public class ChapterDAO extends DBContext {
         }
         return n;
     }
-    
+
     //edit chapter
     public int editChapter(Chapter chapter) {
         int n = 0;
@@ -70,11 +69,11 @@ public class ChapterDAO extends DBContext {
                            ,subject_id = ?
                      WHERE id = ?
                      """;
-        
+
         try {
             PreparedStatement pre = connection.prepareStatement(sql);
             pre.setString(1, chapter.getName());
-            pre.setString(2,chapter.getDescription());
+            pre.setString(2, chapter.getDescription());
             pre.setInt(3, chapter.getSubject_id());
             pre.setInt(4, chapter.getId());
             n = pre.executeUpdate();
@@ -83,7 +82,7 @@ public class ChapterDAO extends DBContext {
         }
         return n;
     }
-    
+
     //delete chapter theo id
     public int deleteChapter(int id) {
         int n = 0;
@@ -97,13 +96,81 @@ public class ChapterDAO extends DBContext {
         }
         return n;
     }
-    
-    public static void main(String[] args) {
-        ChapterDAO daoC = new ChapterDAO();
-        List<Chapter> list = daoC.getChapter("select * from chapter");
-        int n = daoC.addChapter(new Chapter(3, ":Rơi tự do", "Giới thiệu về rơi tự do",1));
-        for (Chapter chapter : list) {
-            System.out.println(chapter);
+
+    //tim chapter theo id
+    public Chapter findChapterById(int id) {
+        String sql = "SELECT * FROM chapter WHERE id = ?";
+        try {
+            PreparedStatement pre = connection.prepareStatement(sql);
+            pre.setInt(1, id);
+            ResultSet rs = pre.executeQuery();
+            while (rs.next()) {
+                return new Chapter(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getString("description"),
+                        rs.getInt("subject_id")
+                );
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(ChapterDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return null;
     }
+    
+    //tim Chapter theo name
+    public List<Chapter> findChapterByName (String name) {
+        List<Chapter> list = new ArrayList<>();
+        String sql = "SELECT * FROM CHAPTER WHERE name LIKE ?";
+        try {
+            PreparedStatement pre = connection.prepareStatement(sql);
+            pre.setString(1, "%" + name + "%");
+            ResultSet rs = pre.executeQuery();
+            while (rs.next()) {
+                Chapter chapter = new Chapter(
+                    rs.getInt("id"),
+                    rs.getString("name"),
+                    rs.getString("description"),
+                    rs.getInt("subject_id")
+                    );
+                list.add(chapter);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(ChapterDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return list;
+    }
+    
+    //tim chapter theo subject_id
+    public List<Chapter> findChapterBySubjectId (int subject_id) {
+        List<Chapter> list = new ArrayList<>();
+        String sql = "SELECT * FROM CHAPTER WHERE subject_id = ?";
+        try {
+            PreparedStatement pre = connection.prepareStatement(sql);
+            pre.setInt(1, subject_id);
+            ResultSet rs = pre.executeQuery();
+            while (rs.next()) {
+                Chapter chapter = new Chapter(
+                    rs.getInt("id"),
+                    rs.getString("name"),
+                    rs.getString("description"),
+                    rs.getInt("subject_id")
+                );
+                list.add(chapter);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(ChapterDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return list;
+    }
+    
+
+//    public static void main(String[] args) {
+//        ChapterDAO daoC = new ChapterDAO();
+//        List<Chapter> list = daoC.getChapter("select * from chapter");
+//        int n = daoC.addChapter(new Chapter(3, ":Rơi tự do", "Giới thiệu về rơi tự do",1));
+//        for (Chapter chapter : list) {
+//            System.out.println(chapter);
+//        }
+//    }
 }

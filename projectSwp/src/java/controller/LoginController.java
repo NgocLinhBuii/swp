@@ -86,15 +86,29 @@ public class LoginController extends HttpServlet {
     }
 
     private void loadCookies(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("userType".equals(cookie.getName())) {
+    Cookie[] cookies = request.getCookies();
+    if (cookies != null) {
+        for (Cookie cookie : cookies) {
+            switch (cookie.getName()) {
+                case "email":
+                    request.setAttribute("email", cookie.getValue());
+                    break;
+                case "username":
+                    request.setAttribute("username", cookie.getValue());
+                    break;
+                case "password":
+                    request.setAttribute("password", cookie.getValue());
+                    break;
+                case "remember":
+                    request.setAttribute("remember", cookie.getValue());
+                    break;
+                case "userType":
                     request.setAttribute("userType", cookie.getValue());
-                }
+                    break;
             }
         }
     }
+}
 
     private void handleLogin(HttpServletRequest request, HttpServletResponse response, String userType, String email, String username, String password)
             throws ServletException, IOException {
@@ -111,10 +125,10 @@ public class LoginController extends HttpServlet {
                 session.setAttribute("account", account);
                 session.setAttribute("role", account.getRole());
 
-                if (password.length() == 5) {
-                    response.sendRedirect(request.getContextPath() + "/changePassword");
-                    return;
-                }
+//                if (password.length() == 5) {
+//                    response.sendRedirect(request.getContextPath() + "/changePassword");
+//                    return;
+//                }
 
                 redirectBasedOnRole(response, request, account.getRole());
                 return;
@@ -125,10 +139,10 @@ public class LoginController extends HttpServlet {
                 session.setAttribute("student", student);
                 session.setAttribute("role", "student");
 
-                if (password.length() == 5) {
-                    response.sendRedirect(request.getContextPath() + "/changePassword");
-                    return;
-                }
+//                if (password.length() == 5) {
+//                    response.sendRedirect(request.getContextPath() + "/changePassword");
+//                    return;
+//                }
 
                 redirectBasedOnRole(response, request, "student");
                 return;

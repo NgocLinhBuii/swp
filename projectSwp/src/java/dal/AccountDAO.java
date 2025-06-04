@@ -45,6 +45,21 @@ public class AccountDAO extends DBContext {
         return accounts;
     }
 
+    public boolean existEmail(String email) {
+        String sql = "SELECT * FROM account WHERE Email = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, email);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return true;
+                }
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(AccountDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+
 //    public int deleteAccount(int id) throws SQLException {
 //        String sqlSelectStudentIds = "SELECT id FROM student WHERE parent_id = ?";
 //        String sqlSelectTestRecordIds = "SELECT id FROM test_record WHERE student_id = ?";
@@ -175,6 +190,32 @@ public class AccountDAO extends DBContext {
             int rowsUpdated = ps.executeUpdate();
             return rowsUpdated > 0;
         }
+    }
+
+    public Account selectByAccount(String email) {
+        Account account = null;
+        String sql = "SELECT * FROM account WHERE Email = ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                account = new Account(
+                        rs.getInt("id"),
+                        rs.getString("email"),
+                        rs.getString("password"),
+                        rs.getString("status"),
+                        rs.getString("role"),
+                        rs.getString("full_name"),
+                        rs.getInt("sex"),
+                        rs.getDate("dob").toLocalDate(),
+                        rs.getInt("image_id")
+                );
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(AccountDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return account;
     }
 
     // Tìm account theo email

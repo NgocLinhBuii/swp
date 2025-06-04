@@ -1,10 +1,14 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
 <html>
 <head>
     <title>Update Grade</title>
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="assets/css/nice-select.css" />
+    <link rel="stylesheet" href="assets/css/style.css" />
 
     <style>
         .error-msg {
@@ -13,35 +17,16 @@
         }
     </style>
 
-    <script>
-        function validateForm() {
-            let valid = true;
-
-            const nameInput = document.forms["gradeForm"]["name"];
-            const teacherSelect = document.forms["gradeForm"]["teacher_id"];
-            const nameError = document.getElementById("nameError");
-            const teacherError = document.getElementById("teacherError");
-
-            nameError.textContent = "";
-            teacherError.textContent = "";
-
-            if (nameInput.value.trim() === "") {
-                nameError.textContent = "You must input the name.";
-                valid = false;
-            }
-
-            if (teacherSelect.value === "" || teacherSelect.value === "0") {
-                teacherError.textContent = "You must select a teacher.";
-                valid = false;
-            }
-
-            return valid;
-        }
-    </script>
+    <!-- jQuery + nice-select -->
+    <script src="assets/js/vendor/jquery-1.12.4.min.js"></script>
+    <script src="assets/js/jquery.nice-select.min.js"></script>
 </head>
 
-<body>
-    <div class="container mt-5">
+<body class="bg-light">
+    <!-- ✅ Include Header -->
+    <jsp:include page="../header.jsp" />
+
+    <div class="container mt-5 mb-5">
         <h2 class="mb-4">Update Grade</h2>
 
         <c:if test="${empty grade}">
@@ -87,6 +72,40 @@
             </form>
         </c:if>
     </div>
+
+    <!-- ✅ Include Footer -->
+    <jsp:include page="../footer.jsp" />
+
+    <!-- Form Validation -->
+    <script>
+        function validateForm() {
+            let valid = true;
+
+            const nameInput = document.forms["gradeForm"]["name"];
+            const teacherSelect = document.forms["gradeForm"]["teacher_id"];
+            const nameError = document.getElementById("nameError");
+            const teacherError = document.getElementById("teacherError");
+
+            nameError.textContent = "";
+            teacherError.textContent = "";
+
+            if (nameInput.value.trim() === "") {
+                nameError.textContent = "You must input the name.";
+                valid = false;
+            }
+
+            if (teacherSelect.value === "" || teacherSelect.value === "0") {
+                teacherError.textContent = "You must select a teacher.";
+                valid = false;
+            }
+
+            return valid;
+        }
+
+        $(document).ready(function () {
+            $('select').niceSelect(); // Kích hoạt dropdown đẹp nếu dùng nice-select
+        });
+    </script>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

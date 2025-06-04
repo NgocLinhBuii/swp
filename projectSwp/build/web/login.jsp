@@ -236,40 +236,37 @@
                         <option value="student" ${userType == 'student' ? 'selected' : ''}>Student</option>
                     </select>
                 </div>
-</br>
-</br>
+                </br>
+                </br>
 
                 <div class="form-group" id="emailGroup">
                     <label for="email">Email</label>
                     <input type="text" name="email" id="email"
-                           value="${param.email != null ? param.email : (userType == 'account' ? requestScope.email : '')}"
+                           value="${cookie.email.value != null ? cookie.email.value : requestScope.email}"
                            placeholder="Enter your email"/>
                 </div>
 
                 <div class="form-group" id="usernameGroup" style="display:none;">
                     <label for="username">Username</label>
                     <input type="text" name="username" id="username"
-                           value="${param.username != null ? param.username : (userType == 'student' ? requestScope.username : '')}"
+                           value="${cookie.username.value != null ? cookie.username.value : requestScope.username}"
                            placeholder="Enter your username"/>
                 </div>
 
                 <div class="form-group">
                     <label for="password">Password</label>
                     <input type="password" name="password" id="password"
-                           value="${param.password != null ? param.password : ''}" placeholder="Enter your password"/>
+                           value="${cookie.password.value != null ? cookie.password.value : requestScope.password}" placeholder="Enter your password"/>
                 </div>
 
                 <div class="form-group remember-me">
                     <input type="checkbox" id="remember_me" name="remember_me"
-                           ${param.remember_me == 'on' || (cookieRemember == 'on') ? 'checked' : ''}/>
+                           ${cookie.remember.value!=null?'checked':''}/>
                     <label for="remember_me">Remember me</label>
                 </div>
-                                    <button  class="btn btn-lg btn-danger" type="submit">Login</button>
-                <a href="https://accounts.google.com/o/oauth2/auth?scope=email profile openid
-                   &redirect_uri=http://localhost:9999/login
-                   &response_type=code
-                   &client_id=118450184719-ar44tevflkttlnqbb8hina7u55l0ecdv.apps.googleusercontent.com
-                   &approval_prompt=force" class="btn btn-lg btn-danger" >
+                    <a href="forgot-password" class="forget-password" style="background: black">Forget Password?</a>
+                <button  class="btn btn-lg btn-danger" type="submit">Login</button>
+                <a href="https://accounts.google.com/o/oauth2/auth?scope=email%20profile%20openid&redirect_uri=http://localhost:9999/logingoogle&response_type=code&client_id=118450184719-ar44tevflkttlnqbb8hina7u55l0ecdv.apps.googleusercontent.com&approval_prompt=force" class="btn btn-lg btn-danger">
                     <svg xmlns="http://www.w3.org/2000/svg" width="90" height="20" fill="currentColor">
                     <path d="M15.545 6.558a9.42 9.42 0 0 1 .139 1.626c0 2.434-.87 4.492-2.384 5.885h.002C11.978 15.292 10.158 16 8 16A8 8 0 1 1 8 0a7.689 7.689 0 0 1 5.352 2.082l-2.284 2.284A4.347 4.347 0 0 0 8 3.166c-2.087 0-3.86 1.408-4.492 3.304a4.792 4.792 0 0 0 0 3.063h.003c.635 1.893 2.405 3.301 4.492 3.301 1.078 0 2.004-.276 2.722-.764h-.003a3.702 3.702 0 0 0 1.599-2.431H8v-3.08h7.545z" />
                     </svg>

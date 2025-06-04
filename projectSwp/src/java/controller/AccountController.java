@@ -129,7 +129,7 @@ public class AccountController extends HttpServlet {
 
     private void showCreateForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.getRequestDispatcher("/accountForm.jsp").forward(request, response);
+        request.getRequestDispatcher("/insertAccount.jsp").forward(request, response);
     }
 
     private void showEditForm(HttpServletRequest request, HttpServletResponse response)
@@ -164,7 +164,7 @@ public class AccountController extends HttpServlet {
             response.sendRedirect("admin?action=listAccount");
         } else {
             request.setAttribute("error", "Failed to insert account");
-            request.getRequestDispatcher("/accountForm.jsp").forward(request, response);
+            request.getRequestDispatcher("/insertAccount.jsp").forward(request, response);
         }
     }
 
@@ -192,7 +192,7 @@ public class AccountController extends HttpServlet {
             account.setImage_id(oldAccount.getImage_id());
         }
         accountDAO.update(account);
-        response.sendRedirect("admin?action=listAccount");
+        response.sendRedirect("admin?action=viewProfile&id=" + account.getId());
     }
 
     private void deleteAccount(HttpServletRequest request, HttpServletResponse response)

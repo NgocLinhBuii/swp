@@ -168,62 +168,73 @@
         </div>
         <!-- Header End -->
         <main>
-    <div class="container mt-5 mb-5">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <h2 class="mb-4">My Profile</h2>
-                
-                <table class="table table-bordered">
-                    <tbody>
-                        <tr>
-                            <th scope="row">Name:</th>
-                            <td>${view.full_name}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Email:</th>
-                            <td>${view.email}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Sex:</th>
-                            <td>
-                                <c:choose>
-                                    <c:when test="${view.sex == 1}">Male</c:when>
-                                    <c:when test="${view.sex == 0}">Female</c:when>
-                                    <c:otherwise>Unknown</c:otherwise>
-                                </c:choose>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row">DOB:</th>
-                            <td><fmt:formatDate value="${view.getFormattedDate()}" pattern="dd/MM/yyyy" /></td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Role:</th>
-                            <td>${view.role}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Status:</th>
-                            <td>${view.status}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Avatar:</th>
-                            <td>
-                                <c:forEach items="${imageList}" var="i">
-                                    <c:if test="${i.id == view.image_id}">
-                                        <img src="${pageContext.request.contextPath}/${not empty i.image_data ? i.image_data : 'assets/img/avatar/macdinh.jpg'}"
-                                             alt="Avatar" class="img-fluid img-thumbnail" style="max-width: 200px; height: auto;" />
-                                    </c:if>
-                                </c:forEach>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                
+            <div class="container mt-5 mb-5">
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <h2 class="mb-4">My Profile</h2>
+
+                        <table class="table table-bordered">
+                            <tbody>
+                                <tr>
+                                    <th scope="row">Name:</th>
+                                    <td>${view.full_name}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Email:</th>
+                                    <td>${view.email}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Sex:</th>
+                                    <td>
+                                        <c:choose>
+                                            <c:when test="${view.sex == 1}">Male</c:when>
+                                            <c:when test="${view.sex == 0}">Female</c:when>
+                                            <c:otherwise>Unknown</c:otherwise>
+                                        </c:choose>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">DOB:</th>
+                                    <td><fmt:formatDate value="${view.getFormattedDate()}" pattern="dd/MM/yyyy" /></td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Role:</th>
+                                    <td>${view.role}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Status:</th>
+                                    <td>${view.status}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Avatar:</th>
+                                    <td>
+                                        <c:forEach items="${imageList}" var="i">
+                                            <c:if test="${i.id == view.image_id}">
+                                                <img src="${pageContext.request.contextPath}/${not empty i.image_data ? i.image_data : 'assets/img/avatar/macdinh.jpg'}"
+                                                     alt="Avatar" class="img-fluid img-thumbnail" style="max-width: 200px; height: auto;" />
+                                            </c:if>
+                                        </c:forEach>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+            <!--                                            <a href="admin?action=deleteAccount&id=${acc.id}" class="btn btn-danger btn-sm"
+                                                           onclick="return confirm('Are you sure you want to delete this account?');">
+                                                            Delete
+                                                        </a>-->
+                                        <a href="admin?action=editAccount&id=${view.id}" class="btn btn-warning btn-sm">
+                                            Update
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-</main>
- <footer>
+        </main>
+        <footer>
             <div class="footer-wrappper footer-bg">
                 <!-- Footer Start-->
                 <div class="footer-area footer-padding">
