@@ -131,6 +131,42 @@ public class StudentDAO extends DBContext {
         return null;
     }
 
+    public List<Student> getStudentsByPage(int offset, int limit) throws SQLException {
+        List<Student> list = new ArrayList<>();
+        String sql = "SELECT * FROM student LIMIT ?, ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, offset);
+            ps.setInt(2, limit);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Student s = new Student(
+                        rs.getInt("id"),
+                        rs.getInt("grade_id"),
+                        rs.getInt("parent_id"),
+                        rs.getString("username"),
+                        rs.getString("password"),
+                        rs.getString("full_name"),
+                        rs.getDate("dob").toLocalDate(),
+                        rs.getBoolean("sex"),
+                        rs.getInt("image_id")
+                );
+                list.add(s);
+            }
+        }
+        return list;
+    }
+
+    public int countStudents() throws SQLException {
+        String sql = "SELECT COUNT(*) FROM student";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+        return 0;
+    }
+
     public Student checkLogin(String username, String password) {
         Student student = null;
         String sql = "SELECT * FROM student WHERE username = ?";

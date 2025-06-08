@@ -34,76 +34,77 @@
 
     <body>
 
-        <!-- ? Preloader Start -->
-        <div id="preloader-active">
-            <div class="preloader d-flex align-items-center justify-content-center">
-                <div class="preloader-inner position-relative">
-                    <div class="preloader-circle"></div>
-                    <div class="preloader-img pere-text">
-                        <img src="assets/img/logo/loder.png" alt="">
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Preloader Start -->
-        <!-- Header Start -->
-        <div class="header-area header-transparent">
-            <div class="main-header ">
-                <div class="header-bottom  header-sticky">
-                    <div class="container-fluid">
-                        <div class="row align-items-center">
-                            <!-- Logo -->
-                            <div class="col-xl-2 col-lg-2">
-                                <div class="logo">
-                                    <a href="/admin"><img src="assets/img/logo/logo.png" alt=""></a>
-                                </div>
-                            </div>
-                            <div class="col-xl-10 col-lg-10">
-                                <div class="menu-wrapper d-flex align-items-center justify-content-end">
-                                    <!-- Main-menu -->
-                                    <div class="main-menu d-none d-lg-block">
-                                        <nav>
-                                            <ul id="navigation">                                                                                          
-                                                <li class="active" ><a href="/admin">Home</a></li>
-                                                <li><a href="#">Courses</a></li>
-                                                <li><a href="#">About</a></li>
-                                                <li><a href="#">Blog</a>
-                                                    <ul class="submenu">
-                                                        <li><a href="blog.html">Blog</a></li>
-                                                        <li><a href="blog_details.html">Blog Details</a></li>
-                                                        <li><a href="elements.html">Element</a></li>
-                                                    </ul>
-                                                </li>
-                                                <li><a href="#">Contact</a></li>
-                                                <!--Button--> 
-                                                <li class="button-header"><a href="/subjects" class="btn btn3">subjects</a></li>
-                                                <li class="button-header"><a href="/Grade" class="btn btn3">Grades</a></li>
-                                                <li class="button-header"><a href="/Question" class="btn btn3">Questions</a></li>
-                                                <li class="button-header"><a href="/LessonURL" class="btn btn3">Lesson</a></li>
-                                                <li class="button-header"><a href="/chapter" class="btn btn3">Chapter</a></li>
-                                                <li class="button-header"><a href="/study_package" class="btn btn3">Study Package</a></li>
-                                                <li class="button-header"><a href="invoice" class="btn btn3">invoice</a></li>
-                                                <!--<li class="button-header"><a href="/student" class="btn btn3">Student</a></li>-->
-                                                <li class="button-header"><a href="/admin?action=listAccount" class="btn btn3">List User</a></li>
-                                                <li class="button-header"><a href="/admin?action=viewProfile&id=${account.id}" class="btn btn3">View Profile</a></li>
-                                                <li class="button-header"><a href="/logout" class="btn btn3">Logout</a></li>
-                                                <!--<li class="button-header"><a href="/register.jsp" class="btn btn3">Register</a></li>-->
-
-                                            </ul>
-                                        </nav>
-                                    </div>
-                                </div>
-                            </div> 
-                            <!-- Mobile Menu -->
-                            <div class="col-12">
-                                <div class="mobile_menu d-block d-lg-none"></div>
+<!--                 ? Preloader Start 
+                <div id="preloader-active">
+                    <div class="preloader d-flex align-items-center justify-content-center">
+                        <div class="preloader-inner position-relative">
+                            <div class="preloader-circle"></div>
+                            <div class="preloader-img pere-text">
+                                <img src="assets/img/logo/loder.png" alt="">
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-        <!-- Header End -->
+                 Preloader Start 
+                 Header Start 
+                <div class="header-area header-transparent">
+                    <div class="main-header ">
+                        <div class="header-bottom  header-sticky">
+                            <div class="container-fluid">
+                                <div class="row align-items-center">
+                                     Logo 
+                                    <div class="col-xl-2 col-lg-2">
+                                        <div class="logo">
+                                            <a href="/admin"><img src="assets/img/logo/logo.png" alt=""></a>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-10 col-lg-10">
+                                        <div class="menu-wrapper d-flex align-items-center justify-content-end">
+                                             Main-menu 
+                                            <div class="main-menu d-none d-lg-block">
+                                                <nav>
+                                                    <ul id="navigation">                                                                                          
+                                                        <li class="active" ><a href="/admin">Home</a></li>
+                                                        <li><a href="#">Courses</a></li>
+                                                        <li><a href="#">About</a></li>
+                                                        <li><a href="#">Blog</a>
+                                                            <ul class="submenu">
+                                                                <li><a href="blog.html">Blog</a></li>
+                                                                <li><a href="blog_details.html">Blog Details</a></li>
+                                                                <li><a href="elements.html">Element</a></li>
+                                                            </ul>
+                                                        </li>
+                                                        <li><a href="#">Contact</a></li>
+                                                        Button 
+                                                        <li class="button-header"><a href="/subjects" class="btn btn3">subjects</a></li>
+                                                        <li class="button-header"><a href="/Grade" class="btn btn3">Grades</a></li>
+                                                        <li class="button-header"><a href="/Question" class="btn btn3">Questions</a></li>
+                                                        <li class="button-header"><a href="/LessonURL" class="btn btn3">Lesson</a></li>
+                                                        <li class="button-header"><a href="/chapter" class="btn btn3">Chapter</a></li>
+                                                        <li class="button-header"><a href="/study_package" class="btn btn3">Study Package</a></li>
+                                                        <li class="button-header"><a href="invoice" class="btn btn3">invoice</a></li>
+                                                        <li class="button-header"><a href="/student" class="btn btn3">student</a></li>
+                                                        <li class="button-header"><a href="/admin?action=listAccount" class="btn btn3">List User</a></li>
+                                                        <li class="button-header"><a href="/admin?action=viewProfile&id=${account.id}" class="btn btn3">View Profile</a></li>
+                                                        <li class="button-header"><a href="/logout" class="btn btn3">Logout</a></li>
+        
+                                                    </ul>
+                                                </nav>
+                                            </div>
+                                        </div>
+                                    </div> 
+                                     Mobile Menu 
+                                    <div class="col-12">
+                                        <div class="mobile_menu d-block d-lg-none"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                 Header End -->
+
+        <%@include file="../header.jsp" %>
         <main>
             <!--? slider Area Start-->
             <section class="slider-area slider-area2">
@@ -597,6 +598,8 @@
             </div>
 
         </footer> 
+        
+        <%@include file="../footer.jsp" %>
         <!-- Scroll Up -->
         <div id="back-top" >
             <a title="Go to Top" href="#"> <i class="fas fa-level-up-alt"></i></a>

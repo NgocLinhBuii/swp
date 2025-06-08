@@ -33,8 +33,8 @@
     </head>
 
     <body>
-
-        <!-- ? Preloader Start -->
+        <%@include file="../header.jsp" %>
+<!--         ? Preloader Start 
         <div id="preloader-active">
             <div class="preloader d-flex align-items-center justify-content-center">
                 <div class="preloader-inner position-relative">
@@ -45,14 +45,14 @@
                 </div>
             </div>
         </div>
-        <!-- Preloader Start -->
-        <!-- Header Start -->
+         Preloader Start 
+         Header Start 
         <div class="header-area header-transparent">
             <div class="main-header ">
                 <div class="header-bottom  header-sticky">
                     <div class="container-fluid">
                         <div class="row align-items-center">
-                            <!-- Logo -->
+                             Logo 
                             <div class="col-xl-2 col-lg-2">
                                 <div class="logo">
                                     <a href="/teacher/home.jsp"><img src="assets/img/logo/logo.png" alt=""></a>
@@ -60,7 +60,7 @@
                             </div>
                             <div class="col-xl-10 col-lg-10">
                                 <div class="menu-wrapper d-flex align-items-center justify-content-end">
-                                    <!-- Main-menu -->
+                                     Main-menu 
                                     <div class="main-menu d-none d-lg-block">
                                         <nav>
                                             <ul id="navigation">                                                                                          
@@ -75,7 +75,7 @@
                                                     </ul>
                                                 </li>
                                                 <li><a href="#">Contact</a></li>
-                                                <!--Button--> 
+                                                Button 
                                                 <li class="button-header"><a href="/subjects" class="btn btn3">subjects</a></li>
                                                 <li class="button-header"><a href="/Grade" class="btn btn3">Grades</a></li>
                                                 <li class="button-header"><a href="/Question" class="btn btn3">Questions</a></li>
@@ -89,7 +89,7 @@
                                     </div>
                                 </div>
                             </div> 
-                            <!-- Mobile Menu -->
+                             Mobile Menu 
                             <div class="col-12">
                                 <div class="mobile_menu d-block d-lg-none"></div>
                             </div>
@@ -98,7 +98,7 @@
                 </div>
             </div>
         </div>
-        <!-- Header End -->
+         Header End -->
         <main>
             <!--? slider Area Start-->
             <section class="slider-area slider-area2">
@@ -140,7 +140,7 @@
                             <div class="properties properties2 mb-30">
                                 <div class="properties__card">
                                     <div class="properties__img overlay1">
-                                        <a href="#"><img src="assets/img/gallery/featured1.png" alt=""></a>
+                                        <a href="#"><img src="/assets/img/gallery/featured1.png" alt=""></a>
                                     </div>
                                     <div class="properties__caption">
                                         <p>User Experience</p>
@@ -171,40 +171,7 @@
                             <div class="properties properties2 mb-30">
                                 <div class="properties__card">
                                     <div class="properties__img overlay1">
-                                        <a href="#"><img src="assets/img/gallery/featured2.png" alt=""></a>
-                                    </div>
-                                    <div class="properties__caption">
-                                        <p>User Experience</p>
-                                        <h3><a href="#">Fundamental of UX for Application design</a></h3>
-                                        <p>The automated process all your website tasks. Discover tools and techniques to engage effectively with vulnerable children and young people.
-
-                                        </p>
-                                        <div class="properties__footer d-flex justify-content-between align-items-center">
-                                            <div class="restaurant-name">
-                                                <div class="rating">
-                                                    <i class="fas fa-star"></i>
-                                                    <i class="fas fa-star"></i>
-                                                    <i class="fas fa-star"></i>
-                                                    <i class="fas fa-star"></i>
-                                                    <i class="fas fa-star-half"></i>
-                                                </div>
-                                                <p><span>(4.5)</span> based on 120</p>
-                                            </div>
-                                            <div class="price">
-                                                <span>$135</span>
-                                            </div>
-                                        </div>
-                                        <a href="#" class="border-btn border-btn2">Find out more</a>
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="properties properties2 mb-30">
-                                <div class="properties__card">
-                                    <div class="properties__img overlay1">
-                                        <a href="#"><img src="assets/img/gallery/featured3.png" alt=""></a>
+                                        <a href="#"><img src="/assets/img/gallery/featured2.png" alt=""></a>
                                     </div>
                                     <div class="properties__caption">
                                         <p>User Experience</p>
@@ -237,7 +204,7 @@
                             <div class="properties properties2 mb-30">
                                 <div class="properties__card">
                                     <div class="properties__img overlay1">
-                                        <a href="#"><img src="assets/img/gallery/featured4.png" alt=""></a>
+                                        <a href="#"><img src="/assets/img/gallery/featured3.png" alt=""></a>
                                     </div>
                                     <div class="properties__caption">
                                         <p>User Experience</p>
@@ -270,7 +237,7 @@
                             <div class="properties properties2 mb-30">
                                 <div class="properties__card">
                                     <div class="properties__img overlay1">
-                                        <a href="#"><img src="assets/img/gallery/featured5.png" alt=""></a>
+                                        <a href="#"><img src="/assets/img/gallery/featured4.png" alt=""></a>
                                     </div>
                                     <div class="properties__caption">
                                         <p>User Experience</p>
@@ -303,7 +270,40 @@
                             <div class="properties properties2 mb-30">
                                 <div class="properties__card">
                                     <div class="properties__img overlay1">
-                                        <a href="#"><img src="assets/img/gallery/featured6.png" alt=""></a>
+                                        <a href="#"><img src="/assets/img/gallery/featured5.png" alt=""></a>
+                                    </div>
+                                    <div class="properties__caption">
+                                        <p>User Experience</p>
+                                        <h3><a href="#">Fundamental of UX for Application design</a></h3>
+                                        <p>The automated process all your website tasks. Discover tools and techniques to engage effectively with vulnerable children and young people.
+
+                                        </p>
+                                        <div class="properties__footer d-flex justify-content-between align-items-center">
+                                            <div class="restaurant-name">
+                                                <div class="rating">
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star-half"></i>
+                                                </div>
+                                                <p><span>(4.5)</span> based on 120</p>
+                                            </div>
+                                            <div class="price">
+                                                <span>$135</span>
+                                            </div>
+                                        </div>
+                                        <a href="#" class="border-btn border-btn2">Find out more</a>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="properties properties2 mb-30">
+                                <div class="properties__card">
+                                    <div class="properties__img overlay1">
+                                        <a href="#"><img src="/assets/img/gallery/featured6.png" alt=""></a>
                                     </div>
                                     <div class="properties__caption">
                                         <p>User Experience</p>
@@ -355,7 +355,7 @@
                         <div class="col-lg-3 col-md-4 col-sm-6">
                             <div class="single-topic text-center mb-30">
                                 <div class="topic-img">
-                                    <img src="assets/img/gallery/topic1.png" alt="">
+                                    <img src="/assets/img/gallery/topic1.png" alt="">
                                     <div class="topic-content-box">
                                         <div class="topic-content">
                                             <h3><a href="#">Programing</a></h3>
@@ -367,7 +367,7 @@
                         <div class="col-lg-3 col-md-4 col-sm-6">
                             <div class="single-topic text-center mb-30">
                                 <div class="topic-img">
-                                    <img src="assets/img/gallery/topic2.png" alt="">
+                                    <img src="/assets/img/gallery/topic2.png" alt="">
                                     <div class="topic-content-box">
                                         <div class="topic-content">
                                             <h3><a href="#">Programing</a></h3>
@@ -379,7 +379,7 @@
                         <div class="col-lg-3 col-md-4 col-sm-6">
                             <div class="single-topic text-center mb-30">
                                 <div class="topic-img">
-                                    <img src="assets/img/gallery/topic3.png" alt="">
+                                    <img src="/assets/img/gallery/topic3.png" alt="">
                                     <div class="topic-content-box">
                                         <div class="topic-content">
                                             <h3><a href="#">Programing</a></h3>
@@ -391,7 +391,7 @@
                         <div class="col-lg-3 col-md-4 col-sm-6">
                             <div class="single-topic text-center mb-30">
                                 <div class="topic-img">
-                                    <img src="assets/img/gallery/topic4.png" alt="">
+                                    <img src="/assets/img/gallery/topic4.png" alt="">
                                     <div class="topic-content-box">
                                         <div class="topic-content">
                                             <h3><a href="#">Programing</a></h3>
@@ -403,7 +403,7 @@
                         <div class="col-lg-3 col-md-4 col-sm-6">
                             <div class="single-topic text-center mb-30">
                                 <div class="topic-img">
-                                    <img src="assets/img/gallery/topic5.png" alt="">
+                                    <img src="/assets/img/gallery/topic5.png" alt="">
                                     <div class="topic-content-box">
                                         <div class="topic-content">
                                             <h3><a href="#">Programing</a></h3>
@@ -415,7 +415,7 @@
                         <div class="col-lg-3 col-md-4 col-sm-6">
                             <div class="single-topic text-center mb-30">
                                 <div class="topic-img">
-                                    <img src="assets/img/gallery/topic6.png" alt="">
+                                    <img src="/assets/img/gallery/topic6.png" alt="">
                                     <div class="topic-content-box">
                                         <div class="topic-content">
                                             <h3><a href="#">Programing</a></h3>
@@ -427,7 +427,7 @@
                         <div class="col-lg-3 col-md-4 col-sm-6">
                             <div class="single-topic text-center mb-30">
                                 <div class="topic-img">
-                                    <img src="assets/img/gallery/topic7.png" alt="">
+                                    <img src="/assets/img/gallery/topic7.png" alt="">
                                     <div class="topic-content-box">
                                         <div class="topic-content">
                                             <h3><a href="#">Programing</a></h3>
@@ -439,7 +439,7 @@
                         <div class="col-lg-3 col-md-4 col-sm-6">
                             <div class="single-topic text-center mb-30">
                                 <div class="topic-img">
-                                    <img src="assets/img/gallery/topic8.png" alt="">
+                                    <img src="/assets/img/gallery/topic8.png" alt="">
                                     <div class="topic-content-box">
                                         <div class="topic-content">
                                             <h3><a href="#">Programing</a></h3>
@@ -466,7 +466,7 @@
                         <div class="col-lg-4 col-md-6 col-sm-8">
                             <div class="single-services mb-30">
                                 <div class="features-icon">
-                                    <img src="assets/img/icon/icon1.svg" alt="">
+                                    <img src="/assets/img/icon/icon1.svg" alt="">
                                 </div>
                                 <div class="features-caption">
                                     <h3>60+ UX courses</h3>
@@ -477,7 +477,7 @@
                         <div class="col-lg-4 col-md-6 col-sm-8">
                             <div class="single-services mb-30">
                                 <div class="features-icon">
-                                    <img src="assets/img/icon/icon2.svg" alt="">
+                                    <img src="/assets/img/icon/icon2.svg" alt="">
                                 </div>
                                 <div class="features-caption">
                                     <h3>Expert instructors</h3>
@@ -488,7 +488,7 @@
                         <div class="col-lg-4 col-md-6 col-sm-8">
                             <div class="single-services mb-30">
                                 <div class="features-icon">
-                                    <img src="assets/img/icon/icon3.svg" alt="">
+                                    <img src="/assets/img/icon/icon3.svg" alt="">
                                 </div>
                                 <div class="features-caption">
                                     <h3>Life time access</h3>
@@ -511,7 +511,7 @@
                                     <div class="single-footer-caption mb-30">
                                         <!-- logo -->
                                         <div class="footer-logo mb-25">
-                                            <a href="index.html"><img src="assets/img/logo/logo2_footer.png" alt=""></a>
+                                            <a href="index.html"><img src="/assets/img/logo/logo2_footer.png" alt=""></a>
                                         </div>
                                         <div class="footer-tittle">
                                             <div class="footer-pera">

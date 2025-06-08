@@ -2,6 +2,17 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/C:/projectswp-group6/projectSwp/src/java/controller/chapter/ChapterController.java</file>
+            <file>file:/C:/projectswp-group6/projectSwp/src/java/controller/subject/SubjectController.java</file>
+            <file>file:/C:/projectswp-group6/projectSwp/src/java/auth/BlockJspHtmlFilter.java</file>
+            <file>file:/C:/projectswp-group6/projectSwp/src/java/controller/category/CategoryController.java</file>
+            <file>file:/C:/projectswp-group6/projectSwp/src/java/util/AuthUtil.java</file>
+            <file>file:/C:/projectswp-group6/projectSwp/src/java/util/RoleConstants.java</file>
+            <file>file:/C:/projectswp-group6/projectSwp/src/java/controller/invoice/InvoiceController.java</file>
+            <file>file:/C:/projectswp-group6/projectSwp/src/java/controller/grade/GradeController.java</file>
+            <file>file:/C:/projectswp-group6/projectSwp/src/java/controller/lesson/LessonController.java</file>
+            <file>file:/C:/projectswp-group6/projectSwp/src/java/controller/question/QuestionController.java</file>
+        </group>
     </open-files>
 </project-private>

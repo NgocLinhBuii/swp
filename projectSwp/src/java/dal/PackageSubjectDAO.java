@@ -9,7 +9,7 @@ public class PackageSubjectDAO extends DBContext {
 
     public List<PackageSubject> getAll() {
         List<PackageSubject> list = new ArrayList<>();
-        String sql = "SELECT * FROM packagesubject";
+        String sql = "SELECT * FROM package_subject";
         try (PreparedStatement ps = connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
@@ -25,7 +25,7 @@ public class PackageSubjectDAO extends DBContext {
     }
 
     public PackageSubject getById(int packageId, int subjectId) {
-        String sql = "SELECT * FROM packagesubject WHERE package_id = ? AND subject_id = ?";
+        String sql = "SELECT * FROM package_subject WHERE package_id = ? AND subject_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, packageId);
             ps.setInt(2, subjectId);
@@ -44,7 +44,7 @@ public class PackageSubjectDAO extends DBContext {
     }
 
     public void insert(PackageSubject ps) {
-        String sql = "INSERT INTO packagesubject (package_id, subject_id) VALUES (?, ?)";
+        String sql = "INSERT INTO package_subject (package_id, subject_id) VALUES (?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, ps.getPackage_id());
             stmt.setInt(2, ps.getSubject_id());
@@ -55,7 +55,7 @@ public class PackageSubjectDAO extends DBContext {
     }
 
     public void update(PackageSubject ps, int oldPackageId, int oldSubjectId) {
-        String sql = "UPDATE packagesubject SET package_id = ?, subject_id = ? WHERE package_id = ? AND subject_id = ?";
+        String sql = "UPDATE package_subject SET package_id = ?, subject_id = ? WHERE package_id = ? AND subject_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, ps.getPackage_id());
             stmt.setInt(2, ps.getSubject_id());
@@ -68,7 +68,7 @@ public class PackageSubjectDAO extends DBContext {
     }
 
     public void delete(int packageId, int subjectId) {
-        String sql = "DELETE FROM packagesubject WHERE package_id = ? AND subject_id = ?";
+        String sql = "DELETE FROM package_subject WHERE package_id = ? AND subject_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, packageId);
             stmt.setInt(2, subjectId);

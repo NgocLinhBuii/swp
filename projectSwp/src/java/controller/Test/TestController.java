@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import util.AuthUtil;
+import util.RoleConstants;
 
 @WebServlet("/test")
 public class TestController extends HttpServlet {
@@ -30,6 +32,10 @@ public class TestController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+         if (!AuthUtil.hasRole(request, RoleConstants.STUDENT)) {
+            response.sendRedirect("/error.jsp");
+            return;
+        }
         String action = request.getParameter("action");
 
         if (action == null) {
@@ -53,6 +59,10 @@ public class TestController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+         if (!AuthUtil.hasRole(request, RoleConstants.STUDENT)) {
+            response.sendRedirect("/error.jsp");
+            return;
+        }
         String action = request.getParameter("action");
 
         if (action == null) {

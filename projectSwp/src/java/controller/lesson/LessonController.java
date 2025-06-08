@@ -1,6 +1,5 @@
 package controller.lesson;
 
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -12,7 +11,8 @@ import java.io.IOException;
 import java.util.List;
 import model.Chapter;
 import dal.ChapterDAO;
-
+import util.AuthUtil;
+import util.RoleConstants;
 
 @WebServlet(name = "LessonController", urlPatterns = {"/LessonURL"})
 public class LessonController extends HttpServlet {
@@ -22,9 +22,14 @@ public class LessonController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
+        if (!AuthUtil.hasRole(request, RoleConstants.ADMIN) && !AuthUtil.hasRole(request, RoleConstants.TEACHER) && !AuthUtil.hasRole(request, RoleConstants.STUDENT)) {
+            response.sendRedirect("/error.jsp");
+            return;
+        }
         String action = request.getParameter("action");
-        if (action == null) action = "";
+        if (action == null) {
+            action = "";
+        }
 
         try {
             switch (action) {
@@ -40,8 +45,8 @@ public class LessonController extends HttpServlet {
                         int id = Integer.parseInt(idStr);
                         Lesson lesson = lessonDAO.getLessonById(id);
                         if (lesson != null) {
-                             List<Chapter> chapter = new ChapterDAO().getChapter("select * from chapter");
-                             request.setAttribute("chapter", chapter);
+                            List<Chapter> chapter = new ChapterDAO().getChapter("select * from chapter");
+                            request.setAttribute("chapter", chapter);
                             request.setAttribute("lesson", lesson);
                             request.getRequestDispatcher("lesson/updateLesson.jsp").forward(request, response);
                             return;
@@ -51,7 +56,6 @@ public class LessonController extends HttpServlet {
                     } else {
                         request.setAttribute("error", "ID không hợp lệ");
                     }
-                    
                     break;
 
                 case "delete":
@@ -78,9 +82,7 @@ public class LessonController extends HttpServlet {
                         lessonList = lessonDAO.getAllLessons();
                     }
                     request.setAttribute("lessonList", lessonList);
-                    ChapterDAO chapterdao = new ChapterDAO();
-                    
-                    List<Chapter> chapter = chapterdao.getChapter("select * from chapter");
+                    List<Chapter> chapter = new ChapterDAO().getChapter("select * from chapter");
                     request.setAttribute("chapter", chapter);
                     break;
             }
@@ -95,7 +97,10 @@ public class LessonController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
+        if (!AuthUtil.hasRole(request, RoleConstants.ADMIN) && !AuthUtil.hasRole(request, RoleConstants.TEACHER)&& !AuthUtil.hasRole(request, RoleConstants.STUDENT)) {
+            response.sendRedirect("/error.jsp");
+            return;
+        }
         String action = request.getParameter("action");
 
         try {
@@ -103,8 +108,9 @@ public class LessonController extends HttpServlet {
                 String name = request.getParameter("name");
                 String content = request.getParameter("content");
                 int chapterId = Integer.parseInt(request.getParameter("chapter_id"));
+                String videoLink = request.getParameter("video_link");
 
-                Lesson lesson = new Lesson(0, name, content, chapterId);
+                Lesson lesson = new Lesson(0, name, content, chapterId, videoLink);
                 lessonDAO.addLesson(lesson);
                 request.setAttribute("message", "Thêm bài học thành công");
 
@@ -113,8 +119,9 @@ public class LessonController extends HttpServlet {
                 String name = request.getParameter("name");
                 String content = request.getParameter("content");
                 int chapterId = Integer.parseInt(request.getParameter("chapter_id"));
+                String videoLink = request.getParameter("video_link");
 
-                Lesson lesson = new Lesson(id, name, content, chapterId);
+                Lesson lesson = new Lesson(id, name, content, chapterId, videoLink);
                 lessonDAO.updateLesson(lesson);
                 request.setAttribute("message", "Cập nhật bài học thành công");
 

@@ -1,49 +1,124 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Update PackageSubject</title>
+    <title>Cập nhật PackageSubject</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/css/nice-select.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+
     <style>
-        body { font-family: Arial, sans-serif; margin: 30px; }
-        form { width: 400px; padding: 20px; border: 1px solid #ccc; border-radius: 8px; background-color: #f9f9f9; }
-        label { display: block; margin-top: 10px; font-weight: bold; }
-        input, select { width: 100%; padding: 8px; margin-top: 4px; }
-        button { margin-top: 15px; padding: 10px 15px; }
-        a { display: inline-block; margin-top: 20px; }
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #f8f9fa;
+        }
+
+        main {
+            flex: 1;
+            padding-top: 80px;
+        }
+
+        .card {
+            margin-bottom: 40px;
+        }
+
+        .text-danger {
+            font-size: 0.875rem;
+        }
     </style>
 </head>
 <body>
 
-<h2>Update PackageSubject</h2>
+<jsp:include page="/PackageSubject/header.jsp" />
 
-<c:if test="${not empty ps}">
-    <form action="packageSubjectURL" method="post">
-        <input type="hidden" name="service" value="update" />
-        <input type="hidden" name="old_package_id" value="${ps.package_id}" />
-        <input type="hidden" name="old_subject_name" value="${ps.subject_name}" />
+<main>
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-warning text-white text-center">
+                        <h5 class="mb-0">Cập nhật PackageSubject</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="packageSubjectURL" onsubmit="return validateUpdateForm()">
+                            <input type="hidden" name="action" value="update" />
+                            <input type="hidden" name="old_package_id" value="${ps.package_id}" />
+                            <input type="hidden" name="old_subject_id" value="${ps.subject_id}" />
 
-        <label>Package ID:</label>
-        <input type="number" name="package_id" value="${ps.package_id}" required />
+                            <div class="mb-3">
+                                <label for="package_id" class="form-label">Package ID</label>
+                                <input type="number" class="form-control" id="package_id" name="package_id" value="${ps.package_id}" required />
+                                <div id="packageError" class="text-danger"></div>
+                            </div>
 
-        <label>Subject name:</label>
-        <select name="subject_name" required>
-            <c:forEach var="sub" items="${subject}">
-                <option value="${sub.id}" ${sub.subject_id == ps.id ? 'selected' : ''}>
-                    ${sub.name}
-                </option>
-            </c:forEach>
-        </select>
+                            <div class="mb-3">
+                                <label for="subject_id" class="form-label">Subject</label>
+                                <select id="subject_id" name="subject_id" class="form-select nice-select wide">
+                                    <option value="">-- Chọn Subject --</option>
+                                    <c:forEach var="s" items="${subject}">
+                                        <option value="${s.id}" <c:if test="${s.id == ps.subject_id}">selected</c:if>>${s.name}</option>
+                                    </c:forEach>
+                                </select>
+                                <div id="subjectError" class="text-danger"></div>
+                            </div>
 
-        <button type="submit">Update</button>
-        <a href="packageSubjectURL">Cancel</a>
-    </form>
-</c:if>
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-warning text-white">Cập nhật</button>
+                                <a href="packageSubjectURL" class="btn btn-outline-secondary">Quay lại danh sách</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
 
-<c:if test="${empty ps}">
-    <p style="color:red">PackageSubject not found!</p>
-    <a href="packageSubjectURL">Back to List</a>
-</c:if>
+<jsp:include page="/PackageSubject/footer.jsp" />
+
+<!-- JS -->
+<script src="/assets/js/jquery-1.12.4.min.js"></script>
+<script src="/assets/js/bootstrap.min.js"></script>
+<script src="/assets/js/jquery.nice-select.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('select').niceSelect();
+    });
+
+    function validateUpdateForm() {
+        let isValid = true;
+
+        document.getElementById("packageError").innerText = "";
+        document.getElementById("subjectError").innerText = "";
+
+        const packageId = document.getElementById("package_id").value.trim();
+        const subjectId = document.getElementById("subject_id").value;
+
+        if (packageId === "") {
+            document.getElementById("packageError").innerText = "Vui lòng nhập Package ID.";
+            isValid = false;
+        }
+
+        if (subjectId === "") {
+            document.getElementById("subjectError").innerText = "Vui lòng chọn một Subject.";
+            isValid = false;
+        }
+
+        return isValid;
+    }
+</script>
 
 </body>
 </html>

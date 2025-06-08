@@ -163,62 +163,64 @@
         </style>
     </head>
     <body>
-        <!-- ? Preloader Start -->
-        <div id="preloader-active">
-            <div class="preloader d-flex align-items-center justify-content-center">
-                <div class="preloader-inner position-relative">
-                    <div class="preloader-circle"></div>
-                    <div class="preloader-img pere-text">
-                        <img src="assets/img/logo/loder.png" alt="">
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Preloader Start -->
-        <!-- Header Start -->
-        <div class="header-area header-transparent">
-            <div class="main-header ">
-                <div class="header-bottom header-sticky">
-                    <div class="container-fluid">
-                        <div class="row align-items-center">
-                            <!-- Logo -->
-                            <div class="col-xl-2 col-lg-2">
-                                <div class="logo">
-                                    <a href="index.html"><img src="assets/img/logo/logo.png" alt=""></a>
-                                </div>
-                            </div>
-                            <div class="col-xl-10 col-lg-10">
-                                <div class="menu-wrapper d-flex align-items-center justify-content-end">
-                                    <!-- Main-menu -->
-                                    <div class="main-menu d-none d-lg-block">
-                                        <nav>
-                                            <ul id="navigation">                                                                                          
-                                                <li class="active" ><a href="index.html">Home</a></li>
-                                                <li><a href="courses.html">Courses</a></li>
-                                                <li><a href="about.html">About</a></li>
-                                                <li><a href="#">Blog</a>
-                                                    <ul class="submenu">
-                                                        <li><a href="blog.html">Blog</a></li>
-                                                        <li><a href="blog_details.html">Blog Details</a></li>
-                                                        <li><a href="elements.html">Element</a></li>
-                                                    </ul>
-                                                </li>
-                                                <li><a href="contact.html">Contact</a></li>
-                                            </ul>
-                                        </nav>
-                                    </div>
-                                </div>
-                            </div> 
-                            <!-- Mobile Menu -->
-                            <div class="col-12">
-                                <div class="mobile_menu d-block d-lg-none"></div>
+        <!--         ? Preloader Start 
+                <div id="preloader-active">
+                    <div class="preloader d-flex align-items-center justify-content-center">
+                        <div class="preloader-inner position-relative">
+                            <div class="preloader-circle"></div>
+                            <div class="preloader-img pere-text">
+                                <img src="assets/img/logo/loder.png" alt="">
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-        <!-- Header End -->
+                 Preloader Start 
+                 Header Start 
+                <div class="header-area header-transparent">
+                    <div class="main-header ">
+                        <div class="header-bottom header-sticky">
+                            <div class="container-fluid">
+                                <div class="row align-items-center">
+                                     Logo 
+                                    <div class="col-xl-2 col-lg-2">
+                                        <div class="logo">
+                                            <a href="index.html"><img src="assets/img/logo/logo.png" alt=""></a>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-10 col-lg-10">
+                                        <div class="menu-wrapper d-flex align-items-center justify-content-end">
+                                             Main-menu 
+                                            <div class="main-menu d-none d-lg-block">
+                                                <nav>
+                                                    <ul id="navigation">                                                                                          
+                                                        <li class="active" ><a href="index.html">Home</a></li>
+                                                        <li><a href="courses.html">Courses</a></li>
+                                                        <li><a href="about.html">About</a></li>
+                                                        <li><a href="#">Blog</a>
+                                                            <ul class="submenu">
+                                                                <li><a href="blog.html">Blog</a></li>
+                                                                <li><a href="blog_details.html">Blog Details</a></li>
+                                                                <li><a href="elements.html">Element</a></li>
+                                                            </ul>
+                                                        </li>
+                                                        <li><a href="contact.html">Contact</a></li>
+                                                    </ul>
+                                                </nav>
+                                            </div>
+                                        </div>
+                                    </div> 
+                                     Mobile Menu 
+                                    <div class="col-12">
+                                        <div class="mobile_menu d-block d-lg-none"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                 Header End -->
+
+        <%@include file="header.jsp" %>
         <div class="login-container">
             <h2>Login</h2>
 
@@ -264,7 +266,7 @@
                            ${cookie.remember.value!=null?'checked':''}/>
                     <label for="remember_me">Remember me</label>
                 </div>
-                    <a href="forgot-password" class="forget-password" style="background: black">Forget Password?</a>
+                <a href="forgot-password" class="forget-password" style="background: black">Forget Password?</a>
                 <button  class="btn btn-lg btn-danger" type="submit">Login</button>
                 <a href="https://accounts.google.com/o/oauth2/auth?scope=email%20profile%20openid&redirect_uri=http://localhost:9999/logingoogle&response_type=code&client_id=118450184719-ar44tevflkttlnqbb8hina7u55l0ecdv.apps.googleusercontent.com&approval_prompt=force" class="btn btn-lg btn-danger">
                     <svg xmlns="http://www.w3.org/2000/svg" width="90" height="20" fill="currentColor">

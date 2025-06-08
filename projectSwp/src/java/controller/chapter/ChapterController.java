@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package controller.chapter;
 
 import dal.ChapterDAO;
@@ -17,11 +13,9 @@ import java.util.List;
 import java.util.Map;
 import model.Chapter;
 import model.Subject;
+import util.AuthUtil;
+import util.RoleConstants;
 
-/**
- *
- * @author Na
- */
 @WebServlet(name = "ChapterController", urlPatterns = {"/chapter"})
 public class ChapterController extends HttpServlet {
 
@@ -36,6 +30,13 @@ public class ChapterController extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        // ✅ PHÂN QUYỀN: chỉ cho phép ADMIN hoặc TEACHER
+        if (!AuthUtil.hasRole(request, RoleConstants.ADMIN) && !AuthUtil.hasRole(request, RoleConstants.TEACHER) && !AuthUtil.hasRole(request, RoleConstants.PARENT)) {
+            response.sendRedirect("/error.jsp");
+            return;
+        }
+
         response.setContentType("text/html;charset=UTF-8");
 
         String service = request.getParameter("service");
@@ -74,27 +75,8 @@ public class ChapterController extends HttpServlet {
             request.setAttribute("listChapter", List.of());
             request.setAttribute("listSubject", List.of());
             request.setAttribute("subjectMap", new HashMap<Integer, String>());
-            try {
-                request.getRequestDispatcher("/chapter/listChapter.jsp").forward(request, response);
-            } catch (ServletException | IOException ex) {
-                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Không thể hiển thị trang: " + ex.getMessage());
-            }
+            request.getRequestDispatcher("/chapter/listChapter.jsp").forward(request, response);
         }
-    }
-
-    private Map<Integer, String> loadSubjectMap() {
-        Map<Integer, String> subjectMap = new HashMap<>();
-        try {
-            List<Subject> listSubject = subjectDAO.findAll();
-            if (listSubject != null) {
-                for (Subject subject : listSubject) {
-                    subjectMap.put(subject.getId(), subject.getName());
-                }
-            }
-        } catch (Exception e) {
-            // Log lỗi nếu cần
-        }
-        return subjectMap;
     }
 
     private void listChapter(HttpServletRequest request, HttpServletResponse response)
@@ -105,7 +87,7 @@ public class ChapterController extends HttpServlet {
 
         request.setAttribute("listChapter", listChapter != null ? listChapter : List.of());
         request.setAttribute("listSubject", listSubject != null ? listSubject : List.of());
-        request.setAttribute("subjectMap", subjectMap != null ? subjectMap : new HashMap<Integer, String>());
+        request.setAttribute("subjectMap", subjectMap != null ? subjectMap : new HashMap<>());
         request.getRequestDispatcher("/chapter/listChapter.jsp").forward(request, response);
     }
 
@@ -127,7 +109,6 @@ public class ChapterController extends HttpServlet {
             Chapter chapter = new Chapter(id, name, description, subjectId);
             int result = chapterDAO.addChapter(chapter);
             if (result > 0) {
-                request.setAttribute("message", "Thêm chapter thành công!");
                 response.sendRedirect("chapter");
             } else {
                 request.setAttribute("errorMessage", "Không thể thêm chapter!");
@@ -144,11 +125,8 @@ public class ChapterController extends HttpServlet {
         int editId = Integer.parseInt(request.getParameter("editId"));
         Chapter chapter = chapterDAO.findChapterById(editId);
         List<Subject> listSubject = subjectDAO.findAll();
-        if (chapter != null) {
-            request.setAttribute("chapterToEdit", chapter);
-        } else {
-            request.setAttribute("errorMessage", "Không tìm thấy chapter với ID: " + editId);
-        }
+
+        request.setAttribute("chapterToEdit", chapter);
         request.setAttribute("listSubject", listSubject != null ? listSubject : List.of());
         request.getRequestDispatcher("/chapter/chapterForm.jsp").forward(request, response);
     }
@@ -164,7 +142,6 @@ public class ChapterController extends HttpServlet {
             Chapter chapter = new Chapter(id, name, description, subjectId);
             int result = chapterDAO.editChapter(chapter);
             if (result > 0) {
-                request.setAttribute("message", "Cập nhật chapter thành công!");
                 response.sendRedirect("chapter");
             } else {
                 request.setAttribute("errorMessage", "Không thể cập nhật chapter!");
@@ -199,83 +176,64 @@ public class ChapterController extends HttpServlet {
         String subjectIdParam = request.getParameter("subject_id");
         List<Subject> listSubject = subjectDAO.findAll();
         Map<Integer, String> subjectMap = loadSubjectMap();
-
         List<Chapter> listChapter;
+
         if (idParam != null && !idParam.isEmpty()) {
             try {
                 int id = Integer.parseInt(idParam);
                 Chapter chapter = chapterDAO.findChapterById(id);
-                listChapter = (chapter != null) ? List.of(chapter) : List.of();
-                if (chapter == null) {
-                    request.setAttribute("message", "Không tìm thấy chapter với id = " + id);
-                }
+                listChapter = chapter != null ? List.of(chapter) : List.of();
             } catch (NumberFormatException e) {
                 listChapter = List.of();
-                request.setAttribute("message", "Định dạng id không hợp lệ!");
+                request.setAttribute("message", "ID không hợp lệ!");
             }
         } else if (nameParam != null && !nameParam.isEmpty()) {
             listChapter = chapterDAO.findChapterByName(nameParam);
-            if (listChapter.isEmpty()) {
-                request.setAttribute("message", "Không tìm thấy chapter với tên chứa: " + nameParam);
-            }
         } else if (subjectIdParam != null && !subjectIdParam.isEmpty()) {
             try {
                 int subjectId = Integer.parseInt(subjectIdParam);
                 listChapter = chapterDAO.findChapterBySubjectId(subjectId);
-                if (listChapter.isEmpty()) {
-                    request.setAttribute("message", "Không tìm thấy chapter với subject_id = " + subjectId);
-                }
             } catch (NumberFormatException e) {
                 listChapter = List.of();
-                request.setAttribute("message", "Định dạng subject_id không hợp lệ!");
+                request.setAttribute("message", "Subject ID không hợp lệ!");
             }
         } else {
             listChapter = List.of();
-            request.setAttribute("message", "Không có tìm kiếm");
         }
 
         request.setAttribute("listChapter", listChapter);
         request.setAttribute("listSubject", listSubject != null ? listSubject : List.of());
-        request.setAttribute("subjectMap", subjectMap != null ? subjectMap : new HashMap<Integer, String>());
+        request.setAttribute("subjectMap", subjectMap != null ? subjectMap : new HashMap<>());
         request.getRequestDispatcher("/chapter/listChapter.jsp").forward(request, response);
     }
 
-  // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
+    private Map<Integer, String> loadSubjectMap() {
+        Map<Integer, String> subjectMap = new HashMap<>();
+        try {
+            List<Subject> listSubject = subjectDAO.findAll();
+            for (Subject s : listSubject) {
+                subjectMap.put(s.getId(), s.getName());
+            }
+        } catch (Exception e) {
+            // Ignore
+        }
+        return subjectMap;
+    }
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
     }
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
     @Override
     public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
+        return "ChapterController - for Admin and Teacher roles";
+    }
 }

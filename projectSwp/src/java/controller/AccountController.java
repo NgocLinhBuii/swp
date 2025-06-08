@@ -107,13 +107,30 @@ public class AccountController extends HttpServlet {
 
     private void listAccounts(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, ServletException, IOException {
-        List<Image> imageList = ImageDAO.findAll();
-        List<Account> accountList = accountDAO.findAll();
-        Account account = getAccountFromRequest(request);
+        int page = 1;
+        int recordsPerPage = 5;
 
-        request.setAttribute("imageList", imageList);
-        request.setAttribute("account", account);
+        String pageParam = request.getParameter("page");
+        if (pageParam != null) {
+            try {
+                page = Integer.parseInt(pageParam);
+            } catch (NumberFormatException e) {
+                page = 1;
+            }
+        }
+
+        int offset = (page - 1) * recordsPerPage;
+
+        List<Account> accountList = accountDAO.getAccountsByPage(offset, recordsPerPage);
+        int totalRecords = accountDAO.countAccounts();
+        int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
+
+        List<Image> imageList = ImageDAO.findAll();
         request.setAttribute("accountList", accountList);
+        request.setAttribute("imageList", imageList);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("totalPages", totalPages);
+
         request.getRequestDispatcher("/accountList.jsp").forward(request, response);
     }
 
@@ -209,7 +226,7 @@ public class AccountController extends HttpServlet {
         if (email != null && !email.trim().isEmpty()) {
             accountList = accountDAO.findByEmail(email.trim());
             if (accountList == null || accountList.isEmpty()) {
-                request.setAttribute("error", "Không tìm thấy tài khoản nào với email: " + email.trim());
+                request.setAttribute("error", "Nothing " + email.trim());
             }
         } else {
             accountList = accountDAO.findAll();

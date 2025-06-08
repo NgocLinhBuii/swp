@@ -4,6 +4,7 @@
  */
 package controller.StudyPackage;
 
+import dal.InvoiceDAO;
 import dal.StudyPackageDAO;
 import model.StudyPackage;
 
@@ -14,7 +15,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
+import model.Invoice;
+import util.AuthUtil;
+import util.RoleConstants;
 
 /**
  *
@@ -32,6 +37,10 @@ public class StudyPackageController extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        if (!AuthUtil.hasRole(request, RoleConstants.ADMIN) && !AuthUtil.hasRole(request, RoleConstants.TEACHER)) {
+            response.sendRedirect("/error.jsp");
+            return;
+        }
         response.setContentType("text/html;charset=UTF-8");
 
         String service = request.getParameter("service");
@@ -65,6 +74,14 @@ public class StudyPackageController extends HttpServlet {
                 case "search":
                     searchStudyPackage(request, response);
                     break;
+                 case "checkout":
+                    checkoutStudyPackage(request, response);
+                    break;
+                case "detail":
+                    showDetail(request, response);
+                    break;
+
+                 
                 default:
                     listStudyPackage(request, response);
                     break;
@@ -207,6 +224,56 @@ public class StudyPackageController extends HttpServlet {
 
         request.getRequestDispatcher("/studypackage/listStudyPackage.jsp").forward(request, response);
     }
+   private void checkoutStudyPackage(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+    try {
+        int id = Integer.parseInt(request.getParameter("id"));
+        StudyPackage sp = dao.findStudyPackageById(id);
+
+        if (sp != null) {
+            // 1. Tạo đối tượng hóa đơn
+            Invoice invoice = new Invoice();
+            invoice.setTotal_amount(sp.getPrice());
+            invoice.setParent_id(1); // TODO: lấy từ session người dùng sau
+            invoice.setCreated_at(LocalDate.now());
+            invoice.setStatus("Đã thanh toán");
+            invoice.setPay_at(LocalDate.now());
+
+            // 2. Gọi DAO để lưu vào DB
+            InvoiceDAO invoiceDAO = new InvoiceDAO();
+            invoiceDAO.insertInvoice(invoice);
+
+            // 3. Gửi về trang hiển thị hóa đơn
+            request.setAttribute("studyPackage", sp);
+            request.getRequestDispatcher("/studypackage/invoice.jsp").forward(request, response);
+        } else {
+            request.setAttribute("errorMessage", "Không tìm thấy gói học để thanh toán.");
+            listStudyPackage(request, response);
+        }
+    } catch (NumberFormatException e) {
+        request.setAttribute("errorMessage", "Định dạng ID không hợp lệ!");
+        listStudyPackage(request, response);
+    }
+}
+
+    private void showDetail(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+    try {
+        int id = Integer.parseInt(request.getParameter("id"));
+        StudyPackage studyPackage = dao.findStudyPackageById(id);
+        if (studyPackage != null) {
+            request.setAttribute("studyPackageDetail", studyPackage);
+            request.getRequestDispatcher("/studypackage/studyPackageDetail.jsp").forward(request, response);
+        } else {
+            request.setAttribute("errorMessage", "Không tìm thấy gói học với ID: " + id);
+            listStudyPackage(request, response);
+        }
+    } catch (NumberFormatException e) {
+        request.setAttribute("errorMessage", "Định dạng ID không hợp lệ!");
+        listStudyPackage(request, response);
+    }
+}
+
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**

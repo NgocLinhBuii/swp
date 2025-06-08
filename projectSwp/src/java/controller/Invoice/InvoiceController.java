@@ -2,10 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-
 package controller.invoice;
-
-
 
 import dal.InvoiceDAO;
 import jakarta.servlet.ServletException;
@@ -18,6 +15,8 @@ import model.Invoice;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
+import util.AuthUtil;
+import util.RoleConstants;
 
 @WebServlet(name = "InvoiceController", urlPatterns = {"/invoice"})
 public class InvoiceController extends HttpServlet {
@@ -32,6 +31,10 @@ public class InvoiceController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        if (!AuthUtil.hasRole(request, RoleConstants.PARENT) && !AuthUtil.hasRole(request, RoleConstants.ADMIN)) {
+            response.sendRedirect("/error.jsp");
+            return;
+        }
         String action = request.getParameter("action");
 
         if ("delete".equals(action)) {
@@ -69,7 +72,10 @@ public class InvoiceController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
+        if (!AuthUtil.hasRole(request, RoleConstants.PARENT)) { // chỉ phụ huynh thực hiện thanh toán
+            response.sendRedirect("/error.jsp");
+            return;
+        }
         request.setCharacterEncoding("UTF-8");
         String action = request.getParameter("action");
 

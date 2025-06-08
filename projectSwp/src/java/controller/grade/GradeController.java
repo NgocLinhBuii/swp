@@ -12,6 +12,8 @@ import model.Account;
 
 import java.io.IOException;
 import java.util.List;
+import util.AuthUtil;
+import util.RoleConstants;
 
 @WebServlet(name = "GradeController", urlPatterns = {"/Grade"})
 public class GradeController extends HttpServlet {
@@ -21,6 +23,10 @@ public class GradeController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        if (!AuthUtil.hasRole(request, RoleConstants.ADMIN) && !AuthUtil.hasRole(request, RoleConstants.STUDENT) && !AuthUtil.hasRole(request, RoleConstants.TEACHER) ) {
+            response.sendRedirect("/error.jsp");
+            return;
+        }
         String action = request.getParameter("action");
         if (action == null) {
             action = "";
@@ -97,7 +103,10 @@ public class GradeController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
+        if (!AuthUtil.hasRole(request, RoleConstants.ADMIN)&&!AuthUtil.hasRole(request, RoleConstants.STUDENT) ) {
+            response.sendRedirect("/error.jsp");
+            return;
+        }
         String action = request.getParameter("action");
 
         try {

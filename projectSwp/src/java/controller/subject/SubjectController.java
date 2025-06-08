@@ -8,12 +8,13 @@ import jakarta.servlet.http.*;
 import model.Subject;
 import model.Grade;
 
-
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import util.AuthUtil;
+import util.RoleConstants;
 
 @WebServlet("/subjects")
 public class SubjectController extends HttpServlet {
@@ -23,7 +24,10 @@ public class SubjectController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String action = req.getParameter("action");
-
+        if (!AuthUtil.hasRole(req, RoleConstants.ADMIN) && !AuthUtil.hasRole(req, RoleConstants.TEACHER)&&  !AuthUtil.hasRole(req, RoleConstants.STUDENT)) {
+            resp.sendRedirect("/error.jsp");
+            return;
+        }
         try {
             // Lấy danh sách Grade để tạo map id -> name
             GradeDAO daoGrade = new GradeDAO();
@@ -58,8 +62,8 @@ public class SubjectController extends HttpServlet {
 
             } else {
                 String name = req.getParameter("name");
-                List<Subject> subjectList = (name != null && !name.trim().isEmpty()) ?
-                        daoSubject.findByNameOfSubject(name) : daoSubject.findAll();
+                List<Subject> subjectList = (name != null && !name.trim().isEmpty())
+                        ? daoSubject.findByNameOfSubject(name) : daoSubject.findAll();
                 req.setAttribute("subjectList", subjectList);
                 req.getRequestDispatcher("Subject/subjectList.jsp").forward(req, resp);
             }
@@ -73,6 +77,10 @@ public class SubjectController extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        if (!AuthUtil.hasRole(req, RoleConstants.ADMIN)) { // chỉ Admin chỉnh sửa môn học
+            resp.sendRedirect("/error.jsp");
+            return;
+        }
         try {
             String idStr = req.getParameter("id");
             String name = req.getParameter("name");

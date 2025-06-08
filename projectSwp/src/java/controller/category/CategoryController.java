@@ -1,8 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
-
 package controller.category;
 
 import dal.CategoryDAO;
@@ -12,6 +7,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import model.Category;
+import util.AuthUtil;
+import util.RoleConstants;
 
 import java.io.IOException;
 import java.util.List;
@@ -19,11 +16,16 @@ import java.util.List;
 @WebServlet("/category")
 public class CategoryController extends HttpServlet {
 
-    private CategoryDAO categoryDAO = new CategoryDAO();
+    private final CategoryDAO categoryDAO = new CategoryDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        // CHỈ CHO ADMIN VÀ TEACHER
+        if (!AuthUtil.hasRole(request, RoleConstants.ADMIN) && !AuthUtil.hasRole(request, RoleConstants.TEACHER)) {
+            response.sendRedirect("/error.jsp");
+            return;
+        }
 
         String action = request.getParameter("action");
         if (action == null) action = "";
@@ -34,7 +36,7 @@ public class CategoryController extends HttpServlet {
                     request.getRequestDispatcher("Category/addCategory.jsp").forward(request, response);
                     return;
 
-                case "updateForm":
+                case "updateForm": {
                     String idStr = request.getParameter("id");
                     if (idStr != null) {
                         int id = Integer.parseInt(idStr);
@@ -50,8 +52,13 @@ public class CategoryController extends HttpServlet {
                         request.setAttribute("error", "ID không hợp lệ");
                     }
                     break;
+                }
 
-                case "delete":
+                case "delete": {
+                    if (!AuthUtil.hasRole(request, RoleConstants.ADMIN)) {
+                        response.sendRedirect("/error.jsp");
+                        return;
+                    }
                     String delIdStr = request.getParameter("id");
                     if (delIdStr != null) {
                         int delId = Integer.parseInt(delIdStr);
@@ -62,8 +69,9 @@ public class CategoryController extends HttpServlet {
                         request.setAttribute("error", "ID không hợp lệ để xóa");
                     }
                     break;
+                }
 
-                default:
+                default: {
                     String name = request.getParameter("name");
                     List<Category> categoryList;
                     if (name != null && !name.trim().isEmpty()) {
@@ -76,6 +84,7 @@ public class CategoryController extends HttpServlet {
                     }
                     request.setAttribute("categoryList", categoryList);
                     break;
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -88,6 +97,11 @@ public class CategoryController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        // CHỈ CHO ADMIN
+        if (!AuthUtil.hasRole(request, RoleConstants.ADMIN)) {
+            response.sendRedirect("/error.jsp");
+            return;
+        }
 
         String action = request.getParameter("action");
 
@@ -112,7 +126,6 @@ public class CategoryController extends HttpServlet {
                 request.setAttribute("message", "Cập nhật category thành công");
             }
 
-            // Tải lại danh sách category sau thao tác
             List<Category> categoryList = categoryDAO.getAllCategories();
             request.setAttribute("categoryList", categoryList);
 

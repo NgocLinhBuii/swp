@@ -59,7 +59,7 @@ public class PackageSubjectController extends HttpServlet {
                     request.setAttribute("list", list);
                     DAOSubject subject = new DAOSubject();
                     List<Subject> sub = subject.findAll();
-                    request.setAttribute("sub", sub);
+                    request.setAttribute("subject", sub);
                     break;
             }
 

@@ -303,7 +303,14 @@
                                         <input type="hidden" name="id" value="${sp.id}" />
                                         <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                                     </form>
+                                    <!-- Nút thanh toán -->
+                                    <form method="post" action="study_package" style="display:inline-block;" onsubmit="return confirm('Bạn có chắc chắn muốn thanh toán gói học này?');">
+                                        <input type="hidden" name="service" value="checkout" />
+                                        <input type="hidden" name="id" value="${sp.id}" />
+                                        <button type="submit" class="btn btn-success btn-sm">Thanh toán</button>
+                                    </form>
                                 </td>
+
                             </tr>
                         </c:forEach>
                     </c:when>

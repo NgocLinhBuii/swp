@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Base64;
 import java.util.List;
+import util.AuthUtil;
+import util.RoleConstants;
 
 @MultipartConfig
 @WebServlet(name = "QuestionController", urlPatterns = {"/Question"})
@@ -30,8 +32,14 @@ public class QuestionController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        if (!AuthUtil.hasRole(request, RoleConstants.ADMIN) && !AuthUtil.hasRole(request, RoleConstants.TEACHER)&& !AuthUtil.hasRole(request, RoleConstants.STUDENT)) {
+            response.sendRedirect("/error.jsp");
+            return;
+        }
         String action = request.getParameter("action");
-        if (action == null) action = "";
+        if (action == null) {
+            action = "";
+        }
 
         try {
             switch (action) {
@@ -98,6 +106,10 @@ public class QuestionController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+       if (!AuthUtil.hasRole(request, RoleConstants.ADMIN) && !AuthUtil.hasRole(request, RoleConstants.TEACHER)&& !AuthUtil.hasRole(request, RoleConstants.STUDENT)) {
+            response.sendRedirect("/error.jsp");
+            return;
+        }
         request.setCharacterEncoding("UTF-8");
         String action = request.getParameter("action");
 

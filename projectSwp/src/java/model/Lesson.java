@@ -9,19 +9,22 @@ package model;
  * @author BuiNgocLinh
  */
 public class Lesson {
+
     private int id;
     private String name;
     private String content;
     private int chapter_id;
+    private String video_link;
 
     public Lesson() {
     }
 
-    public Lesson(int id, String name, String content, int chapter_id) {
+    public Lesson(int id, String name, String content, int chapter_id, String video_link) {
         this.id = id;
         this.name = name;
         this.content = content;
         this.chapter_id = chapter_id;
+        this.video_link = video_link;
     }
 
     public int getId() {
@@ -56,11 +59,17 @@ public class Lesson {
         this.chapter_id = chapter_id;
     }
 
+    public String getVideo_link() {
+        return video_link;
+    }
+
+    public void setVideo_link(String video_link) {
+        this.video_link = video_link;
+    }
+
     @Override
     public String toString() {
-        return "Lesson{" + "id=" + id + ", name=" + name + ", content=" + content + ", chapter_id=" + chapter_id + '}';
+        return "Lesson{" + "id=" + id + ", name=" + name + ", content=" + content + ", chapter_id=" + chapter_id + ", video_link=" + video_link + '}';
     }
-    
-    
-    
+
 }

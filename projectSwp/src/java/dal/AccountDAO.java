@@ -247,7 +247,7 @@ public class AccountDAO extends DBContext {
         String sql = "INSERT INTO account (email, password, status, role, full_name, sex, dob, image_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, account.getEmail());
-            stmt.setString(2, account.getPassword());
+            stmt.setString(2, passwordEncode.hashPassword(account.getPassword()));
             stmt.setString(3, account.getStatus());
             stmt.setString(4, account.getRole());
             stmt.setString(5, account.getFull_name());
@@ -308,6 +308,41 @@ public class AccountDAO extends DBContext {
 //        }
 //        return null;
 //    }
+    public List<Account> getAccountsByPage(int offset, int limit) throws SQLException {
+        List<Account> list = new ArrayList<>();
+        String sql = "SELECT * FROM account LIMIT ?, ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, offset);
+            ps.setInt(2, limit);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Account acc = new Account();
+                acc.setId(rs.getInt("id"));
+                acc.setEmail(rs.getString("email"));
+                acc.setPassword(rs.getString("password"));
+                acc.setStatus(rs.getString("status"));
+                acc.setRole(rs.getString("role"));
+                acc.setFull_name(rs.getString("full_name"));
+                acc.setSex(rs.getObject("sex") == null ? null : rs.getInt("sex"));
+                acc.setDob(rs.getDate("dob") == null ? null : rs.getDate("dob").toLocalDate());
+                acc.setImage_id(rs.getObject("image_id") == null ? null : rs.getInt("image_id"));
+                list.add(acc);
+            }
+        }
+        return list;
+    }
+
+    public int countAccounts() throws SQLException {
+        String sql = "SELECT COUNT(*) FROM account";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+        return 0;
+    }
+
     public Account checkLogin(String email, String password) {
         Account account = null;
         String sql = "SELECT * FROM account WHERE email = ?";

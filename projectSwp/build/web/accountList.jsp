@@ -108,66 +108,92 @@
                 text-align: center;
                 font-weight: bold;
             }
+
+
+            .pagination ul {
+                list-style: none;
+                display: flex;
+                gap: 5px;
+                padding-left: 0;
+            }
+
+            .pagination li {
+                padding: 5px 10px;
+                background: #f8f8f8;
+            }
+
+            .pagination li.active {
+                font-weight: bold;
+                background: #007bff;
+                color: white;
+            }
+
+            .pagination a {
+                text-decoration: none;
+                color: inherit;
+            }
         </style>
 
     </head>
     <body>
-        <!-- ? Preloader Start -->
-        <div id="preloader-active">
-            <div class="preloader d-flex align-items-center justify-content-center">
-                <div class="preloader-inner position-relative">
-                    <div class="preloader-circle"></div>
-                    <div class="preloader-img pere-text">
-                        <img src="assets/img/logo/loder.png" alt="">
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Preloader Start -->
-        <!-- Header Start -->
-        <div class="header-area header-transparent">
-            <div class="main-header ">
-                <div class="header-bottom header-sticky">
-                    <div class="container-fluid">
-                        <div class="row align-items-center">
-                            <!-- Logo -->
-                            <div class="col-xl-2 col-lg-2">
-                                <div class="logo">
-                                    <a href="#"><img src="assets/img/logo/logo.png" alt=""></a>
-                                </div>
-                            </div>
-                            <div class="col-xl-10 col-lg-10">
-                                <div class="menu-wrapper d-flex align-items-center justify-content-end">
-                                    <!-- Main-menu -->
-                                    <div class="main-menu d-none d-lg-block">
-                                        <nav>
-                                            <ul id="navigation">                                                                                          
-                                                <li class="active" ><a href="#">Home</a></li>
-                                                <li><a href="#">Courses</a></li>
-                                                <li><a href="#">About</a></li>
-                                                <li><a href="#">Blog</a>
-                                                    <ul class="submenu">
-                                                        <li><a href="#">Blog</a></li>
-                                                        <li><a href="#l">Blog Details</a></li>
-                                                        <li><a href="#">Element</a></li>
-                                                    </ul>
-                                                </li>
-                                                <li><a href="#">Contact</a></li>
-                                            </ul>
-                                        </nav>
-                                    </div>
-                                </div>
-                            </div> 
-                            <!-- Mobile Menu -->
-                            <div class="col-12">
-                                <div class="mobile_menu d-block d-lg-none"></div>
+        <!--         ? Preloader Start 
+                <div id="preloader-active">
+                    <div class="preloader d-flex align-items-center justify-content-center">
+                        <div class="preloader-inner position-relative">
+                            <div class="preloader-circle"></div>
+                            <div class="preloader-img pere-text">
+                                <img src="assets/img/logo/loder.png" alt="">
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-        <!-- Header End -->
+                 Preloader Start 
+                 Header Start 
+                <div class="header-area header-transparent">
+                    <div class="main-header ">
+                        <div class="header-bottom header-sticky">
+                            <div class="container-fluid">
+                                <div class="row align-items-center">
+                                     Logo 
+                                    <div class="col-xl-2 col-lg-2">
+                                        <div class="logo">
+                                            <a href="#"><img src="assets/img/logo/logo.png" alt=""></a>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-10 col-lg-10">
+                                        <div class="menu-wrapper d-flex align-items-center justify-content-end">
+                                             Main-menu 
+                                            <div class="main-menu d-none d-lg-block">
+                                                <nav>
+                                                    <ul id="navigation">                                                                                          
+                                                        <li class="active" ><a href="#">Home</a></li>
+                                                        <li><a href="#">Courses</a></li>
+                                                        <li><a href="#">About</a></li>
+                                                        <li><a href="#">Blog</a>
+                                                            <ul class="submenu">
+                                                                <li><a href="#">Blog</a></li>
+                                                                <li><a href="#l">Blog Details</a></li>
+                                                                <li><a href="#">Element</a></li>
+                                                            </ul>
+                                                        </li>
+                                                        <li><a href="#">Contact</a></li>
+                                                    </ul>
+                                                </nav>
+                                            </div>
+                                        </div>
+                                    </div> 
+                                     Mobile Menu 
+                                    <div class="col-12">
+                                        <div class="mobile_menu d-block d-lg-none"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                 Header End -->
+
+        <%@include file="header.jsp" %>
         <main>
             <div class="container mt-5 mb-5">
                 <div class="row">
@@ -232,7 +258,51 @@
                                 </c:forEach>
                             </tbody>
                         </table>
+                        <div class="pagination">
+                            <c:if test="${totalPages > 1}">
+                                <nav>
+                                    <ul class="pagination">
+                                        <c:if test="${currentPage > 1}">
+                                            <li class="page-item">
+                                                <a class="page-link" href="admin?action=listAccount&page=${currentPage - 1}">Before</a>
+                                            </li>
+                                        </c:if>
 
+                                        <li class="page-item ${currentPage == 1 ? 'active' : ''}">
+                                            <a class="page-link" href="admin?action=listAccount&page=1">1</a>
+                                        </li>
+
+                                        <c:if test="${currentPage > 3}">
+                                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                                            </c:if>
+
+                                        <c:forEach begin="${currentPage - 1}" end="${currentPage + 1}" var="i">
+                                            <c:if test="${i > 1 && i < totalPages}">
+                                                <li class="page-item ${currentPage == i ? 'active' : ''}">
+                                                    <a class="page-link" href="admin?action=listAccount&page=${i}">${i}</a>
+                                                </li>
+                                            </c:if>
+                                        </c:forEach>
+
+                                        <c:if test="${currentPage < totalPages - 2}">
+                                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                                            </c:if>
+
+                                        <c:if test="${totalPages > 1}">
+                                            <li class="page-item ${currentPage == totalPages ? 'active' : ''}">
+                                                <a class="page-link" href="admin?action=listAccount&page=${totalPages}">${totalPages}</a>
+                                            </li>
+                                        </c:if>
+
+                                        <c:if test="${currentPage < totalPages}">
+                                            <li class="page-item">
+                                                <a class="page-link" href="admin?action=listAccount&page=${currentPage + 1}">After</a>
+                                            </li>
+                                        </c:if>
+                                    </ul>
+                                </nav>
+                            </c:if>
+                        </div>
                         <a href="admin?action=createAccount" class="btn btn-success btn-sm">Add New Account</a>
                         <% if (session.getAttribute("account") != null) { %>
                         <a href="logout" class="btn btn-outline-secondary btn-sm ml-2">Logout</a>
@@ -384,6 +454,5 @@
         <script src="./assets/js/main.js"></script>
 
     </body>
-</body>
 </html>
 

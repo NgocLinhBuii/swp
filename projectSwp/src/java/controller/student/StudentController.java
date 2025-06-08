@@ -25,6 +25,8 @@ import model.Account;
 import model.Grade;
 import model.Image;
 import model.Student;
+import util.AuthUtil;
+import util.RoleConstants;
 
 /**
  *
@@ -43,6 +45,10 @@ public class StudentController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        if (!AuthUtil.hasRole(request, RoleConstants.ADMIN) && !AuthUtil.hasRole(request, RoleConstants.TEACHER) && !AuthUtil.hasRole(request, RoleConstants.STUDENT) ) {
+            response.sendRedirect("/error.jsp");
+            return;
+        }
         String action = request.getParameter("action");
 
         if (action == null) {
@@ -51,6 +57,9 @@ public class StudentController extends HttpServlet {
 
         try {
             switch (action) {
+                case "viewProfile":
+                    viewProfile(request, response);
+                    break;
                 case "search":
                     searchStudents(request, response);
                     break;
@@ -75,6 +84,10 @@ public class StudentController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        if (!AuthUtil.hasRole(request, RoleConstants.ADMIN) && !AuthUtil.hasRole(request, RoleConstants.TEACHER) && !AuthUtil.hasRole(request, RoleConstants.STUDENT) ) {
+            response.sendRedirect("/error.jsp");
+            return;
+        }
         String action = request.getParameter("action");
 
         try {
@@ -93,13 +106,30 @@ public class StudentController extends HttpServlet {
 
     private void listStudents(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, ServletException, IOException {
+        int page = 1;
+        int recordsPerPage = 1;
+
+        String pageParam = request.getParameter("page");
+        if (pageParam != null) {
+            try {
+                page = Integer.parseInt(pageParam);
+            } catch (NumberFormatException e) {
+                page = 1;
+            }
+        }
+
+        int offset = (page - 1) * recordsPerPage;
         List<Account> accList = accountDAO.findAll();
-        List<Student> list = studentDAO.findAll();
+        List<Student> list = studentDAO.getStudentsByPage(offset, recordsPerPage);
+        int totalRecords = studentDAO.countStudents();
+        int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
         List<Grade> gradeList = gradeDAO.findAllFromGrade();
         List<Image> imageList = ImageDAO.findAll();
 
         request.setAttribute("students", list);
         request.setAttribute("accList", accList);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("totalPages", totalPages);
         request.setAttribute("gradeList", gradeList);
         request.setAttribute("imageList", imageList);
         request.getRequestDispatcher("/student/list.jsp").forward(request, response);
@@ -216,6 +246,19 @@ public class StudentController extends HttpServlet {
         int imageId = (imageIdParam == null || imageIdParam.isEmpty()) ? 0 : Integer.parseInt(imageIdParam);
 
         return new Student(id, gradeId, parentId, username, password, fullName, dob, sex, imageId);
+    }
+
+    private void viewProfile(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+        List<Image> imageList = ImageDAO.findAll();
+        List<Account> accList = accountDAO.findAll();
+        List<Grade> gradeList = gradeDAO.findAllFromGrade();
+        int id = Integer.parseInt(request.getParameter("id"));
+        Student studentView = studentDAO.findById(id);
+        request.setAttribute("accList", accList);
+        request.setAttribute("gradeList", gradeList);
+        request.setAttribute("imageList", imageList);
+        request.setAttribute("view", studentView);
+        request.getRequestDispatcher("student/viewProfile.jsp").forward(request, response);
     }
 
 }
