@@ -341,13 +341,27 @@
             <br/>
             <br/>
             <label for="parent_id">Parent:</label>
-            <select name="parent_id" id="parent_id" required>
-                <c:forEach var="parent" items="${accList}">
-                    <c:if test="${parent.role == 'parent'}">
-                        <option value="${parent.id}" ${parent.id == student.parent_id ? 'selected' : ''}>${parent.full_name}</option>
-                    </c:if>
-                </c:forEach>
-            </select>
+            <c:choose>
+                <c:when test="${isParentCreating}">
+                    <!-- Parent đang tạo con, không cho phép chọn parent khác -->
+                    <c:forEach var="parent" items="${accList}">
+                        <c:if test="${parent.role == 'parent' && parent.id == currentParentId}">
+                            <input type="hidden" name="parent_id" value="${parent.id}" />
+                            <input type="text" value="${parent.full_name}" readonly style="background-color: #f8f9fa;" />
+                        </c:if>
+                    </c:forEach>
+                </c:when>
+                <c:otherwise>
+                    <!-- Admin/Teacher có thể chọn parent -->
+                    <select name="parent_id" id="parent_id" required>
+                        <c:forEach var="parent" items="${accList}">
+                            <c:if test="${parent.role == 'parent'}">
+                                <option value="${parent.id}" ${parent.id == student.parent_id ? 'selected' : ''}>${parent.full_name}</option>
+                            </c:if>
+                        </c:forEach>
+                    </select>
+                </c:otherwise>
+            </c:choose>
             <br/>
             <br/>
             Username: <input type="text" name="username" value="${student.username}" required/><br/>
@@ -375,7 +389,14 @@
                 </div>
             </c:if>
             <input type="submit" value="${student == null ? "Add" : "update"}"/>
-            <a href="student">Back</a>
+            <c:choose>
+                <c:when test="${isParentCreating}">
+                    <a href="${pageContext.request.contextPath}/parent?action=myChildren" class="btn btn-secondary">Back to My Children</a>
+                </c:when>
+                <c:otherwise>
+                    <a href="student" class="btn btn-secondary">Back</a>
+                </c:otherwise>
+            </c:choose>
         </form>
         <footer>
             <div class="footer-wrappper footer-bg">

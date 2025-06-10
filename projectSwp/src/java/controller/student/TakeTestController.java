@@ -1,0 +1,467 @@
+package controller.student;
+
+import dal.*;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import model.*;
+import util.AuthUtil;
+import util.RoleConstants;
+
+import java.io.IOException;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@WebServlet("/student/taketest")
+public class TakeTestController extends HttpServlet {
+    private TestDAO testDAO;
+    private TestRecordDAO testRecordDAO;
+    private QuestionDAO questionDAO;
+    private QuestionOptionDAO questionOptionDAO;
+    private QuestionRecordDAO questionRecordDAO;
+    private CategoryDAO categoryDAO;
+
+    @Override
+    public void init() {
+        testDAO = new TestDAO();
+        testRecordDAO = new TestRecordDAO();
+        questionDAO = new QuestionDAO();
+        questionOptionDAO = new QuestionOptionDAO();
+        questionRecordDAO = new QuestionRecordDAO();
+        categoryDAO = new CategoryDAO();
+        
+        // Khởi tạo dữ liệu test nếu cần
+        questionRecordDAO.initializeTestDataIfNeeded();
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        if (!AuthUtil.hasRole(request, RoleConstants.STUDENT)) {
+            response.sendRedirect("/login.jsp");
+            return;
+        }
+
+        String action = request.getParameter("action");
+        if (action == null) {
+            showTestList(request, response);
+        } else {
+            switch (action) {
+                case "start":
+                    startTest(request, response);
+                    break;
+                case "question":
+                    showAllQuestions(request, response);
+                    break;
+                case "result":
+                    showResult(request, response);
+                    break;
+                case "history":
+                    showHistory(request, response);
+                    break;
+                case "finish":
+                    finishTest(request, response);
+                    break;
+                default:
+                    showTestList(request, response);
+                    break;
+            }
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        if (!AuthUtil.hasRole(request, RoleConstants.STUDENT)) {
+            response.sendRedirect("/login.jsp");
+            return;
+        }
+
+        String action = request.getParameter("action");
+        if ("submit".equals(action)) {
+            submitAllAnswers(request, response);
+        } else if ("finish".equals(action)) {
+            finishTest(request, response);
+        }
+    }
+
+    private void showTestList(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            HttpSession session = request.getSession();
+            Student student = (Student) session.getAttribute("student");
+            
+            if (student == null) {
+                response.sendRedirect("/login.jsp");
+                return;
+            }
+
+            List<Test> practiceTests = testDAO.getTestsByType(true);
+            List<Test> officialTests = testDAO.getTestsByType(false);
+            Map<Integer, String> categoryMap = getCategoryMap();
+
+            // Check which official tests student has already taken
+            Map<Integer, Boolean> takenTests = new HashMap<>();
+            for (Test test : officialTests) {
+                boolean hasTaken = testRecordDAO.hasStudentTakenTest(student.getId(), test.getId());
+                takenTests.put(test.getId(), hasTaken);
+            }
+
+            request.setAttribute("practiceTests", practiceTests);
+            request.setAttribute("officialTests", officialTests);
+            request.setAttribute("categoryMap", categoryMap);
+            request.setAttribute("takenTests", takenTests);
+
+            RequestDispatcher dispatcher = request.getRequestDispatcher("/student/testList.jsp");
+            dispatcher.forward(request, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
+            RequestDispatcher dispatcher = request.getRequestDispatcher("/student/testList.jsp");
+            dispatcher.forward(request, response);
+        }
+    }
+
+    private void startTest(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            System.out.println("\n===== START TEST =====");
+            int testId = Integer.parseInt(request.getParameter("testId"));
+            HttpSession session = request.getSession();
+            Student student = (Student) session.getAttribute("student");
+
+            if (student == null) {
+                System.out.println("No student found in session! Redirecting to login");
+                response.sendRedirect("/login.jsp");
+                return;
+            }
+
+            Test test = testDAO.getTestById(testId);
+            if (test == null) {
+                System.out.println("Test ID " + testId + " not found!");
+                request.setAttribute("error", "Test không tồn tại!");
+                showTestList(request, response);
+                return;
+            }
+            
+            // Debug test info
+            testDAO.debugTestInfo(testId);
+
+            // Check if it's an official test and student has already taken it
+            if (!test.isIs_practice() && testRecordDAO.hasStudentTakenTest(student.getId(), testId)) {
+                System.out.println("Student " + student.getId() + " has already taken test " + testId);
+                request.setAttribute("error", "Bạn đã làm bài test này rồi!");
+                showTestList(request, response);
+                return;
+            }
+
+            // Check for active test record
+            TestRecord activeRecord = testRecordDAO.getActiveTestRecord(student.getId(), testId);
+            int testRecordId;
+
+            if (activeRecord != null) {
+                testRecordId = activeRecord.getId();
+                System.out.println("Found active test record ID=" + testRecordId);
+            } else {
+                // Create new test record
+                testRecordId = testRecordDAO.createTestRecord(student.getId(), testId);
+                if (testRecordId == -1) {
+                    System.out.println("Failed to create test record!");
+                    request.setAttribute("error", "Không thể bắt đầu test!");
+                    showTestList(request, response);
+                    return;
+                }
+                System.out.println("Created new test record ID=" + testRecordId);
+            }
+
+            // Store test info in session
+            session.setAttribute("currentTestId", testId);
+            session.setAttribute("currentTestRecordId", testRecordId);
+            session.setAttribute("currentQuestionIndex", 0);
+            
+            System.out.println("Session updated with testId=" + testId + 
+                              ", testRecordId=" + testRecordId + ", questionIndex=0");
+            System.out.println("===== START TEST COMPLETED =====\n");
+
+            // Redirect to first question
+            response.sendRedirect("taketest?action=question");
+
+        } catch (NumberFormatException e) {
+            System.out.println("ERROR: Invalid test ID format");
+            request.setAttribute("error", "Test ID không hợp lệ!");
+            showTestList(request, response);
+        } catch (Exception e) {
+            System.out.println("ERROR in startTest: " + e.getMessage());
+            e.printStackTrace();
+            request.setAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
+            showTestList(request, response);
+        }
+    }
+
+    private void showAllQuestions(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            HttpSession session = request.getSession();
+            Integer testId = (Integer) session.getAttribute("currentTestId");
+            Integer testRecordId = (Integer) session.getAttribute("currentTestRecordId");
+            
+            if (testId == null || testRecordId == null) {
+                response.sendRedirect("taketest");
+                return;
+            }
+            
+            Test test = testDAO.getTestById(testId);
+            if (test == null) {
+                response.sendRedirect("taketest");
+                return;
+            }
+            
+            // Lấy danh sách câu hỏi
+            List<Question> questions = questionDAO.getQuestionsByTest(testId);
+            
+            // Lấy các câu trả lời đã lưu (nếu có)
+            Map<Integer, Integer> previousAnswers = new HashMap<>();
+            List<QuestionRecord> records = questionRecordDAO.getQuestionRecordsByTestRecord(testRecordId);
+            for (QuestionRecord record : records) {
+                previousAnswers.put(record.getQuestion_id(), record.getOption_id());
+            }
+            
+            // Lấy options cho mỗi câu hỏi
+            Map<Integer, List<QuestionOption>> allOptions = new HashMap<>();
+            for (Question question : questions) {
+                List<QuestionOption> options = questionOptionDAO.getOptionsByQuestion(question.getId());
+                allOptions.put(question.getId(), options);
+            }
+            
+            // Đặt dữ liệu vào request
+            request.setAttribute("test", test);
+            request.setAttribute("questions", questions);
+            request.setAttribute("allOptions", allOptions);
+            request.setAttribute("previousAnswers", previousAnswers);
+            request.setAttribute("totalQuestions", questions.size());
+            
+            // Hiển thị lỗi nếu có
+            String error = (String) request.getAttribute("error");
+            if (error != null) {
+                request.setAttribute("error", error);
+            }
+            
+            // Chuyển hướng đến trang hiển thị tất cả câu hỏi
+            RequestDispatcher dispatcher = request.getRequestDispatcher("/student/takeTest.jsp");
+            dispatcher.forward(request, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect("taketest");
+        }
+    }
+    
+    // Phương thức xử lý nộp bài với tất cả câu hỏi
+    private void submitAllAnswers(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        try {
+            HttpSession session = request.getSession();
+            Integer testRecordId = (Integer) session.getAttribute("currentTestRecordId");
+            
+            if (testRecordId == null) {
+                response.sendRedirect("taketest");
+                return;
+            }
+            
+            // Lấy và lưu tất cả câu trả lời
+            int index = 0;
+            String questionIdParam;
+            
+            while ((questionIdParam = request.getParameter("questionId" + index)) != null) {
+                String optionIdParam = request.getParameter("optionId" + index);
+                
+                if (questionIdParam != null && optionIdParam != null && !optionIdParam.isEmpty()) {
+                    int questionId = Integer.parseInt(questionIdParam);
+                    int optionId = Integer.parseInt(optionIdParam);
+                    
+                    // Lưu câu trả lời
+                    questionRecordDAO.saveQuestionRecord(testRecordId, questionId, optionId);
+                }
+                
+                index++;
+            }
+            
+            // Chuyển đến hoàn thành bài test
+            finishTest(request, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect("taketest");
+        }
+    }
+
+    private void finishTest(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        try {
+            System.out.println("\n***** FINISH TEST START *****");
+            HttpSession session = request.getSession();
+            Integer testRecordId = (Integer) session.getAttribute("currentTestRecordId");
+            Integer testId = (Integer) session.getAttribute("currentTestId");
+            System.out.println("Test record ID from session: " + testRecordId);
+
+            if (testRecordId != null) {
+                // Check question records
+                List<QuestionRecord> records = questionRecordDAO.getQuestionRecordsByTestRecord(testRecordId);
+                System.out.println("Number of question records: " + records.size());
+                
+                // Lấy danh sách câu hỏi
+                List<Question> questions = questionDAO.getQuestionsByTest(testId);
+                
+                // Kiểm tra xem đã trả lời đủ câu hỏi chưa
+                if (records.size() < questions.size()) {
+                    // Chưa trả lời đủ câu hỏi
+                    request.setAttribute("error", "Vui lòng trả lời tất cả câu hỏi trước khi nộp bài!");
+                    
+                    // Chuyển hướng về trang làm bài
+                    response.sendRedirect("taketest?action=question");
+                    return;
+                }
+                
+                // Tính điểm thực tế dựa trên câu trả lời
+                double score = questionRecordDAO.calculateScore(testRecordId);
+                System.out.println("ACTUAL SCORE CALCULATION: " + score);
+                
+                try {
+                    // Attempt to save score
+                    System.out.println("Calling finishTestRecord with testRecordId=" + testRecordId + ", score=" + score);
+                    testRecordDAO.finishTestRecord(testRecordId, score);
+                    System.out.println("finishTestRecord completed successfully");
+                    
+                    // Verify score was saved
+                    TestRecord record = testRecordDAO.getTestRecordById(testRecordId);
+                    if (record != null) {
+                        System.out.println("VERIFICATION: Record retrieved, score=" + record.getScore());
+                    } else {
+                        System.out.println("ERROR: Could not retrieve test record after save");
+                    }
+                } catch (Exception e) {
+                    System.out.println("ERROR in finishTestRecord: " + e.getMessage());
+                    e.printStackTrace();
+                }
+
+                // Clear session
+                session.removeAttribute("currentTestId");
+                session.removeAttribute("currentTestRecordId");
+                session.removeAttribute("currentQuestionIndex");
+                
+                System.out.println("Redirecting to result page: taketest?action=result&testRecordId=" + testRecordId);
+                // Redirect to result page with valid testRecordId
+                response.sendRedirect("taketest?action=result&testRecordId=" + testRecordId);
+                System.out.println("***** FINISH TEST END *****\n");
+            } else {
+                System.out.println("ERROR: No testRecordId found in session");
+                System.out.println("***** FINISH TEST FAILED *****\n");
+                // No valid testRecordId, redirect to test list
+                response.sendRedirect("taketest");
+            }
+
+        } catch (Exception e) {
+            System.out.println("CRITICAL ERROR in finishTest: " + e.getMessage());
+            e.printStackTrace();
+            System.out.println("***** FINISH TEST FAILED WITH EXCEPTION *****\n");
+            response.sendRedirect("taketest");
+        }
+    }
+
+    private void showResult(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            String testRecordIdParam = request.getParameter("testRecordId");
+            if (testRecordIdParam == null || testRecordIdParam.equals("null")) {
+                response.sendRedirect("taketest");
+                return;
+            }
+            
+            int testRecordId = Integer.parseInt(testRecordIdParam);
+            TestRecord testRecord = testRecordDAO.getTestRecordById(testRecordId);
+            
+            if (testRecord == null) {
+                request.setAttribute("error", "Không tìm thấy kết quả test!");
+                showTestList(request, response);
+                return;
+            }
+
+            Test test = testDAO.getTestById(testRecord.getTest_id());
+            
+            request.setAttribute("testRecord", testRecord);
+            request.setAttribute("test", test);
+
+            RequestDispatcher dispatcher = request.getRequestDispatcher("/student/testResult.jsp");
+            dispatcher.forward(request, response);
+
+        } catch (NumberFormatException e) {
+            request.setAttribute("error", "Test record ID không hợp lệ!");
+            showTestList(request, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "Có lỗi xảy ra khi tải kết quả!");
+            showTestList(request, response);
+        }
+    }
+
+    private void showHistory(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            HttpSession session = request.getSession();
+            Student student = (Student) session.getAttribute("student");
+
+            if (student == null) {
+                response.sendRedirect("/login.jsp");
+                return;
+            }
+
+            System.out.println("DEBUG: Getting test records for student ID: " + student.getId());
+            List<TestRecord> testRecords = testRecordDAO.getTestRecordsByStudent(student.getId());
+            System.out.println("DEBUG: Found " + testRecords.size() + " test records");
+            
+            Map<Integer, String> testMap = new HashMap<>();
+
+            for (TestRecord record : testRecords) {
+                Test test = testDAO.getTestById(record.getTest_id());
+                if (test != null) {
+                    testMap.put(test.getId(), test.getName());
+                }
+                System.out.println("DEBUG: Record ID: " + record.getId() + ", Test ID: " + record.getTest_id() + ", Score: " + record.getScore());
+            }
+
+            request.setAttribute("testRecords", testRecords);
+            request.setAttribute("testMap", testMap);
+
+            RequestDispatcher dispatcher = request.getRequestDispatcher("/student/testHistory.jsp");
+            dispatcher.forward(request, response);
+
+        } catch (Exception e) {
+            System.out.println("DEBUG: Error in showHistory: " + e.getMessage());
+            e.printStackTrace();
+            request.setAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
+            RequestDispatcher dispatcher = request.getRequestDispatcher("/student/testHistory.jsp");
+            dispatcher.forward(request, response);
+        }
+    }
+
+    private Map<Integer, String> getCategoryMap() {
+        Map<Integer, String> categoryMap = new HashMap<>();
+        try {
+            List<Category> categories = categoryDAO.getAllCategories();
+            for (Category category : categories) {
+                categoryMap.put(category.getId(), category.getName());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return categoryMap;
+    }
+} 

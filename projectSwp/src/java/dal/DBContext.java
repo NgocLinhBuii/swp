@@ -8,9 +8,9 @@ import java.sql.SQLException;
 public class DBContext {
 
     protected Connection connection;
-    private static final String URL = "jdbc:mysql://localhost:3306/db-script";
+    private static final String URL = "jdbc:mysql://localhost:3306/pls";
     private static final String USERNAME = "root";
-    private static final String PASSWORD = "1234";
+    private static final String PASSWORD = "123456";
 
     public DBContext() {
         try {

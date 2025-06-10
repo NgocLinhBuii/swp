@@ -52,11 +52,19 @@
                                             </li>
                                         </c:if>
 
-                                        <c:if test="${sessionScope.role == 'student'}">
-                                            <li><a href="#">Student</a>
+                                                                <c:if test="${sessionScope.role == 'student'}">
+                            <li><a href="#">Learning</a>
                                                 <ul class="submenu">
-                                                    <li><a href="/test">Tests</a></li>
-                                                    <li><a href="/Grade">Grades</a></li>
+                                                    <li><a href="/subjects">My Subjects</a></li>
+                                                    <li><a href="/LessonURL">My Lessons</a></li>
+                                                    <li><a href="/chapter">Chapters</a></li>
+                                                </ul>
+                                            </li>
+                                            <li><a href="#">Tests & Practice</a>
+                                                <ul class="submenu">
+                                                    <li><a href="/student/taketest">All Tests & Practice</a></li>
+                                                    <li><a href="/student/taketest?action=history">My Test History</a></li>
+                                                    <li><a href="/Grade">My Grades</a></li>
                                                 </ul>
                                             </li>
                                         </c:if>
@@ -66,7 +74,7 @@
                                                 <ul class="submenu">
                                                     <li><a href="/invoice">Invoices</a></li>
                                                     <li><a href="/Grade">Grades</a></li>
-                                                    <li><a href="/student?action=viewProfile&id=${sessionScope.account.id}">My Children</a></li>
+                                                    <li><a href="/parent?action=myChildren">My Children</a></li>
 
                                                 </ul>
                                             </li>

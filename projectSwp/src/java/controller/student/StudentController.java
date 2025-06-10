@@ -21,6 +21,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import model.Account;
 import model.Grade;
 import model.Image;
@@ -45,7 +46,7 @@ public class StudentController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        if (!AuthUtil.hasRole(request, RoleConstants.ADMIN) && !AuthUtil.hasRole(request, RoleConstants.TEACHER) && !AuthUtil.hasRole(request, RoleConstants.STUDENT) ) {
+        if (!AuthUtil.hasRole(request, RoleConstants.ADMIN) && !AuthUtil.hasRole(request, RoleConstants.TEACHER) && !AuthUtil.hasRole(request, RoleConstants.STUDENT) && !AuthUtil.hasRole(request, RoleConstants.PARENT)) {
             response.sendRedirect("/error.jsp");
             return;
         }
@@ -84,7 +85,7 @@ public class StudentController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        if (!AuthUtil.hasRole(request, RoleConstants.ADMIN) && !AuthUtil.hasRole(request, RoleConstants.TEACHER) && !AuthUtil.hasRole(request, RoleConstants.STUDENT) ) {
+        if (!AuthUtil.hasRole(request, RoleConstants.ADMIN) && !AuthUtil.hasRole(request, RoleConstants.TEACHER) && !AuthUtil.hasRole(request, RoleConstants.STUDENT) && !AuthUtil.hasRole(request, RoleConstants.PARENT)) {
             response.sendRedirect("/error.jsp");
             return;
         }
@@ -139,6 +140,19 @@ public class StudentController extends HttpServlet {
             throws ServletException, IOException, SQLException {
         List<Grade> gradeList = gradeDAO.findAllFromGrade();
         List<Account> accList = accountDAO.findAll();
+        
+        // Kiểm tra nếu là parent tạo student
+        String fromParent = request.getParameter("fromParent");
+        if ("true".equals(fromParent)) {
+            // Lấy thông tin parent từ session
+            HttpSession session = request.getSession();
+            Account parentAccount = (Account) session.getAttribute("account");
+            if (parentAccount != null && "parent".equals(parentAccount.getRole())) {
+                request.setAttribute("currentParentId", parentAccount.getId());
+                request.setAttribute("isParentCreating", true);
+            }
+        }
+        
         request.setAttribute("gradeList", gradeList);
         request.setAttribute("accList", accList);
         request.getRequestDispatcher("/student/form.jsp").forward(request, response);
@@ -178,7 +192,15 @@ public class StudentController extends HttpServlet {
             }
         }
         studentDAO.insert(student);
-        response.sendRedirect("student");
+        
+        // Kiểm tra nếu là parent tạo thì chuyển về trang My Children
+        HttpSession session = request.getSession();
+        Account account = (Account) session.getAttribute("account");
+        if (account != null && "parent".equals(account.getRole())) {
+            response.sendRedirect("parent?action=myChildren");
+        } else {
+            response.sendRedirect("student");
+        }
     }
 
     private void updateStudent(HttpServletRequest request, HttpServletResponse response)

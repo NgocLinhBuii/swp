@@ -10,3 +10,8 @@ build/web/META-INF/
 *.war
 *.class
 /projectSwp/dist/
+projectSwp/nbproject/private/private.properties
+projectSwp/nbproject/private/private.xml
+projectSwp/nbproject/private/private.xml
+projectSwp/nbproject/project.properties
+projectSwp/src/java/dal/DBContext.java

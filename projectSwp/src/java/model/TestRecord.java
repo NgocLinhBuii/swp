@@ -4,7 +4,9 @@
  */
 package model;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 
 /**
  *
@@ -15,14 +17,14 @@ public class TestRecord {
     private int id;
     private int student_id;
     private int test_id;
-    private LocalDate started_at;
-    private LocalDate finish_at;
+    private LocalDateTime started_at;
+    private LocalDateTime finish_at;
     private double score;
 
     public TestRecord() {
     }
 
-    public TestRecord(int id, int student_id, int test_id, LocalDate started_at, LocalDate finish_at, double score) {
+    public TestRecord(int id, int student_id, int test_id, LocalDateTime started_at, LocalDateTime finish_at, double score) {
         this.id = id;
         this.student_id = student_id;
         this.test_id = test_id;
@@ -55,19 +57,19 @@ public class TestRecord {
         this.test_id = test_id;
     }
 
-    public LocalDate getStarted_at() {
+    public LocalDateTime getStarted_at() {
         return started_at;
     }
 
-    public void setStarted_at(LocalDate started_at) {
+    public void setStarted_at(LocalDateTime started_at) {
         this.started_at = started_at;
     }
 
-    public LocalDate getFinish_at() {
+    public LocalDateTime getFinish_at() {
         return finish_at;
     }
 
-    public void setFinish_at(LocalDate finish_at) {
+    public void setFinish_at(LocalDateTime finish_at) {
         this.finish_at = finish_at;
     }
 
@@ -79,5 +81,18 @@ public class TestRecord {
         this.score = score;
     }
     
+    // Helper methods để convert LocalDateTime sang Date cho JSP
+    public Date getStartedAtAsDate() {
+        if (started_at != null) {
+            return Date.from(started_at.atZone(ZoneId.systemDefault()).toInstant());
+        }
+        return null;
+    }
     
+    public Date getFinishAtAsDate() {
+        if (finish_at != null) {
+            return Date.from(finish_at.atZone(ZoneId.systemDefault()).toInstant());
+        }
+        return null;
+    }
 }

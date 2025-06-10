@@ -3,16 +3,9 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/projectswp-group6/projectSwp/src/java/controller/chapter/ChapterController.java</file>
-            <file>file:/C:/projectswp-group6/projectSwp/src/java/controller/subject/SubjectController.java</file>
-            <file>file:/C:/projectswp-group6/projectSwp/src/java/auth/BlockJspHtmlFilter.java</file>
-            <file>file:/C:/projectswp-group6/projectSwp/src/java/controller/category/CategoryController.java</file>
-            <file>file:/C:/projectswp-group6/projectSwp/src/java/util/AuthUtil.java</file>
-            <file>file:/C:/projectswp-group6/projectSwp/src/java/util/RoleConstants.java</file>
-            <file>file:/C:/projectswp-group6/projectSwp/src/java/controller/invoice/InvoiceController.java</file>
-            <file>file:/C:/projectswp-group6/projectSwp/src/java/controller/grade/GradeController.java</file>
-            <file>file:/C:/projectswp-group6/projectSwp/src/java/controller/lesson/LessonController.java</file>
-            <file>file:/C:/projectswp-group6/projectSwp/src/java/controller/question/QuestionController.java</file>
+            <file>file:/E:/BM/sd/swp/projectSwp/src/java/controller/student/StudentController.java</file>
+            <file>file:/E:/BM/sd/swp/projectSwp/web/header.jsp</file>
+            <file>file:/E:/BM/sd/swp/projectSwp/web/student/home.jsp</file>
         </group>
     </open-files>
 </project-private>

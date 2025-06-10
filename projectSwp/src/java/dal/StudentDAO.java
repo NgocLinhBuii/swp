@@ -193,6 +193,31 @@ public class StudentDAO extends DBContext {
         return student;
     }
 
+    public List<Student> getStudentsByParentId(int parentId) throws SQLException {
+        List<Student> list = new ArrayList<>();
+        String sql = "SELECT * FROM student WHERE parent_id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, parentId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Student s = new Student(
+                            rs.getInt("id"),
+                            rs.getInt("grade_id"),
+                            rs.getInt("parent_id"),
+                            rs.getString("username"),
+                            rs.getString("password"),
+                            rs.getString("full_name"),
+                            rs.getDate("dob").toLocalDate(),
+                            rs.getBoolean("sex"),
+                            rs.getInt("image_id")
+                    );
+                    list.add(s);
+                }
+            }
+        }
+        return list;
+    }
+
     public static void main(String[] args) {
         StudentDAO dao = new StudentDAO();
 
