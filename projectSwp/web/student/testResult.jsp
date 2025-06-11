@@ -140,6 +140,79 @@
             border-radius: 4px;
             margin-top: 20px;
         }
+        
+        /* Styles for question details */
+        .question-details {
+            margin-top: 30px;
+        }
+        
+        .question-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .question-number {
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            background: #007bff;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .question-content {
+            margin-top: 10px;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+        
+        .option-item {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .option-correct {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+        
+        .option-incorrect {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        
+        .option-regular {
+            background-color: #f8f9fa;
+        }
+        
+        .option-selected {
+            border-left: 4px solid #007bff;
+        }
+        
+        .correct-indicator {
+            float: right;
+            font-weight: bold;
+        }
+        
+        .correct-answer {
+            color: #28a745;
+        }
+        
+        .incorrect-answer {
+            color: #dc3545;
+        }
     </style>
 </head>
 <body>
@@ -218,15 +291,6 @@
                     <fmt:formatNumber value="${testRecord.score}" maxFractionDigits="1"/>/10
                 </span></h5>
             </div>
-            
-            <!-- Debug info -->
-            <div style="margin-top:20px; padding:10px; background:#f8f9fa; border:1px solid #ddd; text-align:left; font-family:monospace; border-radius:5px;">
-                <h6>DEBUG INFO:</h6>
-                <p>Raw score: ${testRecord.score}</p>
-                <p>TestRecord ID: ${testRecord.id}</p>
-                <p>Test ID: ${testRecord.test_id}</p>
-                <p>Score displayed: <fmt:formatNumber value="${testRecord.score}" maxFractionDigits="1"/></p>
-            </div>
         </div>
         
         <!-- Test Information -->
@@ -273,6 +337,68 @@
                 </span>
             </div>
         </div>
+        
+        <!-- Question Details Section -->
+        <h4 class="mt-5 mb-4"><i class="fa fa-list-ol text-primary"></i> Chi tiết câu trả lời</h4>
+        
+        <c:forEach var="questionRecord" items="${questionRecords}" varStatus="qStatus">
+            <div class="question-card">
+                <div class="question-number">${qStatus.index + 1}</div>
+                
+                <div class="question-content">
+                    ${questionMap[questionRecord.question_id].question}
+                </div>
+                
+                <!-- Question Image (if exists) -->
+                <c:if test="${questionMap[questionRecord.question_id].image_id != null && questionMap[questionRecord.question_id].image_id > 0}">
+                    <img src="${pageContext.request.contextPath}/image/${questionMap[questionRecord.question_id].image_id}" 
+                         alt="Question Image" class="img-fluid mb-3" style="max-height: 200px;">
+                </c:if>
+                
+                <!-- Options -->
+                <div class="options-container">
+                    <c:forEach var="option" items="${optionsMap[questionRecord.question_id]}" varStatus="oStatus">
+                        <c:set var="isCorrect" value="${option.is_correct}" />
+                        <c:set var="isSelected" value="${option.id == questionRecord.option_id}" />
+                        
+                        <div class="option-item
+                            <c:choose>
+                                <c:when test="${isCorrect}"> option-correct</c:when>
+                                <c:when test="${!isCorrect && isSelected}"> option-incorrect</c:when>
+                                <c:otherwise> option-regular</c:otherwise>
+                            </c:choose>
+                            <c:if test="${isSelected}"> option-selected</c:if>">
+                            
+                            <strong>${oStatus.index + 1}.</strong> ${option.content}
+                            
+                            <c:if test="${isSelected}">
+                                <span class="correct-indicator 
+                                    <c:choose>
+                                        <c:when test="${isCorrect}">correct-answer</c:when>
+                                        <c:otherwise>incorrect-answer</c:otherwise>
+                                    </c:choose>">
+                                    <i class="fa 
+                                        <c:choose>
+                                            <c:when test="${isCorrect}">fa-check</c:when>
+                                            <c:otherwise>fa-times</c:otherwise>
+                                        </c:choose>"></i>
+                                    <c:choose>
+                                        <c:when test="${isCorrect}">Đúng</c:when>
+                                        <c:otherwise>Sai</c:otherwise>
+                                    </c:choose>
+                                </span>
+                            </c:if>
+                            
+                            <c:if test="${isCorrect && !isSelected}">
+                                <span class="correct-indicator correct-answer">
+                                    <i class="fa fa-check"></i> Đáp án đúng
+                                </span>
+                            </c:if>
+                        </div>
+                    </c:forEach>
+                </div>
+            </div>
+        </c:forEach>
         
         <!-- Improvement Tips -->
         <c:if test="${testRecord.score < 7.0}">

@@ -396,8 +396,34 @@ public class TakeTestController extends HttpServlet {
 
             Test test = testDAO.getTestById(testRecord.getTest_id());
             
+            // Lấy tất cả câu trả lời từ bảng question_record
+            List<QuestionRecord> questionRecords = questionRecordDAO.getQuestionRecordsByTestRecord(testRecordId);
+            
+            // Lấy thông tin chi tiết của các câu hỏi
+            Map<Integer, Question> questionMap = new HashMap<>();
+            Map<Integer, List<QuestionOption>> optionsMap = new HashMap<>();
+            
+            for (QuestionRecord record : questionRecords) {
+                int questionId = record.getQuestion_id();
+                
+                // Chỉ lấy thông tin câu hỏi nếu chưa có trong map
+                if (!questionMap.containsKey(questionId)) {
+                    Question question = questionDAO.getQuestionById(questionId);
+                    if (question != null) {
+                        questionMap.put(questionId, question);
+                        
+                        // Lấy tất cả các lựa chọn của câu hỏi
+                        List<QuestionOption> options = questionOptionDAO.getOptionsByQuestion(questionId);
+                        optionsMap.put(questionId, options);
+                    }
+                }
+            }
+            
             request.setAttribute("testRecord", testRecord);
             request.setAttribute("test", test);
+            request.setAttribute("questionRecords", questionRecords);
+            request.setAttribute("questionMap", questionMap);
+            request.setAttribute("optionsMap", optionsMap);
 
             RequestDispatcher dispatcher = request.getRequestDispatcher("/student/testResult.jsp");
             dispatcher.forward(request, response);
