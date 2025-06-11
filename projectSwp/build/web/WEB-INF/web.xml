@@ -16,6 +16,36 @@
         <servlet-name>AccountController</servlet-name>
         <servlet-class>controller.AccountController</servlet-class>
     </servlet>
+    
+    <!-- Video Upload Configuration -->
+    <servlet>
+        <servlet-name>LessonController</servlet-name>
+        <servlet-class>controller.lesson.LessonController</servlet-class>
+        <multipart-config>
+            <max-file-size>104857600</max-file-size> <!-- 100MB -->
+            <max-request-size>209715200</max-request-size> <!-- 200MB -->
+            <file-size-threshold>10485760</file-size-threshold> <!-- 10MB -->
+        </multipart-config>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LessonController</servlet-name>
+        <url-pattern>/LessonURL</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>UploadVideoServlet</servlet-name>
+        <servlet-class>controller.UploadVideoServlet</servlet-class>
+        <multipart-config>
+            <max-file-size>104857600</max-file-size> <!-- 100MB -->
+            <max-request-size>209715200</max-request-size> <!-- 200MB -->
+            <file-size-threshold>10485760</file-size-threshold> <!-- 10MB -->
+        </multipart-config>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>UploadVideoServlet</servlet-name>
+        <url-pattern>/upload-video</url-pattern>
+    </servlet-mapping>
+    
     <servlet-mapping>
         <servlet-name>TinhServlet</servlet-name>
         <url-pattern>/tinh</url-pattern>
@@ -36,4 +66,10 @@
         <servlet-name>AccountController</servlet-name>
         <url-pattern>/admin</url-pattern>
     </servlet-mapping>
+    
+    <!-- Google Cloud Storage Configuration -->
+    <context-param>
+        <param-name>cloudStorageBucket</param-name>
+        <param-value>myproject-video-bucket-2025</param-value>
+    </context-param>
 </web-app>

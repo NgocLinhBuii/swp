@@ -67,7 +67,13 @@ public class InvoiceDAO extends DBContext {
     
     // Phương thức mới để cập nhật trạng thái hóa đơn sau khi thanh toán
     public void updateInvoiceStatus(Invoice invoice) {
-        // Kiểm tra xem bảng invoice có tên cột update_at hay pay_at
+        // Lấy thông tin invoice hiện tại
+        Invoice currentInvoice = getInvoiceById(invoice.getId());
+        if (currentInvoice == null) {
+            System.out.println("Error: Invoice not found with ID " + invoice.getId());
+            return;
+        }
+        
         String sql = "UPDATE invoice SET status = ?, update_at = ? WHERE id = ?";
         System.out.println("Updating invoice status - SQL: " + sql);
         System.out.println("Invoice ID: " + invoice.getId() + ", Status: " + invoice.getStatus() + ", Pay Date: " + invoice.getPay_at());
@@ -81,6 +87,11 @@ public class InvoiceDAO extends DBContext {
 
             int rowsAffected = stmt.executeUpdate();
             System.out.println("Update invoice status result: " + rowsAffected + " rows affected");
+            
+            // Đảm bảo cập nhật thành công
+            if (rowsAffected <= 0) {
+                System.out.println("Warning: No rows affected when updating invoice status");
+            }
         } catch (SQLException e) {
             System.out.println("Error updating invoice status: " + e.getMessage());
             e.printStackTrace();

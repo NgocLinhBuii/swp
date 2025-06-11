@@ -51,6 +51,12 @@
             .card {
                 margin-bottom: 40px;
             }
+            
+            .video-preview {
+                max-width: 100%;
+                margin-top: 10px;
+                display: none;
+            }
         </style>
     </head>
     <body>
@@ -66,7 +72,7 @@
                                 <h5 class="mb-0">Thêm Bài Học Mới</h5>
                             </div>
                             <div class="card-body">
-                                <form id="lessonForm" action="LessonURL" method="post" onsubmit="return validateForm()">
+                                <form id="lessonForm" action="LessonURL" method="post" onsubmit="return validateForm()" enctype="multipart/form-data">
                                     <input type="hidden" name="action" value="insert">
 
                                     <div class="mb-3">
@@ -93,8 +99,10 @@
                                     </div>
 
                                     <div class="mb-3">
-                                        <label for="video_link" class="form-label">Video Link</label>
-                                        <input type="text" class="form-control" id="video_link" name="video_link">
+                                        <label for="video_file" class="form-label">Video bài học</label>
+                                        <input type="file" class="form-control" id="video_file" name="video_file" accept="video/*" onchange="previewVideo(this)">
+                                        <div class="form-text">Hỗ trợ các định dạng: MP4, WebM, Ogg (tối đa 100MB)</div>
+                                        <video id="videoPreview" class="video-preview" controls></video>
                                     </div>
 
                                     <div class="d-grid gap-2">
@@ -138,6 +146,28 @@
                 }
 
                 return isValid;
+            }
+            
+            function previewVideo(input) {
+                const videoPreview = document.getElementById('videoPreview');
+                if (input.files && input.files[0]) {
+                    const file = input.files[0];
+                    
+                    // Kiểm tra kích thước file (tối đa 100MB)
+                    if (file.size > 100 * 1024 * 1024) {
+                        alert("File quá lớn. Vui lòng chọn file nhỏ hơn 100MB.");
+                        input.value = "";
+                        videoPreview.style.display = "none";
+                        return;
+                    }
+                    
+                    // Tạo URL cho video preview
+                    const videoURL = URL.createObjectURL(file);
+                    videoPreview.src = videoURL;
+                    videoPreview.style.display = "block";
+                } else {
+                    videoPreview.style.display = "none";
+                }
             }
         </script>
 

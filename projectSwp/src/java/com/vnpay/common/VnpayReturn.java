@@ -118,9 +118,26 @@ public class VnpayReturn extends HttpServlet {
                     
                     // Kiểm tra sau khi cập nhật
                     Invoice updatedInvoice = invoiceDAO.getInvoiceById(invoiceId);
-                    System.out.println("Invoice after update - ID: " + updatedInvoice.getId() + 
-                                      ", Status: " + updatedInvoice.getStatus() + 
-                                      ", PayDate: " + updatedInvoice.getPay_at());
+                    if (updatedInvoice != null) {
+                        System.out.println("Invoice after update - ID: " + updatedInvoice.getId() + 
+                                          ", Status: " + updatedInvoice.getStatus() + 
+                                          ", PayDate: " + updatedInvoice.getPay_at());
+                        
+                        // Kiểm tra nếu trạng thái vẫn là Pending
+                        if ("Pending".equals(updatedInvoice.getStatus())) {
+                            System.out.println("ERROR: Invoice status is still Pending after update!");
+                            // Thử cập nhật lại một lần nữa
+                            invoice.setStatus("Completed");
+                            invoice.setPay_at(LocalDate.now());
+                            invoiceDAO.updateInvoiceStatus(invoice);
+                            
+                            // Kiểm tra lại
+                            updatedInvoice = invoiceDAO.getInvoiceById(invoiceId);
+                            System.out.println("After second update - Status: " + updatedInvoice.getStatus());
+                        }
+                    } else {
+                        System.out.println("ERROR: Could not find invoice after update!");
+                    }
                 } catch (Exception e) {
                     System.out.println("Error updating invoice status: " + e.getMessage());
                     e.printStackTrace();

@@ -160,6 +160,58 @@
             button:hover {
                 background-color: #303f9f;
             }
+            
+            /* Google Sign-In Button Styles */
+            .google-btn {
+                width: 100%;
+                padding: 10px;
+                background-color: #fff;
+                border: 1px solid #ccc;
+                color: #757575;
+                font-weight: bold;
+                cursor: pointer;
+                border-radius: 3px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-top: 15px;
+                text-decoration: none;
+            }
+            
+            .google-btn:hover {
+                background-color: #f5f5f5;
+            }
+            
+            .google-btn img {
+                margin-right: 10px;
+                width: 18px;
+                height: 18px;
+            }
+            
+            .or-divider {
+                text-align: center;
+                margin: 15px 0;
+                position: relative;
+            }
+            
+            .or-divider:before,
+            .or-divider:after {
+                content: "";
+                display: block;
+                width: 45%;
+                height: 1px;
+                background: #ddd;
+                position: absolute;
+                top: 50%;
+            }
+            
+            .or-divider:before {
+                left: 0;
+            }
+            
+            .or-divider:after {
+                right: 0;
+            }
         </style>
     </head>
     <body>
@@ -279,6 +331,21 @@
                 <a href="/register.jsp"  class="btn btn-lg btn-danger">Register</a>
 
             </form>
+
+            <div class="or-divider">
+                <span>OR</span>
+            </div>
+            
+            <a href="${pageContext.request.contextPath}/auth/google" class="google-btn">
+                <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google logo">
+                Sign in with Google
+            </a>
+
+            <div style="margin-top: 15px; text-align: center;">
+                <a href="${pageContext.request.contextPath}/forgot-password.jsp">Forgot Password?</a>
+                <span style="margin: 0 5px;">|</span>
+                <a href="${pageContext.request.contextPath}/register.jsp">Register</a>
+            </div>
         </div>
 
         <script>

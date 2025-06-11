@@ -23,6 +23,16 @@ public class DBContext {
     }
 
     public Connection getConnection() {
+        try {
+            // Kiểm tra kết nối hiện tại
+            if (connection == null || connection.isClosed()) {
+                connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+                System.out.println("Database connection re-established");
+            }
+        } catch (SQLException e) {
+            System.out.println("Error checking/creating database connection: " + e.getMessage());
+            e.printStackTrace();
+        }
         return connection;
     }
 

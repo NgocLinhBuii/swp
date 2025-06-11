@@ -17,3 +17,4 @@ projectSwp/nbproject/project.properties
 projectSwp/src/java/dal/DBContext.java
 /vn_pay/build/
 /vn_pay/nbproject/private/
+projectSwp/web/WEB-INF/credentials.json

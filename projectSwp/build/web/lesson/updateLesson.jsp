@@ -42,6 +42,18 @@
             footer {
                 flex-shrink: 0;
             }
+            
+            .video-preview {
+                max-width: 100%;
+                margin-top: 10px;
+            }
+            
+            .current-video {
+                margin-top: 10px;
+                padding: 10px;
+                background-color: #f8f9fa;
+                border-radius: 5px;
+            }
         </style>
     </head>
     <body>
@@ -57,7 +69,7 @@
                                 <h5 class="mb-0">Cập nhật bài học</h5>
                             </div>
                             <div class="card-body">
-                                <form action="LessonURL" method="post">
+                                <form action="LessonURL" method="post" enctype="multipart/form-data">
                                     <input type="hidden" name="action" value="update">
                                     <input type="hidden" name="id" value="${lesson.id}">
 
@@ -83,8 +95,26 @@
                                     </div>
 
                                     <div class="mb-3">
-                                        <label for="video_link" class="form-label">Video Link</label>
-                                        <input type="text" id="video_link" name="video_link" class="form-control" value="${lesson.video_link}">
+                                        <label class="form-label">Video hiện tại</label>
+                                        <c:if test="${not empty lesson.video_link}">
+                                            <div class="current-video">
+                                                <p><strong>Link:</strong> ${lesson.video_link}</p>
+                                                <video class="video-preview" controls>
+                                                    <source src="${lesson.video_link}" type="video/mp4">
+                                                    Trình duyệt của bạn không hỗ trợ phát video.
+                                                </video>
+                                            </div>
+                                        </c:if>
+                                        <c:if test="${empty lesson.video_link}">
+                                            <p class="text-muted">Chưa có video</p>
+                                        </c:if>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="video_file" class="form-label">Thay thế video</label>
+                                        <input type="file" id="video_file" name="video_file" class="form-control" accept="video/*" onchange="previewVideo(this)">
+                                        <div class="form-text">Tải lên video mới để thay thế video hiện tại (nếu có)</div>
+                                        <video id="videoPreview" class="video-preview" style="display: none;" controls></video>
                                     </div>
 
                                     <div class="d-grid gap-2">
@@ -101,5 +131,28 @@
             <jsp:include page="/lesson/footer.jsp" />
         </div>
 
+        <script>
+            function previewVideo(input) {
+                const videoPreview = document.getElementById('videoPreview');
+                if (input.files && input.files[0]) {
+                    const file = input.files[0];
+                    
+                    // Kiểm tra kích thước file (tối đa 100MB)
+                    if (file.size > 100 * 1024 * 1024) {
+                        alert("File quá lớn. Vui lòng chọn file nhỏ hơn 100MB.");
+                        input.value = "";
+                        videoPreview.style.display = "none";
+                        return;
+                    }
+                    
+                    // Tạo URL cho video preview
+                    const videoURL = URL.createObjectURL(file);
+                    videoPreview.src = videoURL;
+                    videoPreview.style.display = "block";
+                } else {
+                    videoPreview.style.display = "none";
+                }
+            }
+        </script>
     </body>
 </html>

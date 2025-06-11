@@ -10,26 +10,31 @@ package model;
  */
 public class GoogleAccount {
 
-    private String id, email, name, first_name, given_name, family_name, picture;
-
+    private String google_id, email, name, first_name, given_name, family_name, picture;
+    private int account_id;
     private boolean verified_email;
 
     public GoogleAccount() {
     }
 
-    public GoogleAccount(String id, String email, String name, String first_name, String given_name, String family_name, String picture, boolean verified_email) {
-        this.id = id;
+    public GoogleAccount(String google_id, String email, String name, String first_name, String given_name, String family_name, String picture, int account_id, boolean verified_email) {
+        this.google_id = google_id;
         this.email = email;
         this.name = name;
         this.first_name = first_name;
         this.given_name = given_name;
         this.family_name = family_name;
         this.picture = picture;
+        this.account_id = account_id;
         this.verified_email = verified_email;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setGoogle_id(String google_id) {
+        this.google_id = google_id;
+    }
+    
+    public void setAccount_id(int account_id) {
+        this.account_id = account_id;
     }
 
     public void setEmail(String email) {
@@ -60,8 +65,12 @@ public class GoogleAccount {
         this.verified_email = verified_email;
     }
 
-    public String getId() {
-        return id;
+    public String getGoogle_id() {
+        return google_id;
+    }
+    
+    public int getAccount_id() {
+        return account_id;
     }
 
     public String getEmail() {
@@ -94,6 +103,9 @@ public class GoogleAccount {
 
     @Override
     public String toString() {
-        return "GoogleAccount{" + "id=" + id + ", email=" + email + ", name=" + name + ", first_name=" + first_name + ", given_name=" + given_name + ", family_name=" + family_name + ", picture=" + picture + ", verified_email=" + verified_email + '}';
+        return "GoogleAccount{" + "google_id=" + google_id + ", email=" + email + ", name=" + name 
+                + ", first_name=" + first_name + ", given_name=" + given_name 
+                + ", family_name=" + family_name + ", picture=" + picture 
+                + ", account_id=" + account_id + ", verified_email=" + verified_email + '}';
     }
 }

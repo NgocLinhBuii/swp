@@ -10,6 +10,15 @@
         <!-- CSS -->
         <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
         <link rel="stylesheet" href="/assets/css/style.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+        <style>
+            .content-preview {
+                max-width: 250px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+        </style>
     </head>
     <body>
         <jsp:include page="/lesson/header.jsp" />
@@ -60,7 +69,9 @@
                         <tr>
                             <td>${lesson.id}</td>
                             <td>${lesson.name}</td>
-                            <td>${lesson.content}</td>
+                            <td>
+                                <div class="content-preview">${lesson.content}</div>
+                            </td>
                             <td>
                                 <c:forEach var="chap" items="${chapter}">
                                     <c:if test="${lesson.chapter_id eq chap.id}">
@@ -70,13 +81,23 @@
                             </td>
                             <td>
                                 <c:if test="${not empty lesson.video_link}">
-                                    <a href="${lesson.video_link}" target="_blank" class="btn btn-sm btn-info">Xem video</a>
+                                    <span class="badge bg-success"><i class="fas fa-video"></i> Có video</span>
+                                </c:if>
+                                <c:if test="${empty lesson.video_link}">
+                                    <span class="badge bg-secondary">Không có video</span>
                                 </c:if>
                             </td>
                             <td>
-                                <a href="LessonURL?action=updateForm&id=${lesson.id}" class="btn btn-sm btn-warning">Sửa</a>
+                                <a href="LessonURL?action=view&id=${lesson.id}" class="btn btn-sm btn-info">
+                                    <i class="fas fa-eye"></i> Xem
+                                </a>
+                                <a href="LessonURL?action=updateForm&id=${lesson.id}" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i> Sửa
+                                </a>
                                 <a href="LessonURL?action=delete&id=${lesson.id}" class="btn btn-sm btn-danger"
-                                   onclick="return confirm('Bạn có chắc muốn xóa?')">Xóa</a>
+                                   onclick="return confirm('Bạn có chắc muốn xóa?')">
+                                    <i class="fas fa-trash"></i> Xóa
+                                </a>
                             </td>
                         </tr>
                     </c:forEach>

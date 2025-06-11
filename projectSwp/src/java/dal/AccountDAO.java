@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import model.Account;
+import model.GoogleAccount;
 
 /**
  *
@@ -369,6 +370,108 @@ public class AccountDAO extends DBContext {
             e.printStackTrace();
         }
         return account;
+    }
+
+    // Google Account methods
+    
+    /**
+     * Tìm Google Account theo ID
+     * @param googleId Google ID cần tìm
+     * @return GoogleAccount nếu tìm thấy, null nếu không tìm thấy
+     */
+    public GoogleAccount findGoogleAccountById(String googleId) {
+        String sql = "SELECT * FROM google_account WHERE google_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, googleId);
+            try (ResultSet rs = statement.executeQuery()) {
+                if (rs.next()) {
+                    GoogleAccount googleAccount = new GoogleAccount();
+                    googleAccount.setGoogle_id(rs.getString("google_id"));
+                    googleAccount.setEmail(rs.getString("email"));
+                    googleAccount.setName(rs.getString("name"));
+                    googleAccount.setFirst_name(rs.getString("first_name"));
+                    googleAccount.setGiven_name(rs.getString("given_name"));
+                    googleAccount.setFamily_name(rs.getString("family_name"));
+                    googleAccount.setPicture(rs.getString("picture"));
+                    googleAccount.setAccount_id(rs.getInt("account_id"));
+                    googleAccount.setVerified_email(rs.getBoolean("verified_email"));
+                    return googleAccount;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
+    /**
+     * Thêm Google Account mới
+     * @param googleAccount GoogleAccount cần thêm
+     * @return true nếu thêm thành công, false nếu thất bại
+     */
+    public boolean addGoogleAccount(GoogleAccount googleAccount) {
+        String sql = "INSERT INTO google_account (google_id, email, name, first_name, given_name, family_name, picture, account_id, verified_email) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, googleAccount.getGoogle_id());
+            statement.setString(2, googleAccount.getEmail());
+            statement.setString(3, googleAccount.getName());
+            statement.setString(4, googleAccount.getFirst_name());
+            statement.setString(5, googleAccount.getGiven_name());
+            statement.setString(6, googleAccount.getFamily_name());
+            statement.setString(7, googleAccount.getPicture());
+            statement.setInt(8, googleAccount.getAccount_id());
+            statement.setBoolean(9, googleAccount.isVerified_email());
+            
+            int rowsAffected = statement.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
+    /**
+     * Cập nhật thông tin Google Account
+     * @param googleAccount GoogleAccount cần cập nhật
+     * @return true nếu cập nhật thành công, false nếu thất bại
+     */
+    public boolean updateGoogleAccount(GoogleAccount googleAccount) {
+        String sql = "UPDATE google_account SET email = ?, name = ?, first_name = ?, given_name = ?, "
+                + "family_name = ?, picture = ?, verified_email = ? WHERE google_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, googleAccount.getEmail());
+            statement.setString(2, googleAccount.getName());
+            statement.setString(3, googleAccount.getFirst_name());
+            statement.setString(4, googleAccount.getGiven_name());
+            statement.setString(5, googleAccount.getFamily_name());
+            statement.setString(6, googleAccount.getPicture());
+            statement.setBoolean(7, googleAccount.isVerified_email());
+            statement.setString(8, googleAccount.getGoogle_id());
+            
+            int rowsAffected = statement.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
+    /**
+     * Xóa Google Account
+     * @param googleId Google ID cần xóa
+     * @return true nếu xóa thành công, false nếu thất bại
+     */
+    public boolean deleteGoogleAccount(String googleId) {
+        String sql = "DELETE FROM google_account WHERE google_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, googleId);
+            int rowsAffected = statement.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
 }
