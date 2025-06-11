@@ -266,7 +266,7 @@
                            ${cookie.remember.value!=null?'checked':''}/>
                     <label for="remember_me">Remember me</label>
                 </div>
-                <a href="forgot-password" class="forget-password" style="background: black">Forget Password?</a>
+                <a href="${pageContext.request.contextPath}/forgot-password" class="forget-password" style="background: black">Forget Password?</a>
                 <button  class="btn btn-lg btn-danger" type="submit">Login</button>
                 <a href="https://accounts.google.com/o/oauth2/auth?scope=email%20profile%20openid&redirect_uri=http://localhost:9999/logingoogle&response_type=code&client_id=118450184719-ar44tevflkttlnqbb8hina7u55l0ecdv.apps.googleusercontent.com&approval_prompt=force" class="btn btn-lg btn-danger">
                     <svg xmlns="http://www.w3.org/2000/svg" width="90" height="20" fill="currentColor">

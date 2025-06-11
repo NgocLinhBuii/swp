@@ -143,18 +143,16 @@
     </style>
 </head>
 <body>
+<%@include file="../header.jsp" %>
 <main>
     <section class="container mt-4">
         <!-- Breadcrumb -->
-       
         <nav aria-label="breadcrumb" class="mb-4">
-            <div class="d-flex align-items-center justify-content-between">
-                <a href="/student/taketest" class="btn btn-outline-secondary">
-                    « Quay lại
-                </a>
-                
-               
-            </div>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item"><a href="/student/taketest">Tests & Practice</a></li>
+                <li class="breadcrumb-item active">Kết quả</li>
+            </ol>
         </nav>
         
         <!-- Result Header -->
