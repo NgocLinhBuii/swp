@@ -17,6 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
+import model.Account;
 import model.Invoice;
 import util.AuthUtil;
 import util.RoleConstants;
@@ -37,7 +38,7 @@ public class StudyPackageController extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        if (!AuthUtil.hasRole(request, RoleConstants.ADMIN) && !AuthUtil.hasRole(request, RoleConstants.TEACHER)) {
+        if (!AuthUtil.hasRole(request, RoleConstants.ADMIN) && !AuthUtil.hasRole(request, RoleConstants.TEACHER) && !AuthUtil.hasRole(request, RoleConstants.PARENT)) {
             response.sendRedirect("/error.jsp");
             return;
         }
@@ -231,27 +232,31 @@ public class StudyPackageController extends HttpServlet {
         StudyPackage sp = dao.findStudyPackageById(id);
 
         if (sp != null) {
-            // 1. Tạo đối tượng hóa đơn
-            Invoice invoice = new Invoice();
-            invoice.setTotal_amount(sp.getPrice());
-            invoice.setParent_id(1); // TODO: lấy từ session người dùng sau
-            invoice.setCreated_at(LocalDate.now());
-            invoice.setStatus("Đã thanh toán");
-            invoice.setPay_at(LocalDate.now());
-
-            // 2. Gọi DAO để lưu vào DB
-            InvoiceDAO invoiceDAO = new InvoiceDAO();
-            invoiceDAO.insertInvoice(invoice);
-
-            // 3. Gửi về trang hiển thị hóa đơn
-            request.setAttribute("studyPackage", sp);
-            request.getRequestDispatcher("/studypackage/invoice.jsp").forward(request, response);
+            // Lấy thông tin người dùng từ session hoặc sử dụng userId mặc định nếu phát triển thử nghiệm
+            int userId = 1; 
+            // Kiểm tra nếu người dùng đã đăng nhập và là parent
+            Object accountObj = request.getSession().getAttribute("account");
+            if (accountObj instanceof Account) {
+                Account account = (Account) accountObj;
+                if (account.getRole() != null && account.getRole().equalsIgnoreCase(RoleConstants.PARENT)) {
+                    userId = account.getId();
+                }
+            }
+            
+            // Tạo form để gọi PaymentServlet thay vì tạo invoice trực tiếp
+            request.setAttribute("packageId", id);
+            request.setAttribute("packageName", sp.getName());
+            request.setAttribute("amount", Double.parseDouble(sp.getPrice()));
+            request.setAttribute("userId", userId);
+            
+            // Chuyển hướng đến trang chọn phương thức thanh toán
+            request.getRequestDispatcher("/studypackage/payment.jsp").forward(request, response);
         } else {
             request.setAttribute("errorMessage", "Không tìm thấy gói học để thanh toán.");
             listStudyPackage(request, response);
         }
-    } catch (NumberFormatException e) {
-        request.setAttribute("errorMessage", "Định dạng ID không hợp lệ!");
+    } catch (Exception e) {
+        request.setAttribute("errorMessage", "Lỗi xử lý: " + e.getMessage());
         listStudyPackage(request, response);
     }
 }
