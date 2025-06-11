@@ -204,9 +204,43 @@ public class StudentController extends HttpServlet {
     }
 
     private void updateStudent(HttpServletRequest request, HttpServletResponse response)
-            throws SQLException, IOException {
+            throws SQLException, IOException, ServletException {
 
+        int id = Integer.parseInt(request.getParameter("id"));
+        Student oldStudent = studentDAO.findById(id);
+        
+        // Validate old password if provided
+        String oldPassword = request.getParameter("oldPassword");
+        if (oldPassword != null && !oldPassword.isEmpty()) {
+            // Check if old password matches
+            if (!studentDAO.validatePassword(oldStudent, oldPassword)) {
+                // Password doesn't match, return to form with error
+                request.setAttribute("passwordError", "Current password is incorrect");
+                
+                // Re-populate form data
+                List<Grade> gradeList = gradeDAO.findAllFromGrade();
+                List<Account> accList = accountDAO.findAll();
+                Image image = ImageDAO.findImageById(oldStudent.getImage_id());
+                request.setAttribute("student", oldStudent);
+                request.setAttribute("image", image);
+                request.setAttribute("gradeList", gradeList);
+                request.setAttribute("accList", accList);
+                
+                request.getRequestDispatcher("/student/form.jsp").forward(request, response);
+                return;
+            }
+        }
+        
+        // Get updated student data
         Student student = getStudentFromRequest(request);
+        
+        // If new password is empty, keep the old password
+        String newPassword = request.getParameter("password");
+        if (newPassword == null || newPassword.isEmpty()) {
+            student.setPassword(oldStudent.getPassword());
+        }
+        
+        // Handle avatar upload
         String avatarName = "avatar_" + System.currentTimeMillis();
         String imgURL = FileUploadUlti.uploadAvatarImage(request, avatarName);
 
@@ -220,9 +254,9 @@ public class StudentController extends HttpServlet {
                 student.setImage_id(imageId);
             }
         } else {
-            Student oldStudent = studentDAO.findById(student.getId());
             student.setImage_id(oldStudent.getImage_id());
         }
+        
         studentDAO.update(student);
         response.sendRedirect("student");
     }

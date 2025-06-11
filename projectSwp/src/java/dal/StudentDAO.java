@@ -100,6 +100,23 @@ public class StudentDAO extends DBContext {
         }
     }
 
+    /**
+     * Validates if the provided password matches the stored password for a student
+     * @param student The student object containing the stored password
+     * @param providedPassword The password to validate
+     * @return true if the password matches, false otherwise
+     */
+    public boolean validatePassword(Student student, String providedPassword) {
+        // Get the stored hashed password
+        String storedPassword = student.getPassword();
+        
+        // Hash the provided password and compare with stored password
+        String hashedProvidedPassword = passwordEncode.hashPassword(providedPassword);
+        
+        // Compare the two hashed passwords
+        return storedPassword.equals(hashedProvidedPassword);
+    }
+
     public void delete(int id) throws SQLException {
         String sql = "DELETE FROM student WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
