@@ -13,6 +13,7 @@ import util.AuthUtil;
 import util.RoleConstants;
 
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -243,12 +244,82 @@ public class TakeTestController extends HttpServlet {
                 allOptions.put(question.getId(), options);
             }
             
+            // Xử lý thời gian làm bài
+            int duration = 0; // Mặc định không có thời gian
+            
+            // Nếu là bài test thực sự (không phải luyện tập), mới cần thời gian
+            if (!test.isIs_practice()) {
+                try {
+                    // Debug: In ra SQL trực tiếp
+                    System.out.println("DEBUG SQL: SELECT * FROM Category WHERE id = " + test.getCategory_id());
+                    
+                    // Lấy trực tiếp từ database thay vì qua DAO để debug
+                    try (Connection conn = new DBContext().getConnection();
+                         PreparedStatement ps = conn.prepareStatement("SELECT * FROM Category WHERE id = ?")) {
+                        ps.setInt(1, test.getCategory_id());
+                        try (ResultSet rs = ps.executeQuery()) {
+                            if (rs.next()) {
+                                duration = rs.getInt("duration");
+                                System.out.println("Truy vấn SQL trực tiếp: Lấy được duration = " + duration + " phút (category_id=" + test.getCategory_id() + ")");
+                            } else {
+                                System.out.println("Truy vấn SQL trực tiếp: Không tìm thấy Category với id = " + test.getCategory_id());
+                            }
+                        }
+                    } catch (Exception sqlEx) {
+                        System.out.println("Lỗi SQL trực tiếp: " + sqlEx.getMessage());
+                    }
+                    
+                    // Thử cách thông thường nếu trên không được
+                    if (duration <= 0) {
+                        Category category = categoryDAO.getCategoryById(test.getCategory_id());
+                        if (category != null && category.getDuration() > 0) {
+                            duration = category.getDuration();
+                            System.out.println("Lấy được duration từ Category thông qua DAO: " + duration + " phút (category_id=" + test.getCategory_id() + ")");
+                        } else {
+                            System.out.println("Không tìm thấy Category hoặc duration = 0, sử dụng mặc định: 30 phút");
+                            duration = 30; // Mặc định 30 phút cho bài test thực sự
+                        }
+                    }
+                } catch (Exception e) {
+                    System.out.println("Lỗi khi lấy duration từ Category: " + e.getMessage());
+                    duration = 30; // Mặc định 30 phút cho bài test thực sự nếu có lỗi
+                }
+            } else {
+                System.out.println("Bài test " + testId + " là bài luyện tập (is_practice=true), không áp dụng thời gian giới hạn");
+            }
+            
+            // Lấy thời gian bắt đầu làm bài từ TestRecord hoặc thiết lập thời gian bắt đầu mới
+            Long startTime = (Long) session.getAttribute("testStartTime");
+            if (startTime == null) {
+                // Lấy startTime từ TestRecord nếu có
+                TestRecord testRecord = testRecordDAO.getTestRecordById(testRecordId);
+                if (testRecord != null && testRecord.getStart_time() != null) {
+                    // Chuyển từ java.sql.Timestamp sang milliseconds
+                    startTime = testRecord.getStart_time().getTime();
+                    System.out.println("Lấy được startTime từ TestRecord: " + new java.util.Date(startTime));
+                } else {
+                    // Nếu không có, tạo thời gian bắt đầu mới
+                    startTime = System.currentTimeMillis();
+                    System.out.println("Tạo mới startTime: " + new java.util.Date(startTime));
+                    // Cập nhật startTime trong database nếu cần
+                    testRecordDAO.updateStartTime(testRecordId, new java.sql.Timestamp(startTime));
+                }
+                session.setAttribute("testStartTime", startTime);
+            } else {
+                System.out.println("Lấy startTime từ session: " + new java.util.Date(startTime));
+            }
+            
+            System.out.println("Test ID: " + testId + ", Is Practice: " + test.isIs_practice() + ", Duration: " + duration + " minutes, Start Time: " + new java.util.Date(startTime));
+            
             // Đặt dữ liệu vào request
             request.setAttribute("test", test);
             request.setAttribute("questions", questions);
             request.setAttribute("allOptions", allOptions);
             request.setAttribute("previousAnswers", previousAnswers);
             request.setAttribute("totalQuestions", questions.size());
+            request.setAttribute("duration", Integer.toString(duration)); // Truyền thời gian làm bài (phút) dưới dạng String
+            request.setAttribute("startTime", Long.toString(startTime)); // Truyền thời gian bắt đầu dưới dạng String
+            request.setAttribute("isPractice", test.isIs_practice()); // Thêm thông tin về loại bài test
             
             // Hiển thị lỗi nếu có
             String error = (String) request.getAttribute("error");
@@ -313,6 +384,9 @@ public class TakeTestController extends HttpServlet {
             System.out.println("Test record ID from session: " + testRecordId);
 
             if (testRecordId != null) {
+                // Clear test timing information from session
+                session.removeAttribute("testStartTime");
+                
                 // Check question records
                 List<QuestionRecord> records = questionRecordDAO.getQuestionRecordsByTestRecord(testRecordId);
                 System.out.println("Number of question records: " + records.size());

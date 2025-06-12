@@ -2,176 +2,185 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <html>
 <head>
-    <title>Test Management</title>
-    
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/nice-select.css" />
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-
+    <title>Danh sách Tests</title>
     <style>
-        .badge-success {
-            background-color: #28a745;
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding-top:  50px;
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
         }
-        .badge-primary {
-            background-color: #007bff;
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding-top: 80px; 
+        }
+
+        main {
+            flex: 1;
+            padding: 20px;
+        }
+
+        h2 {
+            color: #333;
+            border-bottom: 2px solid #007BFF;
+            padding-bottom: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            margin-top: 20px;
+        }
+
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #007BFF;
+            color: white;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        a {
+            text-decoration: none;
+            color: #007BFF;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        p {
+            margin: 10px 0;
+            color: red;
+        }
+
+        .add-link {
+            display: inline-block;
+            margin-top: 15px;
+            background-color: #007BFF;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+        }
+
+        .add-link:hover {
+            background-color: #0056b3;
         }
     </style>
+
+    <!-- Styles -->
+   <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/assets/css/owl.carousel.min.css">
+        <link rel="stylesheet" href="/assets/css/slicknav.css">
+        <link rel="stylesheet" href="/assets/css/flaticon.css">
+        <link rel="stylesheet" href="/assets/css/progressbar_barfiller.css">
+        <link rel="stylesheet" href="/assets/css/gijgo.css">
+        <link rel="stylesheet" href="/assets/css/animate.min.css">
+        <link rel="stylesheet" href="/assets/css/animated-headline.css">
+        <link rel="stylesheet" href="/assets/css/magnific-popup.css">
+        <link rel="stylesheet" href="/assets/css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="/assets/css/themify-icons.css">
+        <link rel="stylesheet" href="/assets/css/slick.css">
+        <link rel="stylesheet" href="/assets/css/nice-select.css">
+        <link rel="stylesheet" href="/assets/css/style.css">
 </head>
 
-<body class="bg-light">
-    <!-- Include header -->
-    <jsp:include page="/header.jsp" />
+<body>
+    <jsp:include page="/Test/header.jsp" />
 
-    <div class="container mt-5 mb-5">
-        <div class="row">
-            <div class="col-lg-10 mx-auto">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2 class="mb-0">Test Management</h2>
-                    <a href="${pageContext.request.contextPath}/test?action=create" class="btn btn-success btn-lg">
-                        <i class="fas fa-plus"></i> Create New Test
-                    </a>
-                </div>
+    <main>
+        <h2>Danh sách Tests</h2>
 
-                <div class="card shadow-sm mb-4">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <form method="get" action="${pageContext.request.contextPath}/test" class="row g-3 flex-grow-1">
-                                <div class="col-md-4">
-                                    <div class="input-group">
-                                        <input type="text" name="search" class="form-control" placeholder="Search tests..." value="${param.search}" />
-                                        <button type="submit" class="btn btn-primary">
-                                            <i class="fas fa-search"></i> Search
-                                        </button>
-                                    </div>
-                                </div>
-                            </form>
-                            <div>
-                                <a href="${pageContext.request.contextPath}/test" class="btn btn-outline-secondary me-2">
-                                    <i class="fas fa-list"></i> All Tests
-                                </a>
-                                <a href="${pageContext.request.contextPath}/test?filter=practice" class="btn btn-outline-primary me-2">
-                                    <i class="fas fa-graduation-cap"></i> Practice Tests
-                                </a>
-                                <a href="${pageContext.request.contextPath}/test?filter=exam" class="btn btn-outline-danger">
-                                    <i class="fas fa-clock"></i> Exam Tests
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <c:if test="${not empty error}">
+            <p>${error}</p>
+        </c:if>
 
-                <c:if test="${param.success eq 'true'}">
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        <i class="fas fa-check-circle"></i> 
-                        <c:choose>
-                            <c:when test="${not empty param.message}">
-                                ${param.message}
-                            </c:when>
-                            <c:otherwise>
-                                Operation completed successfully!
-                            </c:otherwise>
-                        </c:choose>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                </c:if>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Practice</th>
+                    <th>Category Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <c:forEach var="test" items="${testList}">
+                    <tr>
+                        <td>${test.id}</td>
+                        <td>${test.name}</td>
+                        <td>${test.description}</td>
+                        <td>
+                            <c:choose>
+                                <c:when test="${test.is_practice}">Yes</c:when>
+                                <c:otherwise>No</c:otherwise>
+                            </c:choose>
+                        </td>
+                        <td>${categoryMap[test.category_id]}</td>
+                        <td>
+                            <a href="${pageContext.request.contextPath}/test?action=edit&id=${test.id}">Sửa</a> |
+                            <a href="${pageContext.request.contextPath}/test?action=delete&id=${test.id}" onclick="return confirm('Bạn chắc chắn muốn xoá?');">Xoá</a>
+                        </td>
+                    </tr>
+                </c:forEach>
+            </tbody>
+        </table>
 
-                <c:if test="${not empty error}">
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        <i class="fas fa-exclamation-circle"></i> ${error}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                </c:if>
+        <a class="add-link" href="${pageContext.request.contextPath}/test?action=create">Thêm mới Test</a>
+    </main>
 
-                <div class="card shadow">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Name</th>
-                                    <th>Description</th>
-                                    <th>Type</th>
-                                    <th>Category</th>
-                                    <th>Questions</th>
-                                    <th class="text-center">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <c:forEach var="test" items="${testList}">
-                                    <tr>
-                                        <td>${test.id}</td>
-                                        <td>
-                                            <strong>${test.name}</strong>
-                                        </td>
-                                        <td>${test.description}</td>
-                                        <td>
-                                            <c:choose>
-                                                <c:when test="${test.is_practice}">
-                                                    <span class="badge bg-success rounded-pill">Practice</span>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <span class="badge bg-danger rounded-pill">Exam</span>
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </td>
-                                        <td>${categoryMap[test.category_id]}</td>
-                                        <td>
-                                            <c:if test="${questionCountMap != null}">
-                                                <span class="badge bg-primary rounded-pill">${questionCountMap[test.id]} questions</span>
-                                            </c:if>
-                                        </td>
-                                        <td>
-                                            <div class="d-flex justify-content-center">
-                                                <a href="${pageContext.request.contextPath}/test?action=manage-questions&id=${test.id}" 
-                                                   class="btn btn-sm btn-primary me-1" title="Manage Questions">
-                                                    <i class="fas fa-question-circle"></i>
-                                                </a>
-                                                <a href="${pageContext.request.contextPath}/test?action=edit&id=${test.id}" 
-                                                   class="btn btn-sm btn-warning me-1" title="Edit Test">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
-                                                <a href="${pageContext.request.contextPath}/test?action=delete&id=${test.id}" 
-                                                   class="btn btn-sm btn-danger" 
-                                                   onclick="return confirm('Are you sure you want to delete this test?')"
-                                                   title="Delete Test">
-                                                    <i class="fas fa-trash-alt"></i>
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </c:forEach>
-                                
-                                <c:if test="${empty testList}">
-                                    <tr>
-                                        <td colspan="7" class="text-center py-4">
-                                            <div class="text-muted">
-                                                <i class="fas fa-info-circle me-2"></i>No tests found
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </c:if>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <jsp:include page="/Test/footer.jsp" />
 
-    <!-- Include footer -->
-    <jsp:include page="/footer.jsp" />
+    <!-- JS -->
+    <script src="${pageContext.request.contextPath}/assets/js/vendor/modernizr-3.5.0.min.js"></script>
+        <!-- Jquery, Popper, Bootstrap -->
+        <script src="${pageContext.request.contextPath}/assets/js/vendor/jquery-1.12.4.min.js"></script>
+        <script src="${pageContext.request.contextPath}/assets/js/popper.min.js"></script>
+        <script src="${pageContext.request.contextPath}/assets/js/bootstrap.min.js"></script>
+        <!-- Jquery Mobile Menu -->
+        <script src="${pageContext.request.contextPath}/assets/js/jquery.slicknav.min.js"></script>
 
-    <!-- Bootstrap JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="${pageContext.request.contextPath}/assets/js/vendor/jquery-1.12.4.min.js"></script>
-    <script src="${pageContext.request.contextPath}/assets/js/jquery.nice-select.min.js"></script>
-    
-    <script>
-        $(document).ready(function() {
-            $('select').niceSelect();
-        });
-    </script>
+        <!-- Jquery Slick , Owl-Carousel Plugins -->
+        <script src="${pageContext.request.contextPath}/assets/js/owl.carousel.min.js"></script>
+        <script src="${pageContext.request.contextPath}/assets/js/slick.min.js"></script>
+        <!-- One Page, Animated-HeadLin -->
+        <script src="${pageContext.request.contextPath}/assets/js/wow.min.js"></script>
+        <script src="${pageContext.request.contextPath}/assets/js/animated.headline.js"></script>
+        <script src="${pageContext.request.contextPath}/assets/js/jquery.magnific-popup.js"></script>
+
+        <!-- Date Picker -->
+        <script src="${pageContext.request.contextPath}/assets/js/gijgo.min.js"></script>
+        <!-- Nice-select, sticky -->
+        <script src="${pageContext.request.contextPath}/assets/js/jquery.nice-select.min.js"></script>
+        <script src="${pageContext.request.contextPath}/assets/js/jquery.sticky.js"></script>
+        <!-- Progress -->
+        <script src="${pageContext.request.contextPath}/assets/js/jquery.barfiller.js"></script>
+
+        <!-- counter , waypoint,Hover Direction -->
+        <script src="${pageContext.request.contextPath}/assets/js/jquery.counterup.min.js"></script>
+        <script src="${pageContext.request.contextPath}/assets/js/waypoints.min.js"></script>
+        <script src="${pageContext.request.contextPath}/assets/js/jquery.countdown.min.js"></script>
+        <script src="${pageContext.request.contextPath}/assets/js/hover-direction-snake.min.js"></script>
+
+        <!-- contact js -->
+        <script src="${pageContext.request.contextPath}/assets/js/contact.js"></script>
+        <script src="${pageContext.request.contextPath}/assets/js/jquery.form.js"></script>
+        <script src="${pageContext.request.contextPath}/assets/js/jquery.validate.min.js"></script>
+        <script src="${pageContext.request.contextPath}/assets/js/mail-script.js"></script>
+        <script src="${pageContext.request.contextPath}/assets/js/jquery.ajaxchimp.min.js"></script>
 </body>
 </html>

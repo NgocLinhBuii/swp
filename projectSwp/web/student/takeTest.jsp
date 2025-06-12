@@ -130,7 +130,61 @@
         .badge-official {
             background-color: #dc3545;
         }
+        
+        /* Styles for timer */
+        .timer-container {
+            position: fixed;
+            top: 90px; /* Below the header */
+            right: 20px;
+            background: white;
+            border-radius: 8px;
+            padding: 10px 15px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.2);
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 150px;
+        }
+        
+        .timer-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .timer-display {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .timer-warning {
+            color: #dc3545;
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
     </style>
+    
+    <!-- Truyền dữ liệu JSP vào JavaScript -->
+    <script>
+        // Khai báo biến từ dữ liệu JSP - đã chuyển sang String ở controller
+        var TOTAL_QUESTIONS = parseInt("${totalQuestions}");
+        var TEST_DURATION = parseInt("${duration}"); // phút
+        var TEST_START_TIME = parseInt("${startTime}"); // milliseconds
+        var IS_PRACTICE = ${isPractice}; // boolean: true nếu là bài luyện tập
+        
+        // Ghi log để debug
+        console.log("TOTAL_QUESTIONS:", TOTAL_QUESTIONS);
+        console.log("TEST_DURATION:", TEST_DURATION, "phút");
+        console.log("TEST_START_TIME:", TEST_START_TIME, "->", new Date(TEST_START_TIME));
+        console.log("IS_PRACTICE:", IS_PRACTICE);
+    </script>
 </head>
 <body>
 
@@ -146,6 +200,14 @@
                 <div style="width: 85px;"></div> <!-- Spacer for balance -->
             </div>
         </nav>
+        
+        <!-- Timer - Chỉ hiển thị cho bài test thực sự -->
+        <c:if test="${not isPractice}">
+            <div class="timer-container">
+                <div class="timer-label">Thời gian còn lại</div>
+                <div id="timer" class="timer-display">--:--</div>
+            </div>
+        </c:if>
         
         <!-- Test Header -->
         <div class="test-header">
@@ -262,11 +324,10 @@ function updateQuestionStatus(questionId) {
 
 // Cập nhật thanh tiến độ
 function updateProgress() {
-    var totalQuestions = ${totalQuestions};
     var answeredQuestions = document.querySelectorAll('input[type="radio"]:checked').length;
     
     document.getElementById('answeredCount').textContent = answeredQuestions;
-    var progressPercent = (answeredQuestions / totalQuestions) * 100;
+    var progressPercent = (answeredQuestions / TOTAL_QUESTIONS) * 100;
     
     var progressBar = document.getElementById('progressBar');
     progressBar.style.width = progressPercent + '%';
@@ -275,11 +336,10 @@ function updateProgress() {
 
 // Kiểm tra và nộp bài
 function validateAndSubmit() {
-    var totalQuestions = ${totalQuestions};
     var answeredQuestions = document.querySelectorAll('input[type="radio"]:checked').length;
     
-    if (answeredQuestions < totalQuestions) {
-        alert('Bạn chưa trả lời tất cả câu hỏi. Vui lòng trả lời đủ ' + totalQuestions + ' câu hỏi trước khi nộp bài.');
+    if (answeredQuestions < TOTAL_QUESTIONS) {
+        alert('Bạn chưa trả lời tất cả câu hỏi. Vui lòng trả lời đủ ' + TOTAL_QUESTIONS + ' câu hỏi trước khi nộp bài.');
         
         // Cuộn đến câu hỏi đầu tiên chưa trả lời
         var unansweredContainers = document.querySelectorAll('.question-container:not(.answered)');
@@ -313,7 +373,121 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     updateProgress();
+    
+    // Khởi tạo đồng hồ đếm ngược
+    initializeTimer();
 });
+
+// Biến toàn cục cho đồng hồ
+let timerInterval;
+let remainingTime;
+
+// Khởi tạo đồng hồ đếm ngược
+function initializeTimer() {
+    // Nếu là bài luyện tập, không cần đồng hồ
+    if (IS_PRACTICE) {
+        console.log("Bài test luyện tập - không cần đồng hồ đếm ngược");
+        return;
+    }
+    
+    // Kiểm tra các giá trị đầu vào
+    if (isNaN(TEST_DURATION) || TEST_DURATION <= 0) {
+        console.log("TEST_DURATION không hợp lệ:", TEST_DURATION, "- đặt thành 60 phút");
+        TEST_DURATION = 60; // Mặc định 60 phút
+    }
+    
+    if (isNaN(TEST_START_TIME) || TEST_START_TIME <= 0) {
+        console.log("TEST_START_TIME không hợp lệ:", TEST_START_TIME, "- đặt thành thời gian hiện tại");
+        TEST_START_TIME = new Date().getTime();
+    }
+    
+    var currentTime = new Date().getTime();
+    
+    // Tính toán thời gian còn lại (milliseconds)
+    var elapsedTime = currentTime - TEST_START_TIME;
+    var totalTime = TEST_DURATION * 60 * 1000; // Chuyển phút thành milliseconds
+    
+    console.log("Thời gian tổng cộng:", totalTime / 60000, "phút");
+    console.log("Thời gian đã trôi qua:", elapsedTime / 60000, "phút");
+    
+    // Bảo vệ khỏi giá trị duration = 0 hoặc âm
+    if (TEST_DURATION <= 0) {
+        console.log("Thời gian làm bài không hợp lệ: " + TEST_DURATION + " phút. Đặt thành 60 phút mặc định.");
+        remainingTime = 60 * 60 * 1000; // Mặc định 60 phút nếu duration <= 0
+    } else {
+        remainingTime = totalTime - elapsedTime;
+        
+        // Bảo vệ khỏi trường hợp remainingTime âm
+        if (remainingTime <= 0) {
+            // Thời gian không hợp lệ, đặt lại thành giá trị mặc định (toàn bộ thời gian)
+            console.log("Thời gian còn lại không hợp lệ: " + remainingTime / 60000 + " phút. Đặt lại thời gian bắt đầu.");
+            remainingTime = totalTime;
+        }
+    }
+    
+    console.log("Thời gian còn lại:", remainingTime / 60000, "phút");
+    
+    // Cập nhật đồng hồ mỗi giây
+    updateTimerDisplay();
+    timerInterval = setInterval(updateTimerDisplay, 1000);
+}
+
+// Cập nhật hiển thị đồng hồ
+function updateTimerDisplay() {
+    // Giảm thời gian còn lại đi 1 giây
+    remainingTime -= 1000;
+    
+    // Nếu thời gian đã hết, tự động nộp bài
+    if (remainingTime <= 0) {
+        clearInterval(timerInterval);
+        autoSubmitDueToTimeout();
+        return;
+    }
+    
+    // Tính toán phút và giây
+    var minutes = Math.floor(remainingTime / (60 * 1000));
+    var seconds = Math.floor((remainingTime % (60 * 1000)) / 1000);
+    
+    // Format: MM:SS (đảm bảo luôn có 2 chữ số)
+    var minutesStr = (minutes < 10) ? "0" + minutes : minutes.toString();
+    var secondsStr = (seconds < 10) ? "0" + seconds : seconds.toString();
+    var timeString = minutesStr + ":" + secondsStr;
+    
+    // Hiển thị thời gian
+    var timerElement = document.getElementById('timer');
+    if (timerElement) {
+        timerElement.textContent = timeString;
+        
+        // Thêm hiệu ứng cảnh báo khi thời gian còn ít (dưới 5 phút)
+        if (remainingTime < 5 * 60 * 1000) {
+            timerElement.classList.add('timer-warning');
+        }
+    } else {
+        console.error("Không tìm thấy phần tử timer!");
+        clearInterval(timerInterval);
+    }
+}
+
+// Tự động nộp bài khi hết thời gian
+function autoSubmitDueToTimeout() {
+    // Nếu là bài luyện tập, không cần nộp tự động
+    if (IS_PRACTICE) {
+        return;
+    }
+    
+    // Hiển thị thông báo
+    var timerElement = document.getElementById('timer');
+    if (timerElement) {
+        timerElement.textContent = "00:00";
+        timerElement.classList.add('timer-warning');
+    }
+    
+    // Thông báo cho người dùng
+    alert('Hết thời gian làm bài! Bài làm của bạn sẽ được tự động nộp.');
+    
+    // Nộp form
+    document.getElementById('allQuestionsForm').submit();
+}
 </script>
 </body>
 </html>

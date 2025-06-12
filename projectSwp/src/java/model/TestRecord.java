@@ -4,6 +4,7 @@
  */
 package model;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
@@ -92,6 +93,22 @@ public class TestRecord {
     public Date getFinishAtAsDate() {
         if (finish_at != null) {
             return Date.from(finish_at.atZone(ZoneId.systemDefault()).toInstant());
+        }
+        return null;
+    }
+    
+    // Trả về Timestamp từ started_at cho sử dụng trong controller
+    public Timestamp getStart_time() {
+        if (started_at != null) {
+            return Timestamp.valueOf(started_at);
+        }
+        return null;
+    }
+    
+    // Trả về Timestamp từ finish_at cho sử dụng trong controller
+    public Timestamp getFinish_time() {
+        if (finish_at != null) {
+            return Timestamp.valueOf(finish_at);
         }
         return null;
     }

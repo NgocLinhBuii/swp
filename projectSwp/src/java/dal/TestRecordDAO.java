@@ -36,6 +36,23 @@ public class TestRecordDAO extends DBContext {
         return -1;
     }
 
+    // Cập nhật thời gian bắt đầu của test record
+    public boolean updateStartTime(int testRecordId, Timestamp startTime) {
+        String sql = "UPDATE test_record SET started_at = ? WHERE id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setTimestamp(1, startTime);
+            ps.setInt(2, testRecordId);
+            int rowsAffected = ps.executeUpdate();
+            
+            System.out.println("Updated start time for test record ID " + testRecordId + ": " + startTime);
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            System.out.println("Error updating start time: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     // Hoàn thành test và tính điểm
     public void finishTestRecord(int testRecordId, double score) {
         System.out.println("\n** SAVING TEST RECORD: ID=" + testRecordId + ", SCORE=" + score + " **\n");
