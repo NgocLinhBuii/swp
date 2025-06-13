@@ -24,7 +24,7 @@
 CREATE TABLE `account` (
   `id` int NOT NULL AUTO_INCREMENT,
   `email` varchar(255) DEFAULT NULL,
-  `password` varchar(255) DEFAULT NULL,
+  `password` varchar(50) DEFAULT NULL,
   `status` varchar(20) DEFAULT NULL,
   `role` varchar(30) DEFAULT NULL,
   `full_name` varchar(200) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
@@ -35,14 +35,8 @@ CREATE TABLE `account` (
   UNIQUE KEY `account_uk_email` (`email`),
   KEY `account_image_id_fk` (`image_id`),
   CONSTRAINT `account_image_id_fk` FOREIGN KEY (`image_id`) REFERENCES `image` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `account`
---
-
-INSERT INTO `account` VALUES (1,'parent1@example.com','$2a$10$gHFIrl9e47BBiSDoIiypauhRWkXHi2dPD5BCcWGbVVty8al1JwIN6','active','parent','Nguyen Van A',1,'1980-05-12',1),(2,'teacher1@example.com','$2a$10$gHFIrl9e47BBiSDoIiypauhRWkXHi2dPD5BCcWGbVVty8al1JwIN6','active','teacher','Tran Thi B',0,'1990-07-20',2),(3,'parent2@example.com','$2a$10$gHFIrl9e47BBiSDoIiypauhRWkXHi2dPD5BCcWGbVVty8al1JwIN6','active','parent2','Nguyen Van B',1,'1980-05-12',1),(4,'parent3@example.com','$2a$10$gHFIrl9e47BBiSDoIiypauhRWkXHi2dPD5BCcWGbVVty8al1JwIN6','active','parent3','Nguyen Van C',1,'1980-05-12',1);
 
 --
 -- Table structure for table `category`
@@ -56,14 +50,8 @@ CREATE TABLE `category` (
   `num_questions` int DEFAULT NULL,
   `duration` int DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `category`
---
-
-INSERT INTO `category` VALUES (1,'Toán',20,30),(2,'Tiếng Việt',25,35);
 
 --
 -- Table structure for table `chapter`
@@ -79,14 +67,8 @@ CREATE TABLE `chapter` (
   PRIMARY KEY (`id`),
   KEY `chapter_subject_id_fk` (`subject_id`),
   CONSTRAINT `chapter_subject_id_fk` FOREIGN KEY (`subject_id`) REFERENCES `subject` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `chapter`
---
-
-INSERT INTO `chapter` VALUES (1,'Chương 1: Cộng trừ','Giới thiệu cộng trừ trong phạm vi 10',1),(2,'Chương 2: Làm quen chữ cái','Học chữ cái cơ bản',2);
 
 --
 -- Table structure for table `grade`
@@ -102,14 +84,8 @@ CREATE TABLE `grade` (
   PRIMARY KEY (`id`),
   KEY `grade_account_id_fk` (`teacher_id`),
   CONSTRAINT `grade_account_id_fk` FOREIGN KEY (`teacher_id`) REFERENCES `account` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `grade`
---
-
-INSERT INTO `grade` VALUES (1,'Grade 1','Lớp 1 - Cơ bản',2),(2,'Grade 2','Lớp 2 - Nâng cao',2);
 
 --
 -- Table structure for table `image`
@@ -121,14 +97,8 @@ CREATE TABLE `image` (
   `id` int NOT NULL AUTO_INCREMENT,
   `image_data` longtext,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `image`
---
-
-INSERT INTO `image` VALUES (1,'base64_string_or_image_url_1'),(2,'base64_string_or_image_url_2'),(3,'base64_string_or_image_url_3'),(4,'base64_string_or_image_url_4'),(5,'assets/img/avatar/avatar_1749464303221.mp4');
 
 --
 -- Table structure for table `invoice`
@@ -146,14 +116,8 @@ CREATE TABLE `invoice` (
   PRIMARY KEY (`id`),
   KEY `invoice_account_id_fk` (`parent_id`),
   CONSTRAINT `invoice_account_id_fk` FOREIGN KEY (`parent_id`) REFERENCES `account` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `invoice`
---
-
-INSERT INTO `invoice` VALUES (1,'500000',1,'2025-06-04 22:42:06','PAID','2025-06-04 22:42:06');
 
 --
 -- Table structure for table `invoice_line`
@@ -172,12 +136,6 @@ CREATE TABLE `invoice_line` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `invoice_line`
---
-
-INSERT INTO `invoice_line` VALUES (1,1);
-
---
 -- Table structure for table `lesson`
 --
 
@@ -188,18 +146,11 @@ CREATE TABLE `lesson` (
   `name` varchar(300) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
   `content` longtext,
   `chapter_id` int DEFAULT NULL,
-  `video_link` text,
   PRIMARY KEY (`id`),
   KEY `lesson_chapter_id_fk` (`chapter_id`),
   CONSTRAINT `lesson_chapter_id_fk` FOREIGN KEY (`chapter_id`) REFERENCES `chapter` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `lesson`
---
-
-INSERT INTO `lesson` VALUES (1,'Bài 1: Cộng trong phạm vi 10','Nội dung bài học...',1,NULL),(2,'Bài 2: Âm a, ă, â','Nội dung bài học...',2,NULL);
 
 --
 -- Table structure for table `package_subject`
@@ -218,12 +169,6 @@ CREATE TABLE `package_subject` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `package_subject`
---
-
-INSERT INTO `package_subject` VALUES (1,1),(2,2);
-
---
 -- Table structure for table `question`
 --
 
@@ -239,14 +184,8 @@ CREATE TABLE `question` (
   KEY `question_image_id_fk` (`image_id`),
   CONSTRAINT `question_image_id_fk` FOREIGN KEY (`image_id`) REFERENCES `image` (`id`),
   CONSTRAINT `question_lesson_id_fk` FOREIGN KEY (`lesson_id`) REFERENCES `lesson` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `question`
---
-
-INSERT INTO `question` VALUES (1,'5 + (-3) = ?',NULL,1),(2,'Vận tốc là gì?',NULL,2);
 
 --
 -- Table structure for table `question_option`
@@ -262,14 +201,8 @@ CREATE TABLE `question_option` (
   PRIMARY KEY (`id`),
   KEY `question_option_question_id_fk` (`question_id`),
   CONSTRAINT `question_option_question_id_fk` FOREIGN KEY (`question_id`) REFERENCES `question` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `question_option`
---
-
-INSERT INTO `question_option` VALUES (1,1,'2',_binary ''),(2,1,'-8',_binary '\0'),(3,2,'Độ lớn của quãng đường chia cho thời gian',_binary ''),(4,2,'Khối lượng vật',_binary '\0');
 
 --
 -- Table structure for table `question_record`
@@ -291,11 +224,6 @@ CREATE TABLE `question_record` (
   CONSTRAINT `question_record_test_record_id_fk` FOREIGN KEY (`test_record_id`) REFERENCES `test_record` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `question_record`
---
-
 
 --
 -- Table structure for table `student`
@@ -325,12 +253,6 @@ CREATE TABLE `student` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `student`
---
-
-INSERT INTO `student` VALUES (1,1,2,'student01','pass123','Le Van C','2010-09-01',_binary '',3),(2,2,3,'student02','pass456','Pham Thi D','2011-03-15',_binary '\0',4);
-
---
 -- Table structure for table `study_package`
 --
 
@@ -341,14 +263,8 @@ CREATE TABLE `study_package` (
   `name` varchar(300) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
   `price` mediumtext,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `study_package`
---
-
-INSERT INTO `study_package` VALUES (1,'Gói học Toán 6','500000'),(2,'Gói học Vật lý 7','600000');
 
 --
 -- Table structure for table `subject`
@@ -364,14 +280,8 @@ CREATE TABLE `subject` (
   PRIMARY KEY (`id`),
   KEY `subject_grade_id_fk` (`grade_id`),
   CONSTRAINT `subject_grade_id_fk` FOREIGN KEY (`grade_id`) REFERENCES `grade` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `subject`
---
-
-INSERT INTO `subject` VALUES (1,'Toán nâng cao','Môn Toán nâng cao cho lớp 1',1),(2,'Tiếng Việt nâng cao','Môn Tiếng Việt nâng cao cho lớp 2',2);
 
 --
 -- Table structure for table `test`
@@ -388,14 +298,8 @@ CREATE TABLE `test` (
   PRIMARY KEY (`id`),
   KEY `test_category_id_fk` (`category_id`),
   CONSTRAINT `test_category_id_fk` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `test`
---
-
-INSERT INTO `test` VALUES (1,'Test Toán Học Cơ Bản','Bài kiểm tra về kiến thức toán học cơ bản',_binary '',1),(2,'Test Vật Lý Nâng Cao','Bài kiểm tra nâng cao về vật lý',_binary '\0',2);
 
 --
 -- Table structure for table `test_question`
@@ -412,12 +316,6 @@ CREATE TABLE `test_question` (
   CONSTRAINT `test_question_test_id_fk` FOREIGN KEY (`test_id`) REFERENCES `test` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `test_question`
---
-
-INSERT INTO `test_question` VALUES (1,1),(2,2);
 
 --
 -- Table structure for table `test_record`
@@ -437,14 +335,8 @@ CREATE TABLE `test_record` (
   KEY `test_record_test_id_fk` (`test_id`),
   CONSTRAINT `test_record_student_id_fk` FOREIGN KEY (`student_id`) REFERENCES `student` (`id`),
   CONSTRAINT `test_record_test_id_fk` FOREIGN KEY (`test_id`) REFERENCES `test` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `test_record`
---
-
-INSERT INTO `test_record` VALUES (1,1,1,'2025-05-19 08:00:00','2025-05-19 08:30:00',8.5),(2,2,2,'2025-05-20 09:00:00','2025-05-20 09:45:00',7);
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -455,4 +347,4 @@ INSERT INTO `test_record` VALUES (1,1,1,'2025-05-19 08:00:00','2025-05-19 08:30:
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-06-09 21:12:28
+-- Dump completed on 2025-05-20 22:25:39
