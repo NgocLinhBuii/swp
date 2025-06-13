@@ -92,39 +92,27 @@ public class QuestionRecordDAO extends DBContext {
         }
     }
 
-    private void insertQuestionRecord(int testRecordId, int questionId, int optionId) {
+    public void insertQuestionRecord(int testRecordId, int questionId, int optionId) {
         System.out.println("\n----- INSERT QUESTION RECORD -----");
         System.out.println("PARAMS: testRecordId=" + testRecordId + ", questionId=" + questionId + ", optionId=" + optionId);
-        
         // KIỂM TRA THAM SỐ trước khi insert
         if (testRecordId <= 0 || questionId <= 0 || optionId <= 0) {
             System.out.println("ERROR: Invalid parameters for insert! Skipping insert.");
             return;
         }
-        
         String sql = "INSERT INTO question_record (test_record_id, question_id, option_id) VALUES (?, ?, ?)";
         try {
-            // Tạo PreparedStatement với kết nối mới để tránh vấn đề với connection
             Connection freshConn = new DBContext().getConnection();
             PreparedStatement ps = freshConn.prepareStatement(sql);
-            
             ps.setInt(1, testRecordId);
             ps.setInt(2, questionId);
-            ps.setInt(3, optionId); // Đảm bảo đúng optionId được đặt vào
-            
-            // Log SQL query trước khi thực hiện
+            ps.setInt(3, optionId);
             System.out.println("Executing SQL: " + sql + " with values [" + testRecordId + ", " + questionId + ", " + optionId + "]");
-            
             int inserted = ps.executeUpdate();
             System.out.println("INSERT RESULT: " + (inserted > 0 ? "SUCCESS" : "FAILED") + " - Rows affected: " + inserted);
-            
-            // Close resources
             ps.close();
             freshConn.close();
-            
-            // Kiểm tra lại sau khi insert
             verifyInsert(testRecordId, questionId, optionId);
-            
         } catch (SQLException e) {
             System.out.println("SQL ERROR in insertQuestionRecord: " + e.getMessage());
             e.printStackTrace();
@@ -285,89 +273,68 @@ public class QuestionRecordDAO extends DBContext {
     // Tính điểm cho test record
     public double calculateScore(int testRecordId) {
         System.out.println("=== CALCULATING SCORE FOR TEST " + testRecordId + " ===");
-        
         try {
-            // Cách đơn giản nhất để MySQL xử lý bit(1) là chuyển về số
-            String sql = "SELECT " +
-                        "COUNT(*) AS total, " +
-                        "SUM(qo.is_correct+0) AS correct " +
-                        "FROM question_record qr " +
-                        "JOIN question_option qo ON qr.option_id = qo.id " +
-                        "WHERE qr.test_record_id = ?";
-        
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, testRecordId);
-            ResultSet rs = ps.executeQuery();
-                
-            if (rs.next()) {
-                int total = rs.getInt("total");
-                int correct = rs.getInt("correct");
-                
-                    System.out.println("SQL Result: Total=" + total + ", Correct=" + correct);
-                
-                if (total > 0) {
-                    double score = (double) correct / total * 10.0;
-                        System.out.println("Final score: " + score);
-                        return score;
-                    }
-                }
-            }
-            
-            System.out.println("No valid data for score calculation, trying backup method...");
-            
-            // Backup method nếu cách 1 không hoạt động
+            // Lấy tất cả các câu hỏi trong test record
+            String getQuestionsSql = "SELECT DISTINCT question_id FROM question_record WHERE test_record_id = ?";
+            PreparedStatement psQ = conn.prepareStatement(getQuestionsSql);
+            psQ.setInt(1, testRecordId);
+            ResultSet rsQ = psQ.executeQuery();
             int totalQuestions = 0;
-            int correctAnswers = 0;
-            
-            // Đếm tổng số câu hỏi
-            String countSql = "SELECT COUNT(*) FROM question_record WHERE test_record_id = ?";
-            try (PreparedStatement ps = conn.prepareStatement(countSql)) {
-                ps.setInt(1, testRecordId);
-                ResultSet rs = ps.executeQuery();
-                if (rs.next()) {
-                    totalQuestions = rs.getInt(1);
+            int correctQuestions = 0;
+            while (rsQ.next()) {
+                int questionId = rsQ.getInt("question_id");
+                totalQuestions++;
+                // Lấy loại câu hỏi
+                String typeSql = "SELECT question_type FROM question WHERE id = ?";
+                PreparedStatement psType = conn.prepareStatement(typeSql);
+                psType.setInt(1, questionId);
+                ResultSet rsType = psType.executeQuery();
+                String questionType = "SINGLE";
+                if (rsType.next()) {
+                    questionType = rsType.getString("question_type");
                 }
-            }
-            
-            if (totalQuestions == 0) {
-                System.out.println("No question records found.");
-                return 0.0;
-            }
-            
-            // Kiểm tra từng câu trả lời
-            String recordsSql = "SELECT qr.option_id FROM question_record qr WHERE qr.test_record_id = ?";
-            try (PreparedStatement ps = conn.prepareStatement(recordsSql)) {
-                ps.setInt(1, testRecordId);
-                ResultSet rs = ps.executeQuery();
-                
-                while (rs.next()) {
-                    int optionId = rs.getInt("option_id");
-                    
-                    // Kiểm tra option có đúng không với nhiều cách khác nhau
-                    String correctSql = "SELECT is_correct FROM question_option WHERE id = ?";
-                    try (PreparedStatement ps2 = conn.prepareStatement(correctSql)) {
-                        ps2.setInt(1, optionId);
-                        ResultSet rs2 = ps2.executeQuery();
-                        if (rs2.next()) {
-                            // Kiểm tra cả boolean và int
-                            boolean isCorrectBool = rs2.getBoolean("is_correct");
-                            int isCorrectInt = rs2.getInt("is_correct");
-                            
-                            System.out.println("Option " + optionId + " correct: boolean=" + isCorrectBool + ", int=" + isCorrectInt);
-                            
-                            if (isCorrectBool || isCorrectInt == 1) {
-                                correctAnswers++;
-                            }
-                        }
-                    }
+                rsType.close();
+                psType.close();
+                // Lấy đáp án đúng
+                List<Integer> correctOptionIds = new ArrayList<>();
+                String correctSql = "SELECT id FROM question_option WHERE question_id = ? AND is_correct = 1";
+                PreparedStatement psC = conn.prepareStatement(correctSql);
+                psC.setInt(1, questionId);
+                ResultSet rsC = psC.executeQuery();
+                while (rsC.next()) {
+                    correctOptionIds.add(rsC.getInt("id"));
                 }
+                rsC.close();
+                psC.close();
+                // Lấy đáp án học sinh chọn
+                List<Integer> studentOptionIds = new ArrayList<>();
+                String studentSql = "SELECT option_id FROM question_record WHERE test_record_id = ? AND question_id = ?";
+                PreparedStatement psS = conn.prepareStatement(studentSql);
+                psS.setInt(1, testRecordId);
+                psS.setInt(2, questionId);
+                ResultSet rsS = psS.executeQuery();
+                while (rsS.next()) {
+                    studentOptionIds.add(rsS.getInt("option_id"));
+                }
+                rsS.close();
+                psS.close();
+                // So sánh
+                boolean isCorrect = false;
+                if ("SINGLE".equals(questionType)) {
+                    isCorrect = studentOptionIds.size() == 1 && correctOptionIds.size() == 1 && studentOptionIds.get(0).equals(correctOptionIds.get(0));
+                } else {
+                    Collections.sort(correctOptionIds);
+                    Collections.sort(studentOptionIds);
+                    isCorrect = correctOptionIds.equals(studentOptionIds);
+                }
+                if (isCorrect) correctQuestions++;
             }
-            
-            System.out.println("Backup method - Total: " + totalQuestions + ", Correct: " + correctAnswers);
-            double score = (double) correctAnswers / totalQuestions * 10.0;
-            System.out.println("Backup score: " + score);
+            rsQ.close();
+            psQ.close();
+            if (totalQuestions == 0) return 0.0;
+            double score = (double) correctQuestions / totalQuestions * 10.0;
+            System.out.println("Final score: " + score);
             return score;
-            
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("Error calculating score: " + e.getMessage());
@@ -543,5 +510,16 @@ public class QuestionRecordDAO extends DBContext {
              System.err.println("Error testing MySQL bit type: " + e.getMessage());
          }
          System.err.println("=== END MYSQL BIT TEST ===");
+    }
+
+    public void deleteQuestionRecordsByTestRecordAndQuestion(int testRecordId, int questionId) {
+        String sql = "DELETE FROM question_record WHERE test_record_id = ? AND question_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, testRecordId);
+            ps.setInt(2, questionId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 } 

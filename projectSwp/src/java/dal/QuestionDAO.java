@@ -19,7 +19,8 @@ public class QuestionDAO extends DBContext {
                         rs.getInt("id"),
                         rs.getString("question"),
                         rs.getInt("image_id"),
-                        rs.getInt("lesson_id")
+                        rs.getInt("lesson_id"),
+                        rs.getString("question_type")
                 );
                 list.add(q);
             }
@@ -37,7 +38,8 @@ public class QuestionDAO extends DBContext {
                             rs.getInt("id"),
                             rs.getString("question"),
                             rs.getInt("image_id"),
-                            rs.getInt("lesson_id")
+                            rs.getInt("lesson_id"),
+                            rs.getString("question_type")
                     );
                 }
             }
@@ -46,22 +48,24 @@ public class QuestionDAO extends DBContext {
     }
 
     public void insert(Question question) throws SQLException {
-        String sql = "INSERT INTO Question (question, image_id, lesson_id) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO Question (question, image_id, lesson_id, question_type) VALUES (?, ?, ?, ?)";
         try (Connection conn = new DBContext().getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, question.getQuestion());
             stmt.setInt(2, question.getImage_id());
             stmt.setInt(3, question.getLesson_id());
+            stmt.setString(4, question.getQuestion_type());
             stmt.executeUpdate();
         }
     }
 
     public void update(Question question) throws SQLException {
-        String sql = "UPDATE Question SET question = ?, image_id = ?, lesson_id = ? WHERE id = ?";
+        String sql = "UPDATE Question SET question = ?, image_id = ?, lesson_id = ?, question_type = ? WHERE id = ?";
         try (Connection conn = new DBContext().getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, question.getQuestion());
             stmt.setInt(2, question.getImage_id());
             stmt.setInt(3, question.getLesson_id());
-            stmt.setInt(4, question.getId());
+            stmt.setString(4, question.getQuestion_type());
+            stmt.setInt(5, question.getId());
             stmt.executeUpdate();
         }
     }
@@ -85,7 +89,8 @@ public class QuestionDAO extends DBContext {
                             rs.getInt("id"),
                             rs.getString("question"),
                             rs.getInt("image_id"),
-                            rs.getInt("lesson_id")
+                            rs.getInt("lesson_id"),
+                            rs.getString("question_type")
                     );
                     list.add(q);
                 }
@@ -132,7 +137,8 @@ public class QuestionDAO extends DBContext {
                             rs.getInt("id"),
                             rs.getString("question"),
                             rs.getInt("image_id"),
-                            rs.getInt("lesson_id")
+                            rs.getInt("lesson_id"),
+                            rs.getString("question_type")
                     );
                     list.add(q);
                     System.out.println("Found question: ID=" + q.getId() + 
@@ -214,7 +220,8 @@ public class QuestionDAO extends DBContext {
                             rs.getInt("id"),
                             rs.getString("question"),
                             rs.getInt("image_id"),
-                            rs.getInt("lesson_id")
+                            rs.getInt("lesson_id"),
+                            rs.getString("question_type")
                     );
                     list.add(q);
                     System.out.println("Found question: ID=" + q.getId() + 
@@ -250,7 +257,8 @@ public class QuestionDAO extends DBContext {
                             rs.getInt("id"),
                             rs.getString("question"),
                             rs.getInt("image_id"),
-                            rs.getInt("lesson_id")
+                            rs.getInt("lesson_id"),
+                            rs.getString("question_type")
                     );
                     list.add(q);
                 }

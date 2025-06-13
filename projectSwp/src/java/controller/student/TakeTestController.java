@@ -20,8 +20,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @WebServlet("/student/taketest")
 public class TakeTestController extends HttpServlet {
@@ -347,30 +349,47 @@ public class TakeTestController extends HttpServlet {
         try {
             HttpSession session = request.getSession();
             Integer testRecordId = (Integer) session.getAttribute("currentTestRecordId");
-            
-            if (testRecordId == null) {
+            Integer testId = (Integer) session.getAttribute("currentTestId");
+            if (testRecordId == null || testId == null) {
                 response.sendRedirect("taketest");
                 return;
             }
-            
-            // Lấy và lưu tất cả câu trả lời
+            // Lấy danh sách câu hỏi để biết loại câu hỏi
+            List<Question> questions = questionDAO.getQuestionsByTest(testId);
             int index = 0;
             String questionIdParam;
-            
             while ((questionIdParam = request.getParameter("questionId" + index)) != null) {
-                String optionIdParam = request.getParameter("optionId" + index);
-                
-                if (questionIdParam != null && optionIdParam != null && !optionIdParam.isEmpty()) {
-                    int questionId = Integer.parseInt(questionIdParam);
-                    int optionId = Integer.parseInt(optionIdParam);
-                    
-                    // Lưu câu trả lời
-                    questionRecordDAO.saveQuestionRecord(testRecordId, questionId, optionId);
+                int questionId = Integer.parseInt(questionIdParam);
+                Question question = null;
+                for (Question q : questions) {
+                    if (q.getId() == questionId) {
+                        question = q;
+                        break;
+                    }
                 }
-                
+                if (question != null) {
+                    // Luôn xóa đáp án cũ trước khi lưu mới
+                    questionRecordDAO.deleteQuestionRecordsByTestRecordAndQuestion(testRecordId, questionId);
+                    if ("MULTIPLE".equals(question.getQuestion_type())) {
+                        String[] optionIds = request.getParameterValues("optionId" + index);
+                        if (optionIds != null) {
+                            for (String optIdStr : optionIds) {
+                                if (optIdStr != null && !optIdStr.isEmpty()) {
+                                    int optionId = Integer.parseInt(optIdStr);
+                                    questionRecordDAO.insertQuestionRecord(testRecordId, questionId, optionId);
+                                }
+                            }
+                        }
+                    } else {
+                        String optionIdParam = request.getParameter("optionId" + index);
+                        if (optionIdParam != null && !optionIdParam.isEmpty()) {
+                            int optionId = Integer.parseInt(optionIdParam);
+                            questionRecordDAO.insertQuestionRecord(testRecordId, questionId, optionId);
+                        }
+                    }
+                }
                 index++;
             }
-            
             // Chuyển đến hoàn thành bài test
             finishTest(request, response);
         } catch (Exception e) {
@@ -400,10 +419,13 @@ public class TakeTestController extends HttpServlet {
                 List<Question> questions = questionDAO.getQuestionsByTest(testId);
                 
                 // Kiểm tra xem đã trả lời đủ câu hỏi chưa
-                if (records.size() < questions.size()) {
+                Set<Integer> answeredQuestions = new HashSet<>();
+                for (QuestionRecord record : records) {
+                    answeredQuestions.add(record.getQuestion_id());
+                }
+                if (answeredQuestions.size() < questions.size()) {
                     // Chưa trả lời đủ câu hỏi
                     request.setAttribute("error", "Vui lòng trả lời tất cả câu hỏi trước khi nộp bài!");
-                    
                     // Chuyển hướng về trang làm bài
                     response.sendRedirect("taketest?action=question");
                     return;
@@ -478,6 +500,13 @@ public class TakeTestController extends HttpServlet {
             // Lấy tất cả câu trả lời từ bảng question_record
             List<QuestionRecord> questionRecords = questionRecordDAO.getQuestionRecordsByTestRecord(testRecordId);
             
+            // Tạo map questionId -> List<QuestionRecord> để hiển thị mỗi câu hỏi 1 lần
+            Map<Integer, List<QuestionRecord>> questionRecordMap = new HashMap<>();
+            for (QuestionRecord record : questionRecords) {
+                questionRecordMap.computeIfAbsent(record.getQuestion_id(), k -> new java.util.ArrayList<>()).add(record);
+            }
+            request.setAttribute("questionRecordMap", questionRecordMap);
+            
             // Lấy thông tin chi tiết của các câu hỏi
             Map<Integer, Question> questionMap = new HashMap<>();
             Map<Integer, List<QuestionOption>> optionsMap = new HashMap<>();
@@ -498,6 +527,11 @@ public class TakeTestController extends HttpServlet {
                 }
             }
             
+            // Lấy danh sách hình ảnh cho câu hỏi (giống takeTest.jsp)
+            ImageDAO imageDAO = new ImageDAO(this.questionDAO.getDBConnection());
+            List<Image> images = imageDAO.findAll();
+            request.setAttribute("images", images);
+
             request.setAttribute("testRecord", testRecord);
             request.setAttribute("test", test);
             request.setAttribute("questionRecords", questionRecords);

@@ -3,9 +3,11 @@ package controller.question;
 import dal.ImageDAO;
 import dal.QuestionDAO;
 import dal.LessonDAO;
+import dal.QuestionOptionDAO;
 import model.Question;
 import model.Lesson;
 import model.Image;
+import model.QuestionOption;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -28,6 +30,7 @@ public class QuestionController extends HttpServlet {
 
     private QuestionDAO questionDAO = new QuestionDAO();
     private ImageDAO imageDAO = new ImageDAO(questionDAO.getDBConnection());
+    private QuestionOptionDAO questionOptionDAO = new QuestionOptionDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -58,9 +61,11 @@ public class QuestionController extends HttpServlet {
 
                         LessonDAO lessonDAO2 = new LessonDAO();
                         List<Lesson> lessonList2 = lessonDAO2.getAllLessons();
+                        List<QuestionOption> options = questionOptionDAO.getOptionsByQuestion(id);
 
                         request.setAttribute("question", question);
                         request.setAttribute("les", lessonList2);
+                        request.setAttribute("options", options);
                         request.getRequestDispatcher("question/updateQuestion.jsp").forward(request, response);
                         return;
                     }
@@ -132,13 +137,64 @@ public class QuestionController extends HttpServlet {
                 image_id = imageDAO.insertImage(img);
             }
 
+            String questionType = request.getParameter("question_type");
+            if (questionType == null || (!questionType.equals("SINGLE") && !questionType.equals("MULTIPLE"))) {
+                questionType = "SINGLE";
+            }
+
             if ("insert".equals(action)) {
-                Question q = new Question(questionText, image_id, lesson_id);
+                Question q = new Question(questionText, image_id, lesson_id, questionType);
                 questionDAO.insert(q);
+                int questionId = questionDAO.findAllQuestion().get(questionDAO.findAllQuestion().size() - 1).getId();
+                String[] optionContents = request.getParameterValues("optionContent");
+                boolean[] correctArr;
+                if ("SINGLE".equals(questionType)) {
+                    int correctIndex = -1;
+                    String correctOption = request.getParameter("correctOption");
+                    if (correctOption != null) correctIndex = Integer.parseInt(correctOption);
+                    correctArr = new boolean[optionContents.length];
+                    for (int i = 0; i < correctArr.length; i++) correctArr[i] = (i == correctIndex);
+                } else {
+                    correctArr = new boolean[optionContents.length];
+                    for (int i = 0; i < correctArr.length; i++) {
+                        String val = request.getParameter("correctOption" + i);
+                        correctArr[i] = (val != null && val.equals("true"));
+                    }
+                }
+                for (int i = 0; i < optionContents.length; i++) {
+                    QuestionOption opt = new QuestionOption();
+                    opt.setQuestion_id(questionId);
+                    opt.setContent(optionContents[i]);
+                    opt.setIs_correct(correctArr[i]);
+                    questionOptionDAO.insertOption(opt);
+                }
             } else if ("update".equals(action)) {
                 int id = Integer.parseInt(request.getParameter("id"));
-                Question q = new Question(id, questionText, image_id, lesson_id);
+                Question q = new Question(id, questionText, image_id, lesson_id, questionType);
                 questionDAO.update(q);
+                questionOptionDAO.deleteOptionsByQuestion(id);
+                String[] optionContents = request.getParameterValues("optionContent");
+                boolean[] correctArr;
+                if ("SINGLE".equals(questionType)) {
+                    int correctIndex = -1;
+                    String correctOption = request.getParameter("correctOption");
+                    if (correctOption != null) correctIndex = Integer.parseInt(correctOption);
+                    correctArr = new boolean[optionContents.length];
+                    for (int i = 0; i < correctArr.length; i++) correctArr[i] = (i == correctIndex);
+                } else {
+                    correctArr = new boolean[optionContents.length];
+                    for (int i = 0; i < correctArr.length; i++) {
+                        String val = request.getParameter("correctOption" + i);
+                        correctArr[i] = (val != null && val.equals("true"));
+                    }
+                }
+                for (int i = 0; i < optionContents.length; i++) {
+                    QuestionOption opt = new QuestionOption();
+                    opt.setQuestion_id(id);
+                    opt.setContent(optionContents[i]);
+                    opt.setIs_correct(correctArr[i]);
+                    questionOptionDAO.insertOption(opt);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -6,21 +6,24 @@ public class Question {
     private String question; // Trước đây là name
     private int image_id;
     private int lesson_id;
+    private String question_type; // 'SINGLE' hoặc 'MULTIPLE'
 
     public Question() {
     }
 
-    public Question(int id, String question, int image_id, int lesson_id) {
+    public Question(int id, String question, int image_id, int lesson_id, String question_type) {
         this.id = id;
         this.question = question;
         this.image_id = image_id;
         this.lesson_id = lesson_id;
+        this.question_type = question_type;
     }
 
-    public Question(String question, int image_id, int lesson_id) {
+    public Question(String question, int image_id, int lesson_id, String question_type) {
         this.question = question;
         this.image_id = image_id;
         this.lesson_id = lesson_id;
+        this.question_type = question_type;
     }
 
     public int getId() {
@@ -39,6 +42,10 @@ public class Question {
         return lesson_id;
     }
 
+    public String getQuestion_type() {
+        return question_type;
+    }
+
     public void setId(int id) {
         this.id = id;
     }
@@ -53,5 +60,9 @@ public class Question {
 
     public void setLesson_id(int lesson_id) {
         this.lesson_id = lesson_id;
+    }
+
+    public void setQuestion_type(String question_type) {
+        this.question_type = question_type;
     }
 }

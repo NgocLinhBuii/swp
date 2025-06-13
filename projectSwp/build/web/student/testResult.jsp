@@ -340,27 +340,33 @@
         
         <!-- Question Details Section -->
         <h4 class="mt-5 mb-4"><i class="fa fa-list-ol text-primary"></i> Chi tiết câu trả lời</h4>
-        
-        <c:forEach var="questionRecord" items="${questionRecords}" varStatus="qStatus">
+        <c:set var="questionIndex" value="0" />
+        <c:forEach var="questionId" items="${questionRecordMap.keySet()}">
+            <c:set var="records" value="${questionRecordMap[questionId]}" />
             <div class="question-card">
-                <div class="question-number">${qStatus.index + 1}</div>
-                
+                <div class="question-number">${questionIndex + 1}</div>
+                <c:set var="questionIndex" value="${questionIndex + 1}" />
                 <div class="question-content">
-                    ${questionMap[questionRecord.question_id].question}
+                    ${questionMap[questionId].question}
                 </div>
-                
                 <!-- Question Image (if exists) -->
-                <c:if test="${questionMap[questionRecord.question_id].image_id != null && questionMap[questionRecord.question_id].image_id > 0}">
-                    <img src="${pageContext.request.contextPath}/image/${questionMap[questionRecord.question_id].image_id}" 
-                         alt="Question Image" class="img-fluid mb-3" style="max-height: 200px;">
+                <c:if test="${questionMap[questionId].image_id != null && questionMap[questionId].image_id > 0}">
+                    <c:forEach var="img" items="${images}">
+                        <c:if test="${img.id == questionMap[questionId].image_id}">
+                            <img src="data:image/jpg;base64, ${img.image_data}" alt="Question Image" class="question-image mb-3" style="max-height: 200px;">
+                        </c:if>
+                    </c:forEach>
                 </c:if>
-                
                 <!-- Options -->
                 <div class="options-container">
-                    <c:forEach var="option" items="${optionsMap[questionRecord.question_id]}" varStatus="oStatus">
+                    <c:forEach var="option" items="${optionsMap[questionId]}" varStatus="oStatus">
                         <c:set var="isCorrect" value="${option.is_correct}" />
-                        <c:set var="isSelected" value="${option.id == questionRecord.option_id}" />
-                        
+                        <c:set var="isSelected" value="false" />
+                        <c:forEach var="rec" items="${records}">
+                            <c:if test="${option.id == rec.option_id}">
+                                <c:set var="isSelected" value="true" />
+                            </c:if>
+                        </c:forEach>
                         <div class="option-item
                             <c:choose>
                                 <c:when test="${isCorrect}"> option-correct</c:when>
@@ -368,9 +374,7 @@
                                 <c:otherwise> option-regular</c:otherwise>
                             </c:choose>
                             <c:if test="${isSelected}"> option-selected</c:if>">
-                            
                             <strong>${oStatus.index + 1}.</strong> ${option.content}
-                            
                             <c:if test="${isSelected}">
                                 <span class="correct-indicator 
                                     <c:choose>
@@ -388,7 +392,6 @@
                                     </c:choose>
                                 </span>
                             </c:if>
-                            
                             <c:if test="${isCorrect && !isSelected}">
                                 <span class="correct-indicator correct-answer">
                                     <i class="fa fa-check"></i> Đáp án đúng

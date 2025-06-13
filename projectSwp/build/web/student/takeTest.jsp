@@ -327,19 +327,45 @@
                             </c:forEach>
                         </c:if>
                         
+                        <!-- Loại câu hỏi -->
+                        <div class="question-type-label mb-2">
+                            <c:choose>
+                                <c:when test="${question.question_type == 'SINGLE'}">
+                                    <span class="badge bg-primary">Chọn 1 đáp án đúng</span>
+                                </c:when>
+                                <c:otherwise>
+                                    <span class="badge bg-warning text-dark">Chọn tất cả đáp án đúng</span>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
+                        
                         <!-- Options -->
                         <input type="hidden" name="questionId${qStatus.index}" value="${question.id}">
                         
                         <c:forEach var="option" items="${allOptions[question.id]}" varStatus="oStatus">
                             <div class="option-container">
-                                <input type="radio" 
-                                       id="option_${question.id}_${option.id}" 
-                                       name="optionId${qStatus.index}" 
-                                       value="${option.id}"
-                                       class="option-input"
-                                       data-question-id="${question.id}"
-                                       onclick="updateQuestionStatus(${question.id}, ${qStatus.index})"
-                                       ${previousAnswers[question.id] == option.id ? 'checked' : ''}>
+                                <c:choose>
+                                    <c:when test="${question.question_type == 'SINGLE'}">
+                                        <input type="radio" 
+                                               id="option_${question.id}_${option.id}" 
+                                               name="optionId${qStatus.index}" 
+                                               value="${option.id}"
+                                               class="option-input"
+                                               data-question-id="${question.id}"
+                                               onclick="updateQuestionStatus(${question.id}, ${qStatus.index})"
+                                               <c:if test="${previousAnswers[question.id] == option.id}">checked</c:if>>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <input type="checkbox" 
+                                               id="option_${question.id}_${option.id}" 
+                                               name="optionId${qStatus.index}" 
+                                               value="${option.id}"
+                                               class="option-input"
+                                               data-question-id="${question.id}"
+                                               onclick="updateQuestionStatus(${question.id}, ${qStatus.index})"
+                                               <c:if test="${previousAnswers[question.id] != null && previousAnswers[question.id].contains(option.id)}">checked</c:if>>
+                                    </c:otherwise>
+                                </c:choose>
                                 <label for="option_${question.id}_${option.id}" class="option-label">
                                     <strong>${oStatus.index + 1}.</strong> ${option.content}
                                 </label>
@@ -468,26 +494,40 @@ function updateProgress() {
 
 // Kiểm tra và nộp bài
 function validateAndSubmit() {
-    var answeredQuestions = document.querySelectorAll('input[type="radio"]:checked').length;
-    
+    var questions = document.querySelectorAll('.question-container');
+    var answeredQuestions = 0;
+    for (var i = 0; i < questions.length; i++) {
+        var q = questions[i];
+        var radios = q.querySelectorAll('input[type="radio"]');
+        var checkboxes = q.querySelectorAll('input[type="checkbox"]');
+        var answered = false;
+        if (radios.length > 0) {
+            answered = q.querySelector('input[type="radio"]:checked') !== null;
+        } else if (checkboxes.length > 0) {
+            answered = Array.from(checkboxes).some(cb => cb.checked);
+        }
+        if (answered) answeredQuestions++;
+    }
     if (answeredQuestions < TOTAL_QUESTIONS) {
         alert('Bạn chưa trả lời tất cả câu hỏi. Vui lòng trả lời đủ ' + TOTAL_QUESTIONS + ' câu hỏi trước khi nộp bài.');
-        
         // Tìm câu hỏi đầu tiên chưa trả lời
-        var questions = document.querySelectorAll('.question-container');
         for (var i = 0; i < questions.length; i++) {
-            var questionId = questions[i].id.split('-')[1];
-            var answered = questions[i].querySelector('input[type="radio"]:checked') !== null;
-            
+            var q = questions[i];
+            var radios = q.querySelectorAll('input[type="radio"]');
+            var checkboxes = q.querySelectorAll('input[type="checkbox"]');
+            var answered = false;
+            if (radios.length > 0) {
+                answered = q.querySelector('input[type="radio"]:checked') !== null;
+            } else if (checkboxes.length > 0) {
+                answered = Array.from(checkboxes).some(cb => cb.checked);
+            }
             if (!answered) {
                 showQuestion(i);
                 break;
             }
         }
-        
         return false;
     }
-    
     if (confirm('Bạn có chắc chắn muốn nộp bài không?')) {
         document.getElementById('allQuestionsForm').submit();
     }
