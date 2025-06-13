@@ -113,4 +113,12 @@ public class TestQuestionDAO extends DBContext {
         }
         return list;
     }
+
+    public void removeQuestionFromAllTests(int questionId) throws SQLException {
+        String sql = "DELETE FROM test_question WHERE question_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, questionId);
+            ps.executeUpdate();
+        }
+    }
 } 

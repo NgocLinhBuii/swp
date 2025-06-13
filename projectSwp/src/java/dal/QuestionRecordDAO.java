@@ -522,4 +522,12 @@ public class QuestionRecordDAO extends DBContext {
             e.printStackTrace();
         }
     }
+
+    public void deleteByQuestionId(int questionId) throws SQLException {
+        String sql = "DELETE FROM question_record WHERE question_id = ?";
+        try (Connection conn = new DBContext().getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, questionId);
+            stmt.executeUpdate();
+        }
+    }
 } 

@@ -4,6 +4,8 @@ import dal.ImageDAO;
 import dal.QuestionDAO;
 import dal.LessonDAO;
 import dal.QuestionOptionDAO;
+import dal.TestQuestionDAO;
+import dal.QuestionRecordDAO;
 import model.Question;
 import model.Lesson;
 import model.Image;
@@ -31,6 +33,8 @@ public class QuestionController extends HttpServlet {
     private QuestionDAO questionDAO = new QuestionDAO();
     private ImageDAO imageDAO = new ImageDAO(questionDAO.getDBConnection());
     private QuestionOptionDAO questionOptionDAO = new QuestionOptionDAO();
+    private TestQuestionDAO testQuestionDAO = new TestQuestionDAO();
+    private QuestionRecordDAO questionRecordDAO = new QuestionRecordDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -73,6 +77,9 @@ public class QuestionController extends HttpServlet {
 
                 case "delete":
                     int delId = Integer.parseInt(request.getParameter("id"));
+                    questionRecordDAO.deleteByQuestionId(delId);
+                    testQuestionDAO.removeQuestionFromAllTests(delId);
+                    questionOptionDAO.deleteOptionsByQuestion(delId);
                     questionDAO.delete(delId);
                     response.sendRedirect("Question");
                     return;
