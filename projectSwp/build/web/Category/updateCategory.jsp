@@ -41,36 +41,20 @@
             padding: 20px;
         }
 
-        form {
-            background-color: #fff;
-            padding: 20px;
+        .form-container {
+            background: #fff;
+            padding: 30px;
             border-radius: 8px;
-            max-width: 500px;
-            margin: auto;
-            box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 20px auto;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
         }
 
-        label {
-            margin-top: 10px;
-            display: block;
-        }
-
-        input[type="text"],
-        input[type="number"] {
-            width: 100%;
-            padding: 8px;
-            margin-top: 4px;
-            margin-bottom: 12px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        button {
-            padding: 8px 16px;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            border-radius: 4px;
+        .form-title {
+            color: #333;
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: 600;
         }
 
         footer {
@@ -80,10 +64,16 @@
             font-size: 14px;
         }
 
-        a {
-            display: block;
-            text-align: center;
-            margin-top: 20px;
+        .alert {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
         }
     </style>
 </head>
@@ -91,34 +81,65 @@
 <div class="page-wrapper">
     <jsp:include page="/Subject/header.jsp" />
     <main>
-        <h2 style="text-align:center;">Update Category</h2>
+        <div class="form-container">
+            <h2 class="form-title">Update Category</h2>
 
-        <c:if test="${empty category}">
-            <p style="color:red; text-align:center;">Category not found!</p>
-            <a href="category">← Back to Category List</a>
-        </c:if>
+            <c:if test="${not empty error}">
+                <div class="alert alert-danger">${error}</div>
+            </c:if>
 
-        <c:if test="${not empty category}">
-            <form method="post" action="category">
-                <input type="hidden" name="action" value="update" />
+            <c:if test="${empty category}">
+                <div class="alert alert-danger">Category not found!</div>
+                <div class="text-center mt-3">
+                    <a href="category" class="btn btn-primary">Back to Category List</a>
+                </div>
+            </c:if>
 
-                <label>ID (read-only):</label>
-                <input type="number" name="id" value="${category.id}" readonly />
+            <c:if test="${not empty category}">
+                <form method="post" action="category" id="categoryForm" class="needs-validation" novalidate>
+                    <input type="hidden" name="action" value="update" />
 
-                <label>Name:</label>
-                <input type="text" name="name" value="${category.name}" required />
+                    <div class="form-group">
+                        <label for="id">ID:</label>
+                        <input type="number" class="form-control" id="id" name="id" value="${category.id}" readonly />
+                    </div>
 
-                <label>Number of Questions:</label>
-                <input type="number" name="num_question" value="${category.num_question}" min="1" required />
+                    <div class="form-group">
+                        <label for="name">Category Name:</label>
+                        <input type="text" class="form-control" name="name" id="name" value="${category.name}" 
+                               required placeholder="Enter category name" maxlength="300"/>
+                        <div class="invalid-feedback">
+                            Please enter a valid category name.
+                        </div>
+                    </div>
 
-                <label>Duration (minutes):</label>
-                <input type="number" name="duration" value="${category.duration}" min="1" required />
+                    <div class="form-group">
+                        <label for="num_question">Number of Questions:</label>
+                        <input type="number" class="form-control" name="num_question" id="num_question" 
+                               value="${category.num_question}" min="1" max="500" required 
+                               placeholder="Number of questions"/>
+                        <div class="invalid-feedback">
+                            Please enter a number between 1 and 500.
+                        </div>
+                    </div>
 
-                <button type="submit">Update Category</button>
-            </form>
-        </c:if>
+                    <div class="form-group">
+                        <label for="duration">Duration (minutes):</label>
+                        <input type="number" class="form-control" name="duration" id="duration" 
+                               value="${category.duration}" min="1" max="300" required 
+                               placeholder="Test duration in minutes"/>
+                        <div class="invalid-feedback">
+                            Please enter a duration between 1 and 300 minutes.
+                        </div>
+                    </div>
 
-        <a href="category">← Back to Category List</a>
+                    <div class="form-group mt-4 text-center">
+                        <button type="submit" class="btn btn-primary">Update Category</button>
+                        <a href="category" class="btn btn-secondary ml-2">Cancel</a>
+                    </div>
+                </form>
+            </c:if>
+        </div>
     </main>
     <jsp:include page="/Subject/footer.jsp" />
 </div>
@@ -149,5 +170,26 @@
 <script src="${pageContext.request.contextPath}/assets/js/jquery.ajaxchimp.min.js"></script>
 <script src="${pageContext.request.contextPath}/assets/js/plugins.js"></script>
 <script src="${pageContext.request.contextPath}/assets/js/main.js"></script>
+
+<script>
+// Bootstrap form validation script
+(function() {
+  'use strict';
+  window.addEventListener('load', function() {
+    // Fetch all forms we want to apply validation to
+    var forms = document.getElementsByClassName('needs-validation');
+    // Loop over them and prevent submission
+    var validation = Array.prototype.filter.call(forms, function(form) {
+      form.addEventListener('submit', function(event) {
+        if (form.checkValidity() === false) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  }, false);
+})();
+</script>
 </body>
 </html>

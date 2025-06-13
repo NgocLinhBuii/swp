@@ -129,15 +129,46 @@
                     Practice
                 </label>
 
-                Category:
-                <select name="categoryId" required>
+                <label for="category">Category:</label>
+                <select id="category" name="categoryId" required>
+                    <option value="" disabled>-- Chọn danh mục --</option>
                     <c:forEach var="entry" items="${categoryMap}">
-                        <option value="${entry.key}"
-                                <c:if test="${test.category_id == entry.key}">selected</c:if>>
-                            ${entry.value}
-                        </option>
+                        <option value="${entry.key}" ${test.category_id == entry.key ? 'selected' : ''}>${entry.value}</option>
                     </c:forEach>
                 </select>
+
+                <!-- Danh sách câu hỏi từ question bank -->
+                <h4>Chọn câu hỏi cho bài test:</h4>
+                <div style="max-height:400px;overflow-y:auto;border:1px solid #ccc;padding:10px;margin-bottom:15px;background:#fafafa">
+                    <c:if test="${empty questionList}">
+                        <p class="text-danger">Không có câu hỏi nào trong ngân hàng câu hỏi.</p>
+                    </c:if>
+                    <c:if test="${not empty questionList}">
+                        <table class="table table-bordered table-sm">
+                            <thead>
+                                <tr>
+                                    <th style="width:40px"></th>
+                                    <th style="width:50px">ID</th>
+                                    <th>Nội dung câu hỏi</th>
+                                    <th style="width:80px">Lesson</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <c:forEach var="q" items="${questionList}">
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" name="questionIds" value="${q.id}" 
+                                                <c:if test="${selectedQuestionIds.contains(q.id)}">checked</c:if> />
+                                        </td>
+                                        <td>${q.id}</td>
+                                        <td>${q.question}</td>
+                                        <td>${q.lesson_id}</td>
+                                    </tr>
+                                </c:forEach>
+                            </tbody>
+                        </table>
+                    </c:if>
+                </div>
 
                 <input type="submit" value="Cập nhật"/>
             </form>

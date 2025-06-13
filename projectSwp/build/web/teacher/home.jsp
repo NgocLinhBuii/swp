@@ -83,7 +83,7 @@
                                                 <li class="button-header"><a href="/student" class="btn btn3">Student</a></li>
                                                 <li class="button-header"><a href="/admin?action=viewProfile&id=${account.id}" class="btn btn3">View Profile</a></li>
                                                 <li class="button-header"><a href="/logout" class="btn btn3">Logout</a></li>
-
+                                                <li class="button-header"><a href="/teacher/manageTests.jsp" class="btn btn3">Quản lý Test</a></li>
                                             </ul>
                                         </nav>
                                     </div>

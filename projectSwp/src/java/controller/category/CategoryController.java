@@ -33,10 +33,12 @@ public class CategoryController extends HttpServlet {
         try {
             switch (action) {
                 case "addForm":
+                    // Thêm mới chỉ cho admin và teacher
                     request.getRequestDispatcher("Category/addCategory.jsp").forward(request, response);
                     return;
 
                 case "updateForm": {
+                    // Cập nhật chỉ cho admin và teacher
                     String idStr = request.getParameter("id");
                     if (idStr != null) {
                         int id = Integer.parseInt(idStr);
@@ -55,14 +57,16 @@ public class CategoryController extends HttpServlet {
                 }
 
                 case "delete": {
-                    if (!AuthUtil.hasRole(request, RoleConstants.ADMIN)) {
-                        response.sendRedirect("/error.jsp");
-                        return;
-                    }
+                    // Xóa cho cả admin và teacher
                     String delIdStr = request.getParameter("id");
                     if (delIdStr != null) {
                         int delId = Integer.parseInt(delIdStr);
-                        categoryDAO.deleteCategory(delId);
+                        boolean success = categoryDAO.deleteCategory(delId);
+                        if (success) {
+                            request.setAttribute("message", "Xóa category thành công");
+                        } else {
+                            request.setAttribute("error", "Không thể xóa category này. Category đang được sử dụng trong các bài test.");
+                        }
                         response.sendRedirect("category");
                         return;
                     } else {
@@ -97,8 +101,8 @@ public class CategoryController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // CHỈ CHO ADMIN
-        if (!AuthUtil.hasRole(request, RoleConstants.ADMIN)) {
+        // CHỈ CHO ADMIN VÀ TEACHER
+        if (!AuthUtil.hasRole(request, RoleConstants.ADMIN) && !AuthUtil.hasRole(request, RoleConstants.TEACHER)) {
             response.sendRedirect("/error.jsp");
             return;
         }
@@ -112,8 +116,13 @@ public class CategoryController extends HttpServlet {
                 int duration = Integer.parseInt(request.getParameter("duration"));
 
                 Category category = new Category(0, name, numQuestion, duration);
-                categoryDAO.addCategory(category);
-                request.setAttribute("message", "Thêm category thành công");
+                boolean success = categoryDAO.addCategory(category);
+                
+                if (success) {
+                    request.setAttribute("message", "Thêm category thành công");
+                } else {
+                    request.setAttribute("error", "Không thể thêm category. Vui lòng kiểm tra lại thông tin.");
+                }
 
             } else if ("update".equalsIgnoreCase(action)) {
                 int id = Integer.parseInt(request.getParameter("id"));
@@ -122,8 +131,13 @@ public class CategoryController extends HttpServlet {
                 int duration = Integer.parseInt(request.getParameter("duration"));
 
                 Category category = new Category(id, name, numQuestion, duration);
-                categoryDAO.updateCategory(category);
-                request.setAttribute("message", "Cập nhật category thành công");
+                boolean success = categoryDAO.updateCategory(category);
+                
+                if (success) {
+                    request.setAttribute("message", "Cập nhật category thành công");
+                } else {
+                    request.setAttribute("error", "Không thể cập nhật category. Vui lòng kiểm tra lại thông tin.");
+                }
             }
 
             List<Category> categoryList = categoryDAO.getAllCategories();

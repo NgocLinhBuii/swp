@@ -244,6 +244,10 @@ public class TakeTestController extends HttpServlet {
                 allOptions.put(question.getId(), options);
             }
             
+            // Lấy danh sách hình ảnh cho câu hỏi
+            ImageDAO imageDAO = new ImageDAO(this.questionDAO.getDBConnection());
+            List<Image> images = imageDAO.findAll();
+            
             // Xử lý thời gian làm bài
             int duration = 0; // Mặc định không có thời gian
             
@@ -320,6 +324,7 @@ public class TakeTestController extends HttpServlet {
             request.setAttribute("duration", Integer.toString(duration)); // Truyền thời gian làm bài (phút) dưới dạng String
             request.setAttribute("startTime", Long.toString(startTime)); // Truyền thời gian bắt đầu dưới dạng String
             request.setAttribute("isPractice", test.isIs_practice()); // Thêm thông tin về loại bài test
+            request.setAttribute("images", images); // Thêm danh sách hình ảnh
             
             // Hiển thị lỗi nếu có
             String error = (String) request.getAttribute("error");

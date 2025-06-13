@@ -16,17 +16,24 @@ public class TestDAO extends DBContext {
         }
     }
 
-    public void addTest(Test test) {
+    public int addTest(Test test) {
         String sql = "INSERT INTO test (name, description, is_practice, category_id) VALUES (?, ?, ?, ?)";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, test.getName());
             ps.setString(2, test.getDescription());
             ps.setBoolean(3, test.isIs_practice());
             ps.setInt(4, test.getCategory_id());
             ps.executeUpdate();
+            
+            // Lấy ID của test vừa tạo
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return -1; // Trả về -1 nếu có lỗi
     }
 
     public void updateTest(Test test) {

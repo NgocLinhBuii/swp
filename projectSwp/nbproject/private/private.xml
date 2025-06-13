@@ -4,8 +4,11 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/E:/BM/sd/swp/projectSwp/src/java/controller/student/StudentController.java</file>
+            <file>file:/E:/BM/sd/swp/projectSwp/src/java/controller/studypackage/StudyPackageController.java</file>
             <file>file:/E:/BM/sd/swp/projectSwp/web/header.jsp</file>
             <file>file:/E:/BM/sd/swp/projectSwp/web/student/home.jsp</file>
+            <file>file:/E:/BM/sd/swp/projectSwp/web/WEB-INF/web.xml</file>
+            <file>file:/E:/BM/sd/swp/projectSwp/src/java/controller/ForgotPasswordController.java</file>
         </group>
     </open-files>
 </project-private>

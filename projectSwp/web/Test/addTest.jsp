@@ -128,6 +128,31 @@
                 </c:forEach>
             </select>
 
+            <!-- Danh sách câu hỏi từ question bank -->
+            <h4>Chọn câu hỏi cho bài test:</h4>
+            <div style="max-height:300px;overflow-y:auto;border:1px solid #ccc;padding:10px;margin-bottom:15px;background:#fafafa">
+                <table class="table table-bordered table-sm">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>ID</th>
+                            <th>Nội dung câu hỏi</th>
+                            <th>Lesson ID</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <c:forEach var="q" items="${questionList}">
+                            <tr>
+                                <td><input type="checkbox" name="questionIds" value="${q.id}" /></td>
+                                <td>${q.id}</td>
+                                <td>${q.question}</td>
+                                <td>${q.lesson_id}</td>
+                            </tr>
+                        </c:forEach>
+                    </tbody>
+                </table>
+            </div>
+
             <input type="submit" value="Thêm mới" />
         </form>
 

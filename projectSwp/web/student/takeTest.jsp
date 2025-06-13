@@ -43,6 +43,7 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             margin-bottom: 20px;
             border-left: 4px solid #ccc;
+            min-height: 350px;
         }
         
         .question-container.answered {
@@ -108,6 +109,7 @@
         
         .btn-navigation {
             min-width: 120px;
+            margin: 0 10px;
         }
         
         .question-image {
@@ -162,6 +164,37 @@
         .timer-warning {
             color: #dc3545;
             animation: blink 1s infinite;
+        }
+        
+        .question-pagination {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .question-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin: 0 5px;
+            cursor: pointer;
+            background-color: #ccc;
+        }
+        
+        .question-indicator.active {
+            background-color: #007bff;
+            transform: scale(1.3);
+        }
+        
+        .question-indicator.answered {
+            background-color: #28a745;
+        }
+        
+        .navigation-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
         }
         
         @keyframes blink {
@@ -255,46 +288,87 @@
             </div>
         </div>
         
+        <!-- Question Pagination Indicators -->
+        <div class="question-pagination mb-4">
+            <c:forEach var="question" items="${questions}" varStatus="qStatus">
+                <span class="question-indicator" 
+                     id="indicator-${qStatus.index}" 
+                     onclick="showQuestion(${qStatus.index})" 
+                     title="Câu ${qStatus.index + 1}">
+                </span>
+            </c:forEach>
+        </div>
+        
         <!-- All Questions -->
         <form method="post" action="${pageContext.request.contextPath}/student/taketest" id="allQuestionsForm">
             <input type="hidden" name="action" value="submit">
-            
-            <c:forEach var="question" items="${questions}" varStatus="qStatus">
-                <div class="question-container" id="question-${question.id}">
-                    <div class="question-number">
-                        ${qStatus.index + 1}
-                    </div>
-                    
-                    <div class="question-text">
-                        ${question.question}
-                    </div>
-                    
-                    <!-- Question Image (if exists) -->
-                    <c:if test="${question.image_id != null && question.image_id > 0}">
-                        <img src="${pageContext.request.contextPath}/image/${question.image_id}" 
-                             alt="Question Image" class="question-image">
-                    </c:if>
-                    
-                    <!-- Options -->
-                    <input type="hidden" name="questionId${qStatus.index}" value="${question.id}">
-                    
-                    <c:forEach var="option" items="${allOptions[question.id]}" varStatus="oStatus">
-                        <div class="option-container">
-                            <input type="radio" 
-                                   id="option_${question.id}_${option.id}" 
-                                   name="optionId${qStatus.index}" 
-                                   value="${option.id}"
-                                   class="option-input"
-                                   data-question-id="${question.id}"
-                                   onclick="updateQuestionStatus(${question.id})"
-                                   ${previousAnswers[question.id] == option.id ? 'checked' : ''}>
-                            <label for="option_${question.id}_${option.id}" class="option-label">
-                                <strong>${oStatus.index + 1}.</strong> ${option.content}
-                            </label>
+            <div id="question-page-container">
+                <c:forEach var="question" items="${questions}" varStatus="qStatus">
+                    <div class="question-container" id="question-${question.id}" style="display: none;">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="question-number">
+                                ${qStatus.index + 1}
+                            </div>
+                            <div class="question-counter">
+                                Câu hỏi ${qStatus.index + 1} / ${totalQuestions}
+                            </div>
                         </div>
-                    </c:forEach>
-                </div>
-            </c:forEach>
+                        
+                        <div class="question-text">
+                            ${question.question}
+                        </div>
+                        
+                        <!-- Question Image (if exists) -->
+                        <c:if test="${question.image_id != null && question.image_id > 0}">
+                            <c:forEach var="img" items="${images}">
+                                <c:if test="${img.id == question.image_id}">
+                                    <img src="data:image/jpg;base64, ${img.image_data}" alt="Question Image" class="question-image">
+                                </c:if>
+                            </c:forEach>
+                        </c:if>
+                        
+                        <!-- Options -->
+                        <input type="hidden" name="questionId${qStatus.index}" value="${question.id}">
+                        
+                        <c:forEach var="option" items="${allOptions[question.id]}" varStatus="oStatus">
+                            <div class="option-container">
+                                <input type="radio" 
+                                       id="option_${question.id}_${option.id}" 
+                                       name="optionId${qStatus.index}" 
+                                       value="${option.id}"
+                                       class="option-input"
+                                       data-question-id="${question.id}"
+                                       onclick="updateQuestionStatus(${question.id}, ${qStatus.index})"
+                                       ${previousAnswers[question.id] == option.id ? 'checked' : ''}>
+                                <label for="option_${question.id}_${option.id}" class="option-label">
+                                    <strong>${oStatus.index + 1}.</strong> ${option.content}
+                                </label>
+                            </div>
+                        </c:forEach>
+                        
+                        <!-- Navigation Buttons -->
+                        <div class="navigation-container">
+                            <button type="button" class="btn btn-outline-primary btn-navigation" 
+                                    onclick="previousQuestion()" 
+                                    ${qStatus.index == 0 ? 'disabled' : ''}>
+                                « Trước
+                            </button>
+                            
+                            <div class="text-center">
+                                <span class="badge badge-pill badge-light p-3">
+                                    Câu ${qStatus.index + 1} / ${totalQuestions}
+                                </span>
+                            </div>
+                            
+                            <button type="button" class="btn btn-outline-primary btn-navigation" 
+                                    onclick="nextQuestion()"
+                                    ${qStatus.index == totalQuestions - 1 ? 'disabled' : ''}>
+                                Tiếp theo »
+                            </button>
+                        </div>
+                    </div>
+                </c:forEach>
+            </div>
             
             <!-- Submit Button -->
             <div class="d-flex justify-content-center mt-4 mb-5">
@@ -313,13 +387,71 @@
 
 <!-- Custom Script -->
 <script>
+// Biến theo dõi câu hỏi hiện tại
+let currentQuestionIndex = 0;
+
+// Hiển thị câu hỏi theo index
+function showQuestion(index) {
+    // Ẩn tất cả câu hỏi
+    var questions = document.querySelectorAll('.question-container');
+    questions.forEach(function(container) {
+        container.style.display = 'none';
+    });
+    
+    // Hiển thị câu hỏi được chọn
+    var currentQuestion = document.querySelector('#question-' + questions[index].id.split('-')[1]);
+    if (currentQuestion) {
+        currentQuestion.style.display = 'block';
+    }
+    
+    // Cập nhật chỉ số câu hỏi hiện tại
+    currentQuestionIndex = index;
+    
+    // Cập nhật visual cho các indicators
+    updateIndicators();
+}
+
+// Đi đến câu hỏi tiếp theo
+function nextQuestion() {
+    if (currentQuestionIndex < TOTAL_QUESTIONS - 1) {
+        showQuestion(currentQuestionIndex + 1);
+    }
+}
+
+// Đi đến câu hỏi trước
+function previousQuestion() {
+    if (currentQuestionIndex > 0) {
+        showQuestion(currentQuestionIndex - 1);
+    }
+}
+
 // Cập nhật trạng thái của từng câu hỏi (đã trả lời hay chưa)
-function updateQuestionStatus(questionId) {
+function updateQuestionStatus(questionId, questionIndex) {
     var container = document.getElementById('question-' + questionId);
     container.classList.remove('unanswered');
     container.classList.add('answered');
     
+    // Cập nhật indicator
+    var indicator = document.getElementById('indicator-' + questionIndex);
+    if (indicator) {
+        indicator.classList.add('answered');
+    }
+    
     updateProgress();
+}
+
+// Cập nhật hiển thị các indicators
+function updateIndicators() {
+    var indicators = document.querySelectorAll('.question-indicator');
+    indicators.forEach(function(indicator, index) {
+        // Xóa class active khỏi tất cả
+        indicator.classList.remove('active');
+        
+        // Thêm class active cho indicator hiện tại
+        if (index === currentQuestionIndex) {
+            indicator.classList.add('active');
+        }
+    });
 }
 
 // Cập nhật thanh tiến độ
@@ -341,10 +473,16 @@ function validateAndSubmit() {
     if (answeredQuestions < TOTAL_QUESTIONS) {
         alert('Bạn chưa trả lời tất cả câu hỏi. Vui lòng trả lời đủ ' + TOTAL_QUESTIONS + ' câu hỏi trước khi nộp bài.');
         
-        // Cuộn đến câu hỏi đầu tiên chưa trả lời
-        var unansweredContainers = document.querySelectorAll('.question-container:not(.answered)');
-        if (unansweredContainers.length > 0) {
-            unansweredContainers[0].scrollIntoView({ behavior: 'smooth' });
+        // Tìm câu hỏi đầu tiên chưa trả lời
+        var questions = document.querySelectorAll('.question-container');
+        for (var i = 0; i < questions.length; i++) {
+            var questionId = questions[i].id.split('-')[1];
+            var answered = questions[i].querySelector('input[type="radio"]:checked') !== null;
+            
+            if (!answered) {
+                showQuestion(i);
+                break;
+            }
         }
         
         return false;
@@ -359,18 +497,27 @@ function validateAndSubmit() {
 document.addEventListener('DOMContentLoaded', function() {
     var questions = document.querySelectorAll('.question-container');
     
-    questions.forEach(function(container) {
+    questions.forEach(function(container, index) {
         var questionId = container.id.split('-')[1];
         var answered = container.querySelector('input[type="radio"]:checked') !== null;
         
         if (answered) {
             container.classList.add('answered');
             container.classList.remove('unanswered');
+            
+            // Cập nhật indicator
+            var indicator = document.getElementById('indicator-' + index);
+            if (indicator) {
+                indicator.classList.add('answered');
+            }
         } else {
             container.classList.add('unanswered');
             container.classList.remove('answered');
         }
     });
+    
+    // Hiển thị câu hỏi đầu tiên
+    showQuestion(0);
     
     updateProgress();
     

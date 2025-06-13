@@ -64,6 +64,24 @@
         h2 {
             margin-top: 0;
         }
+        
+        .alert {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
     </style>
 </head>
 <body>
@@ -72,49 +90,56 @@
     <main>
         <h2>Category List</h2>
 
-        <form method="get" action="category">
-            Search by name: <input type="text" name="name" />
-            <button type="submit" class="btn btn-primary btn-sm">Search</button>
+        <form method="get" action="category" class="mb-4">
+            <div class="input-group">
+                <input type="text" class="form-control" name="name" placeholder="Search by name" value="${param.name}" />
+                <div class="input-group-append">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+            </div>
         </form>
 
         <c:if test="${not empty error}">
-            <p style="color:red">${error}</p>
+            <div class="alert alert-danger">${error}</div>
         </c:if>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Number of Questions</th>
-                    <th>Duration (minutes)</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <c:forEach var="cate" items="${categoryList}">
-                    <tr>
-                        <td>${cate.id}</td>
-                        <td>${cate.name}</td>
-                        <td>${cate.num_question}</td>
-                        <td>${cate.duration}</td>
-                        <td>
-                            <a href="category?action=updateForm&id=${cate.id}">Update</a> |
-                            <a href="category?action=delete&id=${cate.id}"
-                               onclick="return confirm('Are you sure to delete category ID ${cate.id}?');"
-                               style="color:red">Delete</a>
-                        </td>
-                    </tr>
-                </c:forEach>
-            </tbody>
-        </table>
-
-        <br/>
-        <a href="category?action=addForm" class="btn btn-success btn-sm">Add new Category</a>
 
         <c:if test="${not empty message}">
-            <p style="color:green">${message}</p>
+            <div class="alert alert-success">${message}</div>
         </c:if>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Number of Questions</th>
+                        <th>Duration (minutes)</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <c:forEach var="cate" items="${categoryList}">
+                        <tr>
+                            <td>${cate.id}</td>
+                            <td>${cate.name}</td>
+                            <td>${cate.num_question}</td>
+                            <td>${cate.duration}</td>
+                            <td>
+                                <a href="category?action=updateForm&id=${cate.id}" class="btn btn-sm btn-primary">Update</a>
+                                <a href="category?action=delete&id=${cate.id}"
+                                   onclick="return confirm('Are you sure to delete category ID ${cate.id}?');"
+                                   class="btn btn-sm btn-danger">Delete</a>
+                            </td>
+                        </tr>
+                    </c:forEach>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-3">
+            <a href="category?action=addForm" class="btn btn-success">Add new Category</a>
+        </div>
     </main>
     <jsp:include page="/Subject/footer.jsp" />
 </div>

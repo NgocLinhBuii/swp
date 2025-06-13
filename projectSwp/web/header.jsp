@@ -35,8 +35,10 @@
                                                 <ul class="submenu">
                                                     <li><a href="/admin?action=listAccount">Manage Accounts</a></li>
                                                     <li><a href="/Question">Manage Questions</a></li>
+                                                    <li><a href="/test">Manage Tests</a></li>
                                                     <li><a href="/student">Manage Student</a></li>
                                                     <li><a href="/invoice">Invoices</a></li>
+                                                    <li><a href="/category">Test Categories</a></li>
                                                 </ul>
                                             </li>
                                         </c:if>
@@ -47,7 +49,9 @@
                                                     <li><a href="/student">Manage Student</a></li>
                                                     <li><a href="/LessonURL">My Lessons</a></li>
                                                     <li><a href="/Question">Question Bank</a></li>
+                                                    <li><a href="/test">Manage Tests</a></li>
                                                     <li><a href="/chapter">Chapters</a></li>
+                                                    <li><a href="/category">Test Categories</a></li>
                                                 </ul>
                                             </li>
                                         </c:if>
