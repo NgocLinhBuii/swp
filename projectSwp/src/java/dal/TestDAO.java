@@ -51,12 +51,48 @@ public class TestDAO extends DBContext {
     }
 
     public void deleteTest(int id) {
-        String sql = "DELETE FROM test WHERE id = ?";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            ps.executeUpdate();
+        try {
+            // Start a transaction
+            conn.setAutoCommit(false);
+            
+            // First delete related records in test_question table
+            String deleteTestQuestions = "DELETE FROM test_question WHERE test_id = ?";
+            try (PreparedStatement ps = conn.prepareStatement(deleteTestQuestions)) {
+                ps.setInt(1, id);
+                ps.executeUpdate();
+            }
+            
+            // Then delete related records in test_record table
+            String deleteTestRecords = "DELETE FROM test_record WHERE test_id = ?";
+            try (PreparedStatement ps = conn.prepareStatement(deleteTestRecords)) {
+                ps.setInt(1, id);
+                ps.executeUpdate();
+            }
+            
+            // Finally delete the test itself
+            String deleteTest = "DELETE FROM test WHERE id = ?";
+            try (PreparedStatement ps = conn.prepareStatement(deleteTest)) {
+                ps.setInt(1, id);
+                ps.executeUpdate();
+            }
+            
+            // Commit the transaction
+            conn.commit();
         } catch (SQLException e) {
+            // Rollback in case of error
+            try {
+                conn.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
             e.printStackTrace();
+        } finally {
+            // Reset auto-commit
+            try {
+                conn.setAutoCommit(true);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 

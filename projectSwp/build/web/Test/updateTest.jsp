@@ -103,6 +103,40 @@
             text-align: center;
             margin-top: auto;
         }
+        
+        /* Fix for Nice Select dropdown */
+        .nice-select {
+            width: 100%;
+            margin: 6px 0 15px 0;
+            line-height: 40px;
+            height: 42px;
+        }
+        
+        .nice-select .list {
+            width: 100%;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .nice-select .option {
+            line-height: 35px;
+            min-height: 35px;
+        }
+        
+        /* Ensure dropdown is visible */
+        .nice-select .list {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scale(1) translateY(0);
+            z-index: 9999;
+        }
+        
+        .nice-select.open .list {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scale(1) translateY(0);
+            z-index: 9999;
+        }
     </style>
 </head>
 <body>
@@ -130,7 +164,7 @@
                 </label>
 
                 <label for="category">Category:</label>
-                <select id="category" name="categoryId" required>
+                <select id="category" name="categoryId" required style="display: block; width: 100%; height: 40px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; background-color: white;">
                     <option value="" disabled>-- Chọn danh mục --</option>
                     <c:forEach var="entry" items="${categoryMap}">
                         <option value="${entry.key}" ${test.category_id == entry.key ? 'selected' : ''}>${entry.value}</option>
@@ -219,7 +253,30 @@
         <script src="${pageContext.request.contextPath}/assets/js/jquery.ajaxchimp.min.js"></script>
 <script>
     $(document).ready(function () {
-        $('select').niceSelect();
+        // Disable Nice Select for the category dropdown to use native select
+        if ($.fn.niceSelect) {
+            // First destroy any existing nice-select
+            $('#category').niceSelect('destroy');
+        }
+        
+        // Add a click handler to ensure the dropdown opens
+        $('#category').on('click', function(e) {
+            e.stopPropagation();
+            $(this).focus();
+        });
+        
+        // Make sure the selected option is correct
+        var selectedValue = '${test.category_id}';
+        if (selectedValue) {
+            $('#category').val(selectedValue);
+        }
+        
+        // Log for debugging
+        console.log("Selected category ID: " + selectedValue);
+        console.log("Available categories in map");
+        <c:forEach var="entry" items="${categoryMap}">
+            console.log("ID: ${entry.key}, Name: ${entry.value}");
+        </c:forEach>
     });
 </script>
 </body>

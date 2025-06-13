@@ -17,12 +17,28 @@
         th { background: #007BFF; color: #fff; }
         tr:nth-child(even) { background: #f2f2f2; }
         .action-link { margin-right: 8px; }
+        .alert { margin-bottom: 20px; }
     </style>
 </head>
 <body>
 <jsp:include page="/Test/header.jsp" />
 <div class="container">
     <h2>Quản lý bài Test</h2>
+    
+    <!-- Success message -->
+    <c:if test="${not empty message}">
+        <div class="alert alert-success" role="alert">
+            ${message}
+        </div>
+    </c:if>
+    
+    <!-- Error message -->
+    <c:if test="${not empty error}">
+        <div class="alert alert-danger" role="alert">
+            ${error}
+        </div>
+    </c:if>
+    
     <a class="add-link" href="${pageContext.request.contextPath}/test?action=create">Thêm mới Test</a>
     <table class="table table-bordered table-hover">
         <thead>

@@ -51,16 +51,21 @@ public class TestController extends HttpServlet {
             response.sendRedirect("test");
             return;
         }
-        switch (action) {
-            case "add":
-                addTest(request, response);
-                break;
-            case "update":
-                updateTest(request, response);
-                break;
-            default:
-                response.sendRedirect("test");
-                break;
+        try {
+            switch (action) {
+                case "add":
+                    addTest(request, response);
+                    break;
+                case "update":
+                    updateTest(request, response);
+                    break;
+                default:
+                    response.sendRedirect("test");
+                    break;
+            }
+        } catch (Exception e) {
+            request.setAttribute("error", "Lỗi: " + e.getMessage());
+            response.sendRedirect("test");
         }
     }
 
@@ -77,22 +82,27 @@ public class TestController extends HttpServlet {
         if (action == null) {
             listTests(request, response);
         } else {
-            switch (action) {
-                case "create":
-                    showCreateForm(request, response);
-                    break;
-                case "edit":
-                    showEditForm(request, response);
-                    break;
-                case "delete":
-                    deleteTest(request, response);
-                    break;
-                case "search":
-                    searchTestById(request, response);
-                    break;
-                default:
-                    listTests(request, response);
-                    break;
+            try {
+                switch (action) {
+                    case "create":
+                        showCreateForm(request, response);
+                        break;
+                    case "edit":
+                        showEditForm(request, response);
+                        break;
+                    case "delete":
+                        deleteTest(request, response);
+                        break;
+                    case "search":
+                        searchTestById(request, response);
+                        break;
+                    default:
+                        listTests(request, response);
+                        break;
+                }
+            } catch (Exception e) {
+                request.setAttribute("error", "Lỗi: " + e.getMessage());
+                listTests(request, response);
             }
         }
     }
@@ -202,40 +212,76 @@ public class TestController extends HttpServlet {
     }
 
     private void updateTest(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
-        int id = Integer.parseInt(request.getParameter("id"));
-        String name = request.getParameter("name");
-        String description = request.getParameter("description");
-        boolean practice = "true".equals(request.getParameter("practice"));
-        int categoryId = Integer.parseInt(request.getParameter("categoryId"));
+            throws IOException, ServletException {
+        // Check if user has admin or teacher role
+        if (!AuthUtil.hasRole(request, RoleConstants.ADMIN) && !AuthUtil.hasRole(request, RoleConstants.TEACHER)) {
+            response.sendRedirect("/error.jsp");
+            return;
+        }
+        
+        try {
+            int id = Integer.parseInt(request.getParameter("id"));
+            String name = request.getParameter("name");
+            String description = request.getParameter("description");
+            boolean practice = "true".equals(request.getParameter("practice"));
+            int categoryId = Integer.parseInt(request.getParameter("categoryId"));
 
-        // Cập nhật thông tin test
-        Test test = new Test(id, name, description, practice, categoryId);
-        testDAO.updateTest(test);
-        
-        // Xóa tất cả câu hỏi cũ của test
-        testQuestionDAO.removeAllQuestionsFromTest(id);
-        
-        // Thêm lại các câu hỏi mới được chọn
-        String[] questionIds = request.getParameterValues("questionIds");
-        if (questionIds != null && questionIds.length > 0) {
-            for (String questionIdStr : questionIds) {
-                try {
-                    int questionId = Integer.parseInt(questionIdStr);
-                    testQuestionDAO.addTestQuestion(id, questionId);
-                } catch (NumberFormatException e) {
-                    // Bỏ qua nếu không phải số
+            // Validate category exists
+            Category category = categoryDAO.getCategoryById(categoryId);
+            if (category == null) {
+                request.setAttribute("error", "Danh mục không tồn tại");
+                showEditForm(request, response);
+                return;
+            }
+
+            // Cập nhật thông tin test
+            Test test = new Test(id, name, description, practice, categoryId);
+            testDAO.updateTest(test);
+            
+            // Xóa tất cả câu hỏi cũ của test
+            testQuestionDAO.removeAllQuestionsFromTest(id);
+            
+            // Thêm lại các câu hỏi mới được chọn
+            String[] questionIds = request.getParameterValues("questionIds");
+            if (questionIds != null && questionIds.length > 0) {
+                for (String questionIdStr : questionIds) {
+                    try {
+                        int questionId = Integer.parseInt(questionIdStr);
+                        testQuestionDAO.addTestQuestion(id, questionId);
+                    } catch (NumberFormatException e) {
+                        // Bỏ qua nếu không phải số
+                    }
                 }
             }
+            
+            request.setAttribute("message", "Cập nhật bài test thành công");
+        } catch (NumberFormatException e) {
+            request.setAttribute("error", "ID hoặc danh mục không hợp lệ");
+        } catch (Exception e) {
+            request.setAttribute("error", "Lỗi khi cập nhật bài test: " + e.getMessage());
         }
         
         response.sendRedirect("test");
     }
 
     private void deleteTest(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
-        int id = Integer.parseInt(request.getParameter("id"));
-        testDAO.deleteTest(id);
+            throws IOException, ServletException {
+        // Check if user has admin or teacher role
+        if (!AuthUtil.hasRole(request, RoleConstants.ADMIN) && !AuthUtil.hasRole(request, RoleConstants.TEACHER)) {
+            response.sendRedirect("/error.jsp");
+            return;
+        }
+        
+        try {
+            int id = Integer.parseInt(request.getParameter("id"));
+            testDAO.deleteTest(id);
+            request.setAttribute("message", "Xóa bài test thành công");
+        } catch (NumberFormatException e) {
+            request.setAttribute("error", "ID không hợp lệ");
+        } catch (Exception e) {
+            request.setAttribute("error", "Lỗi khi xóa bài test: " + e.getMessage());
+        }
+        
         response.sendRedirect("test");
     }
 
