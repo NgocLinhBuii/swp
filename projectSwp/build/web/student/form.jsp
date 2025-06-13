@@ -365,7 +365,60 @@
             <br/>
             <br/>
             Username: <input type="text" name="username" value="${student.username}" required/><br/>
-            Password: <input type="password" name="password" value="${student.password}" required/><br/>
+            <c:choose>
+                <c:when test="${not empty student}">
+                    <!-- Edit mode - show old and new password fields -->
+                    <div class="mb-3">
+                        <label class="form-label">Current Password:</label>
+                        <div class="input-group">
+                            <input type="password" name="oldPassword" id="oldPassword" class="form-control" required />
+                            <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('oldPassword')">
+                                <i class="fas fa-eye" id="oldPasswordIcon"></i>
+                            </button>
+                        </div>
+                        <c:if test="${not empty passwordError}">
+                            <small class="text-danger">${passwordError}</small>
+                        </c:if>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">New Password:</label>
+                        <div class="input-group">
+                            <input type="password" name="password" id="newPassword" class="form-control" />
+                            <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('newPassword')">
+                                <i class="fas fa-eye" id="newPasswordIcon"></i>
+                            </button>
+                        </div>
+                        <small class="text-muted">Leave blank if you don't want to change password</small>
+                    </div>
+                </c:when>
+                <c:otherwise>
+                    <!-- Create mode - show only one password field -->
+                    <div class="mb-3">
+                        <label class="form-label">Password:</label>
+                        <div class="input-group">
+                            <input type="password" name="password" id="newPassword" class="form-control" value="${student.password}" required />
+                            <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('newPassword')">
+                                <i class="fas fa-eye" id="newPasswordIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+                </c:otherwise>
+            </c:choose>
+            <script>
+                function togglePassword(fieldId) {
+                    var input = document.getElementById(fieldId);
+                    var icon = document.getElementById(fieldId + 'Icon');
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        icon.classList.remove('fa-eye');
+                        icon.classList.add('fa-eye-slash');
+                    } else {
+                        input.type = 'password';
+                        icon.classList.remove('fa-eye-slash');
+                        icon.classList.add('fa-eye');
+                    }
+                }
+            </script>
             Full Name: <input type="text" name="full_name" value="${student.full_name}" required/><br/>
             DOB: <input type="date" name="dob" value="${student.dob}" required/><br/>
 

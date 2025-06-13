@@ -107,14 +107,8 @@ public class StudentDAO extends DBContext {
      * @return true if the password matches, false otherwise
      */
     public boolean validatePassword(Student student, String providedPassword) {
-        // Get the stored hashed password
         String storedPassword = student.getPassword();
-        
-        // Hash the provided password and compare with stored password
-        String hashedProvidedPassword = passwordEncode.hashPassword(providedPassword);
-        
-        // Compare the two hashed passwords
-        return storedPassword.equals(hashedProvidedPassword);
+        return passwordEncode.checkPassword(providedPassword, storedPassword);
     }
 
     public void delete(int id) throws SQLException {

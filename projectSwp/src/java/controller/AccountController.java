@@ -23,6 +23,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import model.Account;
 import model.Image;
+import util.PasswordUtil;
 
 /**
  *
@@ -95,6 +96,9 @@ public class AccountController extends HttpServlet {
                     break;
                 case "editAccount":
                     updateAccount(request, response);
+                    break;
+                case "changePassword":
+                    changePassword(request, response);
                     break;
                 default:
                     response.sendRedirect("admin");
@@ -235,6 +239,30 @@ public class AccountController extends HttpServlet {
         request.setAttribute("imageList", imageList);
         request.setAttribute("accountList", accountList);
         request.getRequestDispatcher("/accountList.jsp").forward(request, response);
+    }
+
+    private void changePassword(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, IOException, ServletException {
+        int id = Integer.parseInt(request.getParameter("id"));
+        String oldPassword = request.getParameter("oldPassword");
+        String newPassword = request.getParameter("newPassword");
+        Account account = accountDAO.findById(id);
+        if (account == null) {
+            request.setAttribute("passwordError", "Account not found.");
+        } else if (!accountDAO.validatePassword(account, oldPassword)) {
+            request.setAttribute("passwordError", "Current password is incorrect.");
+        } else if (newPassword == null || newPassword.length() < 6) {
+            request.setAttribute("passwordError", "New password must be at least 6 characters.");
+        } else {
+            account.setPassword(newPassword);
+            accountDAO.update(account);
+            request.setAttribute("passwordSuccess", "Password changed successfully.");
+        }
+        // Reload profile view
+        List<Image> imageList = ImageDAO.findAll();
+        request.setAttribute("imageList", imageList);
+        request.setAttribute("view", account);
+        request.getRequestDispatcher("profileAccount.jsp").forward(request, response);
     }
 
     private Account getAccountFromRequest(HttpServletRequest request) {

@@ -3,13 +3,9 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/E:/BM/sd/swp/projectSwp/src/java/controller/student/StudentController.java</file>
-            <file>file:/E:/BM/sd/swp/projectSwp/src/java/controller/studypackage/StudyPackageController.java</file>
-            <file>file:/E:/BM/sd/swp/projectSwp/web/header.jsp</file>
-            <file>file:/E:/BM/sd/swp/projectSwp/web/student/home.jsp</file>
-            <file>file:/E:/BM/sd/swp/projectSwp/web/WEB-INF/web.xml</file>
-            <file>file:/E:/BM/sd/swp/projectSwp/src/java/controller/ImageServlet.java</file>
-            <file>file:/E:/BM/sd/swp/projectSwp/src/java/controller/ForgotPasswordController.java</file>
+            <file>file:/E:/BM/sd/swp/projectSwp/web/Test/addTest.jsp</file>
+            <file>file:/E:/BM/sd/swp/projectSwp/src/java/controller/Test/TestController.java</file>
+            <file>file:/E:/BM/sd/swp/projectSwp/src/java/dal/CategoryDAO.java</file>
         </group>
     </open-files>
 </project-private>

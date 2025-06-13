@@ -474,4 +474,12 @@ public class AccountDAO extends DBContext {
         return false;
     }
 
+    // Kiểm tra mật khẩu cũ cho account
+    public boolean validatePassword(Account account, String providedPassword) {
+        // Lấy mật khẩu đã hash từ account
+        String storedPassword = account.getPassword();
+        // Dùng PasswordUtil để kiểm tra
+        return passwordEncode.checkPassword(providedPassword, storedPassword);
+    }
+
 }
