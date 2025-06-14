@@ -23,7 +23,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import model.Account;
 import model.Image;
-import util.PasswordUtil;
 
 /**
  *
@@ -191,9 +190,23 @@ public class AccountController extends HttpServlet {
 
     private void updateAccount(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, IOException, ServletException {
+        Account oldAccount = accountDAO.findById(Integer.parseInt(request.getParameter("id")));
         Account account = getAccountFromRequest(request);
         String avatarName = "avatar_" + System.currentTimeMillis();
         String imgURL = FileUploadUlti.uploadAvatarImage(request, avatarName);
+
+        // Validate old password if provided (edit mode)
+        String oldPassword = request.getParameter("oldPassword");
+        if (oldPassword != null && !oldPassword.isEmpty()) {
+            if (!accountDAO.validatePassword(oldAccount, oldPassword)) {
+                request.setAttribute("passwordError", "Current password is incorrect");
+                Image image = ImageDAO.findImageById(oldAccount.getImage_id());
+                request.setAttribute("account", oldAccount);
+                request.setAttribute("image", image);
+                request.getRequestDispatcher("/accountForm.jsp").forward(request, response);
+                return;
+            }
+        }
 
         if (imgURL != null) {
             Image image = new Image();
@@ -204,14 +217,18 @@ public class AccountController extends HttpServlet {
             if (imageId > 0) {
                 account.setImage_id(imageId);
             } else {
-                // Nếu lưu ảnh mới thất bại, giữ image cũ
-                Account oldAccount = accountDAO.findById(account.getId());
                 account.setImage_id(oldAccount.getImage_id());
             }
         } else {
-            Account oldAccount = accountDAO.findById(account.getId());
             account.setImage_id(oldAccount.getImage_id());
         }
+
+        // If new password is empty, keep the old password
+        String newPassword = request.getParameter("password");
+        if (newPassword == null || newPassword.isEmpty()) {
+            account.setPassword(oldAccount.getPassword());
+        }
+
         accountDAO.update(account);
         response.sendRedirect("admin?action=viewProfile&id=" + account.getId());
     }
@@ -249,20 +266,34 @@ public class AccountController extends HttpServlet {
         Account account = accountDAO.findById(id);
         if (account == null) {
             request.setAttribute("passwordError", "Account not found.");
+            List<Image> imageList = ImageDAO.findAll();
+            request.setAttribute("imageList", imageList);
+            request.setAttribute("view", account);
+            request.getRequestDispatcher("profileAccount.jsp").forward(request, response);
+            return;
         } else if (!accountDAO.validatePassword(account, oldPassword)) {
             request.setAttribute("passwordError", "Current password is incorrect.");
+            List<Image> imageList = ImageDAO.findAll();
+            request.setAttribute("imageList", imageList);
+            request.setAttribute("view", account);
+            request.getRequestDispatcher("profileAccount.jsp").forward(request, response);
+            return;
         } else if (newPassword == null || newPassword.length() < 6) {
             request.setAttribute("passwordError", "New password must be at least 6 characters.");
+            List<Image> imageList = ImageDAO.findAll();
+            request.setAttribute("imageList", imageList);
+            request.setAttribute("view", account);
+            request.getRequestDispatcher("profileAccount.jsp").forward(request, response);
+            return;
         } else {
             account.setPassword(newPassword);
             accountDAO.update(account);
             request.setAttribute("passwordSuccess", "Password changed successfully.");
+            List<Image> imageList = ImageDAO.findAll();
+            request.setAttribute("imageList", imageList);
+            request.setAttribute("view", account);
+            request.getRequestDispatcher("profileAccount.jsp").forward(request, response);
         }
-        // Reload profile view
-        List<Image> imageList = ImageDAO.findAll();
-        request.setAttribute("imageList", imageList);
-        request.setAttribute("view", account);
-        request.getRequestDispatcher("profileAccount.jsp").forward(request, response);
     }
 
     private Account getAccountFromRequest(HttpServletRequest request) {
