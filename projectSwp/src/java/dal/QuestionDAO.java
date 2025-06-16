@@ -51,7 +51,11 @@ public class QuestionDAO extends DBContext {
         String sql = "INSERT INTO Question (question, image_id, lesson_id, question_type) VALUES (?, ?, ?, ?)";
         try (Connection conn = new DBContext().getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, question.getQuestion());
-            stmt.setInt(2, question.getImage_id());
+            if (question.getImage_id() == 0) {
+                stmt.setNull(2, java.sql.Types.INTEGER);
+            } else {
+                stmt.setInt(2, question.getImage_id());
+            }
             stmt.setInt(3, question.getLesson_id());
             stmt.setString(4, question.getQuestion_type());
             stmt.executeUpdate();
@@ -62,7 +66,11 @@ public class QuestionDAO extends DBContext {
         String sql = "UPDATE Question SET question = ?, image_id = ?, lesson_id = ?, question_type = ? WHERE id = ?";
         try (Connection conn = new DBContext().getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, question.getQuestion());
-            stmt.setInt(2, question.getImage_id());
+            if (question.getImage_id() == 0) {
+                stmt.setNull(2, java.sql.Types.INTEGER);
+            } else {
+                stmt.setInt(2, question.getImage_id());
+            }
             stmt.setInt(3, question.getLesson_id());
             stmt.setString(4, question.getQuestion_type());
             stmt.setInt(5, question.getId());
