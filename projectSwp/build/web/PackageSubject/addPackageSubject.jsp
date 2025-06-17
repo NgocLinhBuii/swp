@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html; charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
@@ -40,7 +40,7 @@
 </head>
 <body>
 
-<jsp:include page="/PackageSubject/header.jsp" />
+<%@include file="../header.jsp" %>
 
 <main>
     <div class="container py-5">
@@ -83,7 +83,7 @@
     </div>
 </main>
 
-<jsp:include page="/PackageSubject/footer.jsp" />
+<%@include file="../footer.jsp" %>
 
 <!-- JS -->
 <script src="/assets/js/jquery-1.12.4.min.js"></script>

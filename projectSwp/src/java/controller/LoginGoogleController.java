@@ -94,9 +94,9 @@ public class LoginGoogleController extends HttpServlet {
             case "parent":
                 redirectToPage(response, request, "/parent/home.jsp");
                 break;
-            case "student":
-                redirectToPage(response, request, "/student/home.jsp");
-                break;
+//            case "student":
+//                redirectToPage(response, request, "/student/home.jsp");
+//                break;
             default:
                 redirectToPage(response, request, "error-403");
                 break;

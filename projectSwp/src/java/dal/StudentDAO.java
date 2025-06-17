@@ -101,27 +101,45 @@ public class StudentDAO extends DBContext {
     }
 
     /**
-     * Validates if the provided password matches the stored password for a student
+     * Validates if the provided password matches the stored password for a
+     * student
+     *
      * @param student The student object containing the stored password
      * @param providedPassword The password to validate
      * @return true if the password matches, false otherwise
      */
     public boolean validatePassword(Student student, String providedPassword) {
-        // Get the stored hashed password
         String storedPassword = student.getPassword();
-        
-        // Hash the provided password and compare with stored password
-        String hashedProvidedPassword = passwordEncode.hashPassword(providedPassword);
-        
-        // Compare the two hashed passwords
-        return storedPassword.equals(hashedProvidedPassword);
+        return passwordEncode.checkPassword(providedPassword, storedPassword);
     }
 
     public void delete(int id) throws SQLException {
-        String sql = "DELETE FROM student WHERE id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, id);
-            stmt.executeUpdate();
+        String deleteQuesRecordSql = "DELETE FROM question_record WHERE test_record_id IN (SELECT id FROM test_record WHERE student_id = ?)";
+        String deleteTestRecordSql = "DELETE FROM test_record WHERE student_id = ?";
+        String deleteStudentSql = "DELETE FROM student WHERE id = ?";
+
+        try (
+                PreparedStatement stmt1 = connection.prepareStatement(deleteQuesRecordSql); PreparedStatement stmt2 = connection.prepareStatement(deleteTestRecordSql); PreparedStatement stmt3 = connection.prepareStatement(deleteStudentSql)) {
+            connection.setAutoCommit(false);
+
+            // 1. Xóa các bản ghi question_record liên quan
+            stmt1.setInt(1, id);
+            stmt1.executeUpdate();
+
+            // 2. Xóa test_record của học sinh
+            stmt2.setInt(1, id);
+            stmt2.executeUpdate();
+
+            // 3. Xóa học sinh
+            stmt3.setInt(1, id);
+            stmt3.executeUpdate();
+
+            connection.commit();
+        } catch (SQLException e) {
+            connection.rollback();
+            throw e;
+        } finally {
+            connection.setAutoCommit(true);
         }
     }
 

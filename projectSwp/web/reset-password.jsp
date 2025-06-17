@@ -96,12 +96,12 @@
                 </form>
                 
                 <!-- Debug information button -->
-                <div class="mt-4">
+<!--                <div class="mt-4">
                     <button class="btn btn-sm btn-secondary w-100" onclick="toggleDebugInfo()">
                         Hiển thị thông tin debug
                     </button>
                     <div id="debugInfo" class="debug-info" style="display: none;"></div>
-                </div>
+                </div>-->
             </div>
         </div>
         

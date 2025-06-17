@@ -1,3 +1,9 @@
+<%-- 
+    Document   : paymentResult
+    Created on : Jun 14, 2025, 10:37:31 AM
+    Author     : ledai
+--%>
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>

@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html; charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <html>
@@ -114,7 +114,7 @@
     </style>
 </head>
 <body>
-    <jsp:include page="/Subject/header.jsp" />
+     <%@include file="../header.jsp" %>
 
     <div class="container-content">
         <h2>Subject List</h2>
@@ -167,7 +167,7 @@
     </div>
 
     <!-- Footer fixed to bottom -->
-    <jsp:include page="/Subject/footer.jsp" />
+    <%@include file="../footer.jsp" %>
 
     <!-- JS Libraries -->
       <script src="${pageContext.request.contextPath}/assets/js/vendor/modernizr-3.5.0.min.js"></script>

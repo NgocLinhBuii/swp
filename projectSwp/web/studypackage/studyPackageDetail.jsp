@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html; charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
@@ -33,7 +33,7 @@
 </head>
 <body>
 
-<jsp:include page="/studypackage/header.jsp" />
+<%@include file="../header.jsp" %>
 
 <main>
     <h2>Chi tiết Gói Học</h2>
@@ -69,7 +69,7 @@
     </c:if>
 </main>
 
-<jsp:include page="/studypackage/footer.jsp" />
+<%@include file="../footer.jsp" %>
 
 <!-- JS -->
 <script src="${pageContext.request.contextPath}/assets/js/vendor/jquery-1.12.4.min.js"></script>

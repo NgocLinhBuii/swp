@@ -17,7 +17,8 @@ import dal.ChapterDAO;
 import service.VideoService;
 import util.AuthUtil;
 import util.RoleConstants;
-
+import jakarta.servlet.annotation.WebServlet;
+@WebServlet("/LessonURL")
 @MultipartConfig(
     fileSizeThreshold = 10 * 1024 * 1024, // 10MB
     maxFileSize = 100 * 1024 * 1024,      // 100MB

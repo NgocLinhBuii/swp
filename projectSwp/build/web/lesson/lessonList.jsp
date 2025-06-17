@@ -21,7 +21,7 @@
         </style>
     </head>
     <body>
-        <jsp:include page="/lesson/header.jsp" />
+        <jsp:include page="/header.jsp" />
 
         <!-- Thêm khoảng cách tránh bị header che -->
         <div style="height: 100px;"></div>
@@ -105,7 +105,7 @@
             </table>
         </main>
 
-        <jsp:include page="/lesson/footer.jsp" />
+        <jsp:include page="/footer.jsp" />
 
         <!-- JS -->
         <script src="/assets/js/bootstrap.bundle.min.js"></script>

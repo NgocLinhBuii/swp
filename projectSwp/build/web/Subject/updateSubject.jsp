@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html; charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <html>
 <head>
@@ -101,7 +101,7 @@
 <div class="page-wrapper">
 
     <!-- Header -->
-    <jsp:include page="/Subject/header.jsp" />
+    <%@include file="../header.jsp" %>
 
         <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
         <link rel="stylesheet" href="/assets/css/owl.carousel.min.css">
@@ -152,7 +152,7 @@
     </div>
 
     <!-- Footer -->
-    <jsp:include page="/Subject/footer.jsp" />
+    <%@include file="../footer.jsp" %>
 
 </div>
 

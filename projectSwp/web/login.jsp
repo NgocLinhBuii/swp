@@ -160,7 +160,7 @@
             button:hover {
                 background-color: #303f9f;
             }
-            
+
             /* Google Sign-In Button Styles */
             .google-btn {
                 width: 100%;
@@ -177,23 +177,23 @@
                 margin-top: 15px;
                 text-decoration: none;
             }
-            
+
             .google-btn:hover {
                 background-color: #f5f5f5;
             }
-            
+
             .google-btn img {
                 margin-right: 10px;
                 width: 18px;
                 height: 18px;
             }
-            
+
             .or-divider {
                 text-align: center;
                 margin: 15px 0;
                 position: relative;
             }
-            
+
             .or-divider:before,
             .or-divider:after {
                 content: "";
@@ -204,11 +204,11 @@
                 position: absolute;
                 top: 50%;
             }
-            
+
             .or-divider:before {
                 left: 0;
             }
-            
+
             .or-divider:after {
                 right: 0;
             }
@@ -318,33 +318,35 @@
                            ${cookie.remember.value!=null?'checked':''}/>
                     <label for="remember_me">Remember me</label>
                 </div>
-                <a href="${pageContext.request.contextPath}/forgot-password" class="forget-password" style="background: black">Forget Password?</a>
+                <!--<a href="${pageContext.request.contextPath}/forgot-password" class="forget-password" style="background: black">Forget Password?</a>-->
                 <button  class="btn btn-lg btn-danger" type="submit">Login</button>
-                <a href="https://accounts.google.com/o/oauth2/auth?scope=email%20profile%20openid&redirect_uri=http://localhost:9999/logingoogle&response_type=code&client_id=118450184719-ar44tevflkttlnqbb8hina7u55l0ecdv.apps.googleusercontent.com&approval_prompt=force" class="btn btn-lg btn-danger">
+<!--                <a href="https://accounts.google.com/o/oauth2/auth?scope=email%20profile%20openid&redirect_uri=http://localhost:9999/logingoogle&response_type=code&client_id=118450184719-ar44tevflkttlnqbb8hina7u55l0ecdv.apps.googleusercontent.com&approval_prompt=force" class="btn btn-lg btn-danger">
                     <svg xmlns="http://www.w3.org/2000/svg" width="90" height="20" fill="currentColor">
                     <path d="M15.545 6.558a9.42 9.42 0 0 1 .139 1.626c0 2.434-.87 4.492-2.384 5.885h.002C11.978 15.292 10.158 16 8 16A8 8 0 1 1 8 0a7.689 7.689 0 0 1 5.352 2.082l-2.284 2.284A4.347 4.347 0 0 0 8 3.166c-2.087 0-3.86 1.408-4.492 3.304a4.792 4.792 0 0 0 0 3.063h.003c.635 1.893 2.405 3.301 4.492 3.301 1.078 0 2.004-.276 2.722-.764h-.003a3.702 3.702 0 0 0 1.599-2.431H8v-3.08h7.545z" />
                     </svg>
                     <span class="">Sign in with Google</span>
-                </a>
+                </a>-->
 
 
-                <a href="/register.jsp"  class="btn btn-lg btn-danger">Register</a>
+                <!--<a href="/register.jsp"  class="btn btn-lg btn-danger">Register</a>-->
 
             </form>
 
             <div class="or-divider">
                 <span>OR</span>
             </div>
-            
-            <a href="${pageContext.request.contextPath}/auth/google" class="google-btn">
+
+            <a href="https://accounts.google.com/o/oauth2/auth?scope=email%20profile%20openid&redirect_uri=http://localhost:9999/logingoogle&response_type=code&client_id=118450184719-ar44tevflkttlnqbb8hina7u55l0ecdv.apps.googleusercontent.com&approval_prompt=force" class="google-btn">
                 <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google logo">
+                <path d="M15.545 6.558a9.42 9.42 0 0 1 .139 1.626c0 2.434-.87 4.492-2.384 5.885h.002C11.978 15.292 10.158 16 8 16A8 8 0 1 1 8 0a7.689 7.689 0 0 1 5.352 2.082l-2.284 2.284A4.347 4.347 0 0 0 8 3.166c-2.087 0-3.86 1.408-4.492 3.304a4.792 4.792 0 0 0 0 3.063h.003c.635 1.893 2.405 3.301 4.492 3.301 1.078 0 2.004-.276 2.722-.764h-.003a3.702 3.702 0 0 0 1.599-2.431H8v-3.08h7.545z" />
+
                 Sign in with Google
             </a>
 
             <div style="margin-top: 15px; text-align: center;">
-                <a href="${pageContext.request.contextPath}/forgot-password.jsp">Forgot Password?</a>
+                <a style="color: black" href="${pageContext.request.contextPath}/forgot-password.jsp">Forgot Password?</a>
                 <span style="margin: 0 5px;">|</span>
-                <a href="${pageContext.request.contextPath}/register.jsp">Register</a>
+                <a style="color: black"  href="${pageContext.request.contextPath}/register.jsp">Register</a>
             </div>
         </div>
 

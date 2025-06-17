@@ -9,6 +9,7 @@ package model;
  * @author BuiNgocLinh
  */
 public class Category {
+
     private int id;
     private String name;
     private int num_question;
@@ -55,6 +56,5 @@ public class Category {
     public void setDuration(int duration) {
         this.duration = duration;
     }
-    
-    
+
 }

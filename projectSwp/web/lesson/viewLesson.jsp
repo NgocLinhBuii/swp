@@ -82,7 +82,7 @@
     </head>
     <body>
         <div class="page-wrapper">
-            <jsp:include page="/lesson/header.jsp" />
+            <jsp:include page="/header.jsp" />
 
             <main class="container py-4">
                 <div class="row">
@@ -133,7 +133,7 @@
                 </div>
             </main>
 
-            <jsp:include page="/lesson/footer.jsp" />
+            <jsp:include page="/footer.jsp" />
         </div>
 
         <script src="/assets/js/bootstrap.min.js"></script>

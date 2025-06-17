@@ -1,5 +1,9 @@
-package controller.payment;
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
+ */
 
+package controller.payment;
 import com.vnpay.common.Config;
 import dal.InvoiceDAO;
 import jakarta.servlet.ServletException;
@@ -22,10 +26,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 import model.Invoice;
-
 /**
  *
- * @author PaymentIntegration
+ * @author ledai
  */
 @WebServlet(name = "PaymentController", urlPatterns = {"/payment"})
 public class PaymentController extends HttpServlet {

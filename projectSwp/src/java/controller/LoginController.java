@@ -115,7 +115,7 @@ public class LoginController extends HttpServlet {
         AccountDAO accountDAO = new AccountDAO();
         StudentDAO studentDAO = new StudentDAO();
         HttpSession session = request.getSession();
-        session.setMaxInactiveInterval(10800); // 3 hours = 3 * 60 * 60 = 10800 seconds
+        session.setMaxInactiveInterval(600);
 
         if ("admin".equalsIgnoreCase(userType)
                 || "teacher".equalsIgnoreCase(userType)

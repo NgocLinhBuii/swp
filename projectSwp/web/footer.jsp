@@ -3,7 +3,10 @@
     Created on : May 29, 2025, 9:37:59 AM
     Author     : BuiNgocLinh
 --%>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+
 <footer>
+    
     <div class="footer-wrappper footer-bg">
         <!-- Footer Start-->
         <div class="footer-area footer-padding">
@@ -103,10 +106,177 @@
     </div>
 </footer> 
 
-<!-- Scroll Up -->
-<div id="back-top">
-    <a title="Go to Top" href="#"> <i class="fas fa-level-up-alt"></i></a>
+<!-- Nút cu?n lên ??u trang -->
+<!-- Giao diện chatbot + nút Go to Top xếp dọc -->
+<!-- Chatbot + Nút Go to Top -->
+<div id="floating-tools">
+  <div id="chatbot-box">
+    <div id="chatbot-header">
+      <img src="img/chatbot.png" onerror="this.style.display='none'" alt="Bot"> Chat hỗ trợ
+    </div>
+    <div id="chatbot-messages"></div>
+    <textarea id="chatbot-input" placeholder="Nhập câu hỏi..."></textarea>
+  </div>
+
+  <div id="back-top">
+    <a title="Go to Top" href="#"><i class="fas fa-level-up-alt"></i></a>
+  </div>
 </div>
+
+<style>
+  #floating-tools {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    z-index: 9999;
+    align-items: flex-end;
+  }
+
+  #chatbot-box {
+    width: 320px;
+    height: 360px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  #chatbot-header {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background: #007bff;
+    color: white;
+    font-weight: bold;
+  }
+
+  #chatbot-header img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+
+  #chatbot-messages {
+    padding: 10px;
+    overflow-y: auto;
+    flex: 1;
+    background: #f9f9f9;
+    font-size: 14px;
+    max-height: 240px;
+  }
+
+  #chatbot-input {
+    width: 100%;
+    height: 60px;
+    border: none;
+    padding: 8px;
+    box-sizing: border-box;
+    border-top: 1px solid #ccc;
+    resize: none;
+  }
+
+  .chat-msg {
+    margin-bottom: 8px;
+    line-height: 1.5;
+  }
+
+  .chat-user {
+    font-weight: bold;
+    color: #007bff;
+  }
+
+  .chat-bot {
+    font-weight: bold;
+    color: #28a745;
+  }
+
+  #back-top a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 45px;
+    height: 45px;
+    background-color: #6c63ff;
+    color: white;
+    border-radius: 50%;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    text-decoration: none;
+    font-size: 20px;
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 9998;
+  }
+
+  #back-top a:hover {
+    background: #5a1bb0;
+  }
+</style>
+
+
+<div id="floating-tools">
+  <div id="chatbot-box">
+    <div id="chatbot-header">
+      <!-- Kiểm tra ảnh chatbot.png có thật không, nếu không thì thay bằng emoji -->
+      <img src="img/chatbot.png" onerror="this.style.display='none'" alt="Bot"> Chat hỗ trợ
+    </div>
+    <div id="chatbot-messages"></div>
+    <textarea id="chatbot-input" placeholder="Nhập câu hỏi..."></textarea>
+  </div>
+
+  <div id="back-top">
+    <a title="Go to Top" href="#"><i class="fas fa-level-up-alt"></i></a>
+  </div>
+</div>
+
+<script>
+  const input = document.getElementById("chatbot-input");
+  const messages = document.getElementById("chatbot-messages");
+
+  input.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      const userText = input.value.trim();
+      if (!userText) return;
+
+      // Hiển thị tin nhắn người dùng
+      const userMsg = document.createElement("div");
+      userMsg.classList.add("chat-msg");
+      userMsg.innerHTML = `<span class="chat-user">Bạn:</span> ${userText}`;
+      messages.appendChild(userMsg);
+
+      input.value = "";
+
+      // Gửi đến server
+      fetch("chatbot-response?query=" + encodeURIComponent(userText))
+        .then((res) => res.text())
+        .then((data) => {
+          const botMsg = document.createElement("div");
+          botMsg.classList.add("chat-msg");
+          botMsg.innerHTML = `<span class="chat-bot">Bot:</span> ${data}`;
+          messages.appendChild(botMsg);
+          messages.scrollTop = messages.scrollHeight;
+        })
+        .catch(() => {
+          const errorMsg = document.createElement("div");
+          errorMsg.classList.add("chat-msg");
+          errorMsg.innerHTML = `<span class="chat-bot">Bot:</span> ❌ Lỗi kết nối đến máy chủ.`;
+          messages.appendChild(errorMsg);
+        });
+    }
+  });
+</script>
+
+
+
+
+
 
 <!-- JS scripts remain unchanged -->
 <script src="./assets/js/vendor/modernizr-3.5.0.min.js"></script>

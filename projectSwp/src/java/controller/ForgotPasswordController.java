@@ -285,8 +285,8 @@ public class ForgotPasswordController extends HttpServlet {
     
     private void sendResetPasswordEmail(String email, String hashedOtp, HttpServletRequest request) {
         // Cập nhật thông tin email của bạn
-        final String username = "mlemmlem1456@gmail.com";  // Thay bằng địa chỉ Gmail của bạn
-        final String password = "ullb qwbd imca niei";   // App Password bạn đã tạo
+        final String username = "ngoclinhh29@gmail.com";
+        final String password = "dzzy clae jmts huij";   // App Password bạn đã tạo
         
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");

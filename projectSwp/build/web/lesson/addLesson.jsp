@@ -61,7 +61,7 @@
     </head>
     <body>
 
-        <jsp:include page="/lesson/header.jsp" />
+        <jsp:include page="/header.jsp" />
 
         <main>
             <div class="container py-5">
@@ -117,7 +117,7 @@
             </div>
         </main>
 
-        <jsp:include page="/lesson/footer.jsp" />
+        <jsp:include page="/footer.jsp" />
 
         <script>
             function validateForm() {
