@@ -30,21 +30,8 @@ import util.RoleConstants;
  *
  * @author Na
  */
-
 @WebServlet("/test")
 public class TestController extends HttpServlet {
-    private TestDAO testDAO;
-    private CategoryDAO categoryDAO;
-    private QuestionDAO questionDAO;
-    private TestQuestionDAO testQuestionDAO;
-
-    @Override
-    public void init() {
-        testDAO = new TestDAO();
-        categoryDAO = new CategoryDAO();
-        questionDAO = new QuestionDAO();
-        testQuestionDAO = new TestQuestionDAO();
-    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -118,6 +105,7 @@ public class TestController extends HttpServlet {
 
     private void listTests(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        TestDAO testDAO = new TestDAO();
         List<Test> testList = testDAO.getAllTests();
         Map<Integer, String> categoryMap = getCategoryMap();
         request.setAttribute("testList", testList);
@@ -129,17 +117,18 @@ public class TestController extends HttpServlet {
             RequestDispatcher dispatcher = request.getRequestDispatcher("/admin/manageTests.jsp");
             dispatcher.forward(request, response);
         } else {
-            RequestDispatcher dispatcher = request.getRequestDispatcher("/Test/testList.jsp");
+            RequestDispatcher dispatcher = request.getRequestDispatcher("/test/testList.jsp");
             dispatcher.forward(request, response);
         }
     }
 
     private void showCreateForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        QuestionDAO questionDAO = new QuestionDAO();
         request.setAttribute("test", new Test());
         Map<Integer, String> categoryMap = getCategoryMap();
         request.setAttribute("categoryMap", categoryMap);
-        
+
         // Lấy danh sách câu hỏi cho form tạo test
         try {
             System.out.println("Đang lấy danh sách câu hỏi cho form tạo test");
@@ -152,13 +141,16 @@ public class TestController extends HttpServlet {
             request.setAttribute("error", "Không thể lấy danh sách câu hỏi: " + e.getMessage());
             request.setAttribute("questionList", new ArrayList<Question>());
         }
-        
+
         RequestDispatcher dispatcher = request.getRequestDispatcher("/Test/addTest.jsp");
         dispatcher.forward(request, response);
     }
 
     private void showEditForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        TestDAO testDAO = new TestDAO();
+        QuestionDAO questionDAO = new QuestionDAO();
+        TestQuestionDAO testQuestionDAO = new TestQuestionDAO();
         try {
             int id = Integer.parseInt(request.getParameter("id"));
             Test test = testDAO.getTestById(id);
@@ -194,6 +186,8 @@ public class TestController extends HttpServlet {
 
     private void addTest(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
+        TestDAO testDAO = new TestDAO();
+        TestQuestionDAO testQuestionDAO = new TestQuestionDAO();
         String name = request.getParameter("name");
         String description = request.getParameter("description");
         boolean practice = "true".equals(request.getParameter("practice"));
@@ -202,7 +196,7 @@ public class TestController extends HttpServlet {
         // Tạo và lưu test mới
         Test test = new Test(0, name, description, practice, categoryId);
         int testId = testDAO.addTest(test);
-        
+
         // Lấy danh sách câu hỏi được chọn
         String[] questionIds = request.getParameterValues("questionIds");
         if (questionIds != null && questionIds.length > 0) {
@@ -216,18 +210,22 @@ public class TestController extends HttpServlet {
                 }
             }
         }
-        
+
         response.sendRedirect("test");
     }
 
     private void updateTest(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
+        TestDAO testDAO = new TestDAO();
+        CategoryDAO categoryDAO = new CategoryDAO();
+        TestQuestionDAO testQuestionDAO = new TestQuestionDAO();
+
         // Check if user has admin or teacher role
         if (!AuthUtil.hasRole(request, RoleConstants.ADMIN) && !AuthUtil.hasRole(request, RoleConstants.TEACHER)) {
             response.sendRedirect("/error.jsp");
             return;
         }
-        
+
         try {
             int id = Integer.parseInt(request.getParameter("id"));
             String name = request.getParameter("name");
@@ -246,10 +244,10 @@ public class TestController extends HttpServlet {
             // Cập nhật thông tin test
             Test test = new Test(id, name, description, practice, categoryId);
             testDAO.updateTest(test);
-            
+
             // Xóa tất cả câu hỏi cũ của test
             testQuestionDAO.removeAllQuestionsFromTest(id);
-            
+
             // Thêm lại các câu hỏi mới được chọn
             String[] questionIds = request.getParameterValues("questionIds");
             if (questionIds != null && questionIds.length > 0) {
@@ -262,25 +260,27 @@ public class TestController extends HttpServlet {
                     }
                 }
             }
-            
+
             request.setAttribute("message", "Cập nhật bài test thành công");
         } catch (NumberFormatException e) {
             request.setAttribute("error", "ID hoặc danh mục không hợp lệ");
         } catch (Exception e) {
             request.setAttribute("error", "Lỗi khi cập nhật bài test: " + e.getMessage());
         }
-        
+
         response.sendRedirect("test");
     }
 
     private void deleteTest(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
+        TestDAO testDAO = new TestDAO();
+
         // Check if user has admin or teacher role
         if (!AuthUtil.hasRole(request, RoleConstants.ADMIN) && !AuthUtil.hasRole(request, RoleConstants.TEACHER)) {
             response.sendRedirect("/error.jsp");
             return;
         }
-        
+
         try {
             int id = Integer.parseInt(request.getParameter("id"));
             testDAO.deleteTest(id);
@@ -290,12 +290,14 @@ public class TestController extends HttpServlet {
         } catch (Exception e) {
             request.setAttribute("error", "Lỗi khi xóa bài test: " + e.getMessage());
         }
-        
+
         response.sendRedirect("test");
     }
 
     private void searchTestById(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        TestDAO testDAO = new TestDAO();
+
         try {
             int id = Integer.parseInt(request.getParameter("id"));
             Test test = testDAO.getTestById(id);
@@ -314,6 +316,7 @@ public class TestController extends HttpServlet {
 
     // Hàm lấy map categoryId -> categoryName
     private Map<Integer, String> getCategoryMap() {
+        CategoryDAO categoryDAO = new CategoryDAO();
         Map<Integer, String> categoryMap = new HashMap<>();
         List<Category> categoryList = categoryDAO.getAllCategories();
         for (Category c : categoryList) {

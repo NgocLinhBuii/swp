@@ -98,7 +98,7 @@
     </head>
 
     <body>
-        <jsp:include page="/header.jsp" />
+        <jsp:include page="../header.jsp" />
 
         <main>
             <h2>Danh sách Tests</h2>

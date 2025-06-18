@@ -68,17 +68,21 @@ public class StudentDAO extends DBContext {
     }
 
     public void insert(Student student) throws SQLException {
-        String sql = "INSERT INTO student (id, grade_id, parent_id, username, password, full_name, dob, sex, image_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO student (grade_id, parent_id, username, password, full_name, dob, sex, image_id)\n"
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, student.getId());
-            stmt.setInt(2, student.getGrade_id());
-            stmt.setInt(3, student.getParent_id());
-            stmt.setString(4, student.getUsername());
-            stmt.setString(5, passwordEncode.hashPassword(student.getPassword()));
-            stmt.setString(6, student.getFull_name());
-            stmt.setDate(7, java.sql.Date.valueOf(student.getDob()));
-            stmt.setBoolean(8, student.isSex());
-            stmt.setInt(9, student.getImage_id());
+            stmt.setInt(1, student.getGrade_id());
+            stmt.setInt(2, student.getParent_id());
+            stmt.setString(3, student.getUsername());
+            stmt.setString(4, passwordEncode.hashPassword(student.getPassword()));
+            stmt.setString(5, student.getFull_name());
+            stmt.setDate(6, java.sql.Date.valueOf(student.getDob()));
+            stmt.setBoolean(7, student.isSex());
+            if (student.getImage_id() == 0) {
+                stmt.setNull(8, java.sql.Types.INTEGER);
+            } else {
+                stmt.setInt(8, student.getImage_id());
+            }
             stmt.executeUpdate();
         }
     }
@@ -93,7 +97,11 @@ public class StudentDAO extends DBContext {
             stmt.setString(5, student.getFull_name());
             stmt.setDate(6, java.sql.Date.valueOf(student.getDob()));
             stmt.setBoolean(7, student.isSex());
-            stmt.setInt(8, student.getImage_id());
+            if (student.getImage_id() == 0) {
+                stmt.setNull(8, java.sql.Types.INTEGER);
+            } else {
+                stmt.setInt(8, student.getImage_id());
+            }
             stmt.setInt(9, student.getId());
 
             stmt.executeUpdate();

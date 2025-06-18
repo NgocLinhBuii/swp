@@ -45,7 +45,10 @@ public class StudentController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        if (!AuthUtil.hasRole(request, RoleConstants.ADMIN) && !AuthUtil.hasRole(request, RoleConstants.TEACHER) && !AuthUtil.hasRole(request, RoleConstants.STUDENT) ) {
+        if (!AuthUtil.hasRole(request, RoleConstants.ADMIN) 
+                && !AuthUtil.hasRole(request, RoleConstants.TEACHER) 
+                && !AuthUtil.hasRole(request, RoleConstants.STUDENT)
+                && !AuthUtil.hasRole(request, RoleConstants.PARENT)) {
             response.sendRedirect("/error.jsp");
             return;
         }
@@ -84,7 +87,10 @@ public class StudentController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        if (!AuthUtil.hasRole(request, RoleConstants.ADMIN) && !AuthUtil.hasRole(request, RoleConstants.TEACHER) && !AuthUtil.hasRole(request, RoleConstants.STUDENT) ) {
+        if (!AuthUtil.hasRole(request, RoleConstants.ADMIN) 
+                && !AuthUtil.hasRole(request, RoleConstants.TEACHER) 
+                && !AuthUtil.hasRole(request, RoleConstants.STUDENT)
+                && !AuthUtil.hasRole(request, RoleConstants.PARENT)) {
             response.sendRedirect("/error.jsp");
             return;
         }
@@ -107,7 +113,7 @@ public class StudentController extends HttpServlet {
     private void listStudents(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, ServletException, IOException {
         int page = 1;
-        int recordsPerPage = 1;
+        int recordsPerPage = 5;
 
         String pageParam = request.getParameter("page");
         if (pageParam != null) {
@@ -233,7 +239,10 @@ public class StudentController extends HttpServlet {
     }
 
     private Student getStudentFromRequest(HttpServletRequest request) {
-        int id = Integer.parseInt(request.getParameter("id"));
+        int id = 0;
+        if (request.getParameter("id") != null)  {
+            id = Integer.parseInt(request.getParameter("id"));
+        }
         int gradeId = Integer.parseInt(request.getParameter("grade_id"));
         int parentId = Integer.parseInt(request.getParameter("parent_id"));
         String username = request.getParameter("username");

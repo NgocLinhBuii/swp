@@ -3,7 +3,6 @@
     Created on : May 29, 2025, 9:37:59 AM
     Author     : BuiNgocLinh
 --%>
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 
 <footer>
     
@@ -106,16 +105,16 @@
     </div>
 </footer> 
 
-<!-- Nút cu?n lên ??u trang -->
-<!-- Giao diện chatbot + nút Go to Top xếp dọc -->
-<!-- Chatbot + Nút Go to Top -->
+<!-- N�t cu?n l�n ??u trang -->
+<!-- Giao di?n chatbot + n�t Go to Top x?p d?c -->
+<!-- Chatbot + N�t Go to Top -->
 <div id="floating-tools">
   <div id="chatbot-box">
     <div id="chatbot-header">
-      <img src="img/chatbot.png" onerror="this.style.display='none'" alt="Bot"> Chat hỗ trợ
+      <img src="img/chatbot.png" onerror="this.style.display='none'" alt="Bot"> Chat h? tr?
     </div>
     <div id="chatbot-messages"></div>
-    <textarea id="chatbot-input" placeholder="Nhập câu hỏi..."></textarea>
+    <textarea id="chatbot-input" placeholder="Nh?p c�u h?i..."></textarea>
   </div>
 
   <div id="back-top">
@@ -223,11 +222,11 @@
 <div id="floating-tools">
   <div id="chatbot-box">
     <div id="chatbot-header">
-      <!-- Kiểm tra ảnh chatbot.png có thật không, nếu không thì thay bằng emoji -->
-      <img src="img/chatbot.png" onerror="this.style.display='none'" alt="Bot"> Chat hỗ trợ
+      <!-- Ki?m tra ?nh chatbot.png c� th?t kh�ng, n?u kh�ng th� thay b?ng emoji -->
+      <img src="img/chatbot.png" onerror="this.style.display='none'" alt="Bot"> Chat h? tr?
     </div>
     <div id="chatbot-messages"></div>
-    <textarea id="chatbot-input" placeholder="Nhập câu hỏi..."></textarea>
+    <textarea id="chatbot-input" placeholder="Nh?p c�u h?i..."></textarea>
   </div>
 
   <div id="back-top">
@@ -245,15 +244,15 @@
       const userText = input.value.trim();
       if (!userText) return;
 
-      // Hiển thị tin nhắn người dùng
+      // Hi?n th? tin nh?n ng??i d�ng
       const userMsg = document.createElement("div");
       userMsg.classList.add("chat-msg");
-      userMsg.innerHTML = `<span class="chat-user">Bạn:</span> ${userText}`;
+      userMsg.innerHTML = `<span class="chat-user">B?n:</span> ${userText}`;
       messages.appendChild(userMsg);
 
       input.value = "";
 
-      // Gửi đến server
+      // G?i ??n server
       fetch("chatbot-response?query=" + encodeURIComponent(userText))
         .then((res) => res.text())
         .then((data) => {
@@ -266,7 +265,7 @@
         .catch(() => {
           const errorMsg = document.createElement("div");
           errorMsg.classList.add("chat-msg");
-          errorMsg.innerHTML = `<span class="chat-bot">Bot:</span> ❌ Lỗi kết nối đến máy chủ.`;
+          errorMsg.innerHTML = `<span class="chat-bot">Bot:</span> ? L?i k?t n?i ??n m�y ch?.`;
           messages.appendChild(errorMsg);
         });
     }

@@ -259,6 +259,33 @@
             }
 
         </style>
+        <script>
+            function togglePassword(fieldId) {
+                var input = document.getElementById(fieldId);
+                var icon = document.getElementById(fieldId + 'Icon');
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            }
+            
+            function previewImage(event) {
+                const file = event.target.files[0];
+                const reader = new FileReader();
+                reader.onload = function () {
+                    const output = document.getElementById('avatarPreview');
+                    output.src = reader.result;
+                };
+                if (file) {
+                    reader.readAsDataURL(file);
+                }
+            }
+        </script>
     </head>
     <body>
         <!--         ? Preloader Start 
@@ -326,12 +353,14 @@
                  Header End -->
 
         <%@include file="../header.jsp" %>
-        <h2>${student == null ? "Add student" : "Edit Student"}</h2>
 
         <form action="student" method="post" enctype="multipart/form-data">
+            <h2>${student == null ? "Add student" : "Edit Student"}</h2>
             <input type="hidden" name="action" value="${student == null ? "create" : "edit"}" />
 
-            ID: <input type="text" name="id" value="${student.id}" ${student != null ? "readonly" : ""} required/><br/>
+            <c:if test="${student != null}">
+                ID: <input type="text" name="id" value="${student.id}" readonly required/><br/>
+            </c:if>
             <label for="grade_id">Grade:</label>
             <select name="grade_id" id="grade_id" required>
                 <c:forEach var="grade" items="${gradeList}">
@@ -404,21 +433,6 @@
                     </div>
                 </c:otherwise>
             </c:choose>
-            <script>
-                function togglePassword(fieldId) {
-                    var input = document.getElementById(fieldId);
-                    var icon = document.getElementById(fieldId + 'Icon');
-                    if (input.type === 'password') {
-                        input.type = 'text';
-                        icon.classList.remove('fa-eye');
-                        icon.classList.add('fa-eye-slash');
-                    } else {
-                        input.type = 'password';
-                        icon.classList.remove('fa-eye-slash');
-                        icon.classList.add('fa-eye');
-                    }
-                }
-            </script>
             Full Name: <input type="text" name="full_name" value="${student.full_name}" required/><br/>
             DOB: <input type="date" name="dob" value="${student.dob}" required/><br/>
 
@@ -433,12 +447,13 @@
             <c:if test="${image.id == student.image_id}">
                 <div class="mb-3">
                     <label class="form-label">Avatar:</label><br/>
-                    <img src="${pageContext.request.contextPath}/${not empty image.image_data ? image.image_data : 'assets/img/avatar/macdinh.jpg'}"
+                    <img id="avatarPreview"
+                         src="${pageContext.request.contextPath}/${not empty image.image_data ? image.image_data : 'assets/img/avatar/macdinh.jpg'}"
                          alt="Ảnh cá nhân" width="200" height="200"/>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">New avatar:</label>
-                    <input type="file" name="imgURL" class="form-control"/>
+                    <input type="file" name="imgURL" class="form-control" onchange="previewImage(event)"/>
                 </div>
             </c:if>
             <input type="submit" value="${student == null ? "Add" : "update"}"/>

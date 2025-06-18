@@ -4,21 +4,9 @@
 <html>
     <head>
         <title>Quản lý bài Test - Admin</title>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
         <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
-        <link rel="stylesheet" href="/assets/css/owl.carousel.min.css">
-        <link rel="stylesheet" href="/assets/css/slicknav.css">
-        <link rel="stylesheet" href="/assets/css/flaticon.css">
-        <link rel="stylesheet" href="/assets/css/progressbar_barfiller.css">
-        <link rel="stylesheet" href="/assets/css/gijgo.css">
-        <link rel="stylesheet" href="/assets/css/animate.min.css">
-        <link rel="stylesheet" href="/assets/css/animated-headline.css">
-        <link rel="stylesheet" href="/assets/css/magnific-popup.css">
-        <link rel="stylesheet" href="/assets/css/fontawesome-all.min.css">
-        <link rel="stylesheet" href="/assets/css/themify-icons.css">
-        <link rel="stylesheet" href="/assets/css/slick.css">
-        <link rel="stylesheet" href="/assets/css/nice-select.css">
         <link rel="stylesheet" href="/assets/css/style.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
         <style>
             body {
                 background: #f9f9f9;
@@ -120,48 +108,8 @@
                 </tbody>
             </table>
         </div>
-        <jsp:include page="../footer.jsp" />
-        <!-- JS -->
-        <!-- JS -->
-        <script src="${pageContext.request.contextPath}/assets/js/vendor/modernizr-3.5.0.min.js"></script>
-        <!-- Jquery, Popper, Bootstrap -->
-        <script src="${pageContext.request.contextPath}/assets/js/vendor/jquery-1.12.4.min.js"></script>
-        <script src="${pageContext.request.contextPath}/assets/js/popper.min.js"></script>
-        <script src="${pageContext.request.contextPath}/assets/js/bootstrap.min.js"></script>
-        <!-- Jquery Mobile Menu -->
-        <script src="${pageContext.request.contextPath}/assets/js/jquery.slicknav.min.js"></script>
-
-        <!-- Jquery Slick , Owl-Carousel Plugins -->
-        <script src="${pageContext.request.contextPath}/assets/js/owl.carousel.min.js"></script>
-        <script src="${pageContext.request.contextPath}/assets/js/slick.min.js"></script>
-        <!-- One Page, Animated-HeadLin -->
-        <script src="${pageContext.request.contextPath}/assets/js/wow.min.js"></script>
-        <script src="${pageContext.request.contextPath}/assets/js/animated.headline.js"></script>
-        <script src="${pageContext.request.contextPath}/assets/js/jquery.magnific-popup.js"></script>
-
-        <!-- Date Picker -->
-        <script src="${pageContext.request.contextPath}/assets/js/gijgo.min.js"></script>
-        <!-- Nice-select, sticky -->
-
-        <!-- Progress -->
-        <script src="${pageContext.request.contextPath}/assets/js/jquery.barfiller.js"></script>
-
-        <!-- counter , waypoint,Hover Direction -->
-        <script src="${pageContext.request.contextPath}/assets/js/jquery.counterup.min.js"></script>
-        <script src="${pageContext.request.contextPath}/assets/js/waypoints.min.js"></script>
-        <script src="${pageContext.request.contextPath}/assets/js/jquery.countdown.min.js"></script>
-        <script src="${pageContext.request.contextPath}/assets/js/hover-direction-snake.min.js"></script>
-
-        <!-- contact js -->
-        <script src="${pageContext.request.contextPath}/assets/js/contact.js"></script>
-        <script src="${pageContext.request.contextPath}/assets/js/jquery.form.js"></script>
-        <script src="${pageContext.request.contextPath}/assets/js/jquery.validate.min.js"></script>
-        <script src="${pageContext.request.contextPath}/assets/js/mail-script.js"></script>
-        <script src="${pageContext.request.contextPath}/assets/js/jquery.ajaxchimp.min.js"></script>
-        <script>
-                                    $(document).ready(function () {
-                                        $('select').niceSelect();
-                                    });
-        </script>
+            <jsp:include page="../footer.jsp" />
+            <!-- JS -->
+        <script src="/assets/js/bootstrap.bundle.min.js"></script>
     </body>
 </html> 

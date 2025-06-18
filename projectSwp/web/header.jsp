@@ -1,4 +1,4 @@
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
 <!--Header Start--> 
 <div class="header-area header-transparent">
@@ -56,8 +56,8 @@
                                             </li>
                                         </c:if>
 
-                                                                <c:if test="${sessionScope.role == 'student'}">
-                            <li><a href="#">Learning</a>
+                                        <c:if test="${sessionScope.role == 'student'}">
+                                            <li><a href="#">Learning</a>
                                                 <ul class="submenu">
                                                     <li><a href="/subjects">My Subjects</a></li>
                                                     <li><a href="/LessonURL">My Lessons</a></li>
@@ -94,17 +94,32 @@
                                         <li><a href="/contact">Contact</a></li>
 
                                         <!-- Right-side Buttons -->
-                                        <c:if test="${sessionScope.role == 'student'}">
-                                            <li class="button-header">
-                                                <a href="/student?action=viewProfile&id=${sessionScope.student.id}" class="btn btn3">My Profile</a>
-                                            </li>
-                                        </c:if>
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        <c:choose>
+                                            <c:when test="${sessionScope.role == 'student'}">
+                                                <li class="button-header">
+                                                    <a href="/student?action=viewProfile&id=${sessionScope.student.id}" class="btn btn3">My Profile</a>
+                                                </li>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <li class="button-header">
+                                                    <a href="/admin?action=viewProfile&id=${sessionScope.account.id}" class="btn btn3">My Profile</a>
+                                                </li>
+                                            </c:otherwise>
+                                        </c:choose>
 
-                                        <c:if test="${sessionScope.account.role == 'parent' || sessionScope.account.role == 'teacher' || sessionScope.account.role == 'admin'}">
-                                            <li class="button-header">
-                                                <a href="/admin?action=viewProfile&id=${sessionScope.account.id}" class="btn btn3">My Profile</a>
-                                            </li>
-                                        </c:if>
+   
+   
+   
+   
+  
+  
+   
+   
                                         <c:if test="${not empty sessionScope.student or not empty sessionScope.account}">
                                             <li class="button-header">
                                                 <a href="/logout" class="btn btn3">Logout</a>

@@ -41,12 +41,12 @@
                 padding: 20px;
             }
 
-            /*            footer {
-                            background-color: #f1f1f1;
-                            padding: 10px 20px;
-                            text-align: center;
-                            font-size: 14px;
-                        }*/
+            footer {
+                background-color: #f1f1f1;
+                padding: 10px 20px;
+                text-align: center;
+                font-size: 14px;
+            }
 
             table {
                 width: 100%;
@@ -85,9 +85,8 @@
         </style>
     </head>
     <body>
-        <jsp:include page="/header.jsp" />
-
         <div class="page-wrapper">
+            <jsp:include page="/header.jsp" />
             <main>
                 <h2>Category List</h2>
 
@@ -143,7 +142,6 @@
                 </div>
             </main>
             <jsp:include page="/footer.jsp" />
-
         </div>
 
         <!-- JS Libraries -->
