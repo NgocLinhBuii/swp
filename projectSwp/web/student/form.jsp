@@ -259,6 +259,33 @@
             }
 
         </style>
+        <script>
+            function togglePassword(fieldId) {
+                var input = document.getElementById(fieldId);
+                var icon = document.getElementById(fieldId + 'Icon');
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            }
+            
+            function previewImage(event) {
+                const file = event.target.files[0];
+                const reader = new FileReader();
+                reader.onload = function () {
+                    const output = document.getElementById('avatarPreview');
+                    output.src = reader.result;
+                };
+                if (file) {
+                    reader.readAsDataURL(file);
+                }
+            }
+        </script>
     </head>
     <body>
         <!--         ? Preloader Start 
@@ -326,12 +353,14 @@
                  Header End -->
 
         <%@include file="../header.jsp" %>
-        <h2>${student == null ? "Add student" : "Edit Student"}</h2>
 
         <form action="student" method="post" enctype="multipart/form-data">
+            <h2>${student == null ? "Add student" : "Edit Student"}</h2>
             <input type="hidden" name="action" value="${student == null ? "create" : "edit"}" />
 
-            ID: <input type="text" name="id" value="${student.id}" ${student != null ? "readonly" : ""} required/><br/>
+            <c:if test="${student != null}">
+                ID: <input type="text" name="id" value="${student.id}" readonly required/><br/>
+            </c:if>
             <label for="grade_id">Grade:</label>
             <select name="grade_id" id="grade_id" required>
                 <c:forEach var="grade" items="${gradeList}">
@@ -351,7 +380,7 @@
                         </c:if>
                     </c:forEach>
                 </c:when>
-                <c:otherwise>
+                 <c:otherwise>
                     <!-- Admin/Teacher có thể chọn parent -->
                     <select name="parent_id" id="parent_id" required>
                         <c:forEach var="parent" items="${accList}">
@@ -365,7 +394,45 @@
             <br/>
             <br/>
             Username: <input type="text" name="username" value="${student.username}" required/><br/>
-            Password: <input type="password" name="password" value="${student.password}" required/><br/>
+            <c:choose>
+                <c:when test="${not empty student}">
+                    <!-- Edit mode - show old and new password fields -->
+                    <div class="mb-3">
+                        <label class="form-label">Current Password:</label>
+                        <div class="input-group">
+                            <input type="password" name="oldPassword" id="oldPassword" class="form-control" required />
+                            <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('oldPassword')">
+                                <i class="fas fa-eye" id="oldPasswordIcon"></i>
+                            </button>
+                        </div>
+                        <c:if test="${not empty passwordError}">
+                            <small class="text-danger">${passwordError}</small>
+                        </c:if>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">New Password:</label>
+                        <div class="input-group">
+                            <input type="password" name="password" id="newPassword" class="form-control" />
+                            <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('newPassword')">
+                                <i class="fas fa-eye" id="newPasswordIcon"></i>
+                            </button>
+                        </div>
+                        <small class="text-muted">Leave blank if you don't want to change password</small>
+                    </div>
+                </c:when>
+                <c:otherwise>
+                    <!-- Create mode - show only one password field -->
+                    <div class="mb-3">
+                        <label class="form-label">Password:</label>
+                        <div class="input-group">
+                            <input type="password" name="password" id="newPassword" class="form-control" value="${student.password}" required />
+                            <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('newPassword')">
+                                <i class="fas fa-eye" id="newPasswordIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+                </c:otherwise>
+            </c:choose>
             Full Name: <input type="text" name="full_name" value="${student.full_name}" required/><br/>
             DOB: <input type="date" name="dob" value="${student.dob}" required/><br/>
 
@@ -380,12 +447,13 @@
             <c:if test="${image.id == student.image_id}">
                 <div class="mb-3">
                     <label class="form-label">Avatar:</label><br/>
-                    <img src="${pageContext.request.contextPath}/${not empty image.image_data ? image.image_data : 'assets/img/avatar/macdinh.jpg'}"
+                    <img id="avatarPreview"
+                         src="${pageContext.request.contextPath}/${not empty image.image_data ? image.image_data : 'assets/img/avatar/macdinh.jpg'}"
                          alt="Ảnh cá nhân" width="200" height="200"/>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">New avatar:</label>
-                    <input type="file" name="imgURL" class="form-control"/>
+                    <input type="file" name="imgURL" class="form-control" onchange="previewImage(event)"/>
                 </div>
             </c:if>
             <input type="submit" value="${student == null ? "Add" : "update"}"/>
@@ -539,4 +607,3 @@
 
     </body>
 </html>
-

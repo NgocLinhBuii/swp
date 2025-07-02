@@ -28,7 +28,9 @@ public class CategoryController extends HttpServlet {
         }
 
         String action = request.getParameter("action");
-        if (action == null) action = "";
+        if (action == null) {
+            action = "";
+        }
 
         try {
             switch (action) {
@@ -117,7 +119,7 @@ public class CategoryController extends HttpServlet {
 
                 Category category = new Category(0, name, numQuestion, duration);
                 boolean success = categoryDAO.addCategory(category);
-                
+
                 if (success) {
                     request.setAttribute("message", "Thêm category thành công");
                 } else {
@@ -132,7 +134,7 @@ public class CategoryController extends HttpServlet {
 
                 Category category = new Category(id, name, numQuestion, duration);
                 boolean success = categoryDAO.updateCategory(category);
-                
+
                 if (success) {
                     request.setAttribute("message", "Cập nhật category thành công");
                 } else {

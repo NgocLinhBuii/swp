@@ -1,15 +1,7 @@
 package controller.question;
 
-import dal.ImageDAO;
-import dal.QuestionDAO;
-import dal.LessonDAO;
-import dal.QuestionOptionDAO;
-import dal.TestQuestionDAO;
-import dal.QuestionRecordDAO;
-import model.Question;
-import model.Lesson;
-import model.Image;
-import model.QuestionOption;
+import dal.*;
+import model.*;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -36,10 +28,15 @@ public class QuestionController extends HttpServlet {
     private TestQuestionDAO testQuestionDAO = new TestQuestionDAO();
     private QuestionRecordDAO questionRecordDAO = new QuestionRecordDAO();
 
+    private GradeDAO gradeDAO = new GradeDAO();
+    private DAOSubject subjectDAO = new DAOSubject();
+    private ChapterDAO chapterDAO = new ChapterDAO();
+    private LessonDAO lessonDAO = new LessonDAO();
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        if (!AuthUtil.hasRole(request, RoleConstants.ADMIN) && !AuthUtil.hasRole(request, RoleConstants.TEACHER)&& !AuthUtil.hasRole(request, RoleConstants.STUDENT)) {
+        if (!AuthUtil.hasRole(request, RoleConstants.ADMIN) && !AuthUtil.hasRole(request, RoleConstants.TEACHER) && !AuthUtil.hasRole(request, RoleConstants.STUDENT)) {
             response.sendRedirect("/error.jsp");
             return;
         }
@@ -51,9 +48,9 @@ public class QuestionController extends HttpServlet {
         try {
             switch (action) {
                 case "addForm":
-                    LessonDAO lessonDAO = new LessonDAO();
-                    List<Lesson> lessonList = lessonDAO.getAllLessons();
-                    request.setAttribute("les", lessonList);
+                    // Load hierarchy data for selection
+                    List<Grade> gradeList = gradeDAO.findAllFromGrade();
+                    request.setAttribute("gradeList", gradeList);
                     request.getRequestDispatcher("question/addQuestion.jsp").forward(request, response);
                     return;
 
@@ -63,13 +60,47 @@ public class QuestionController extends HttpServlet {
                         int id = Integer.parseInt(idStr);
                         Question question = questionDAO.getQuestionById(id);
 
-                        LessonDAO lessonDAO2 = new LessonDAO();
-                        List<Lesson> lessonList2 = lessonDAO2.getAllLessons();
+                        // Load hierarchy data
+                        List<Grade> gradeList2 = gradeDAO.findAllFromGrade();
                         List<QuestionOption> options = questionOptionDAO.getOptionsByQuestion(id);
 
                         request.setAttribute("question", question);
-                        request.setAttribute("les", lessonList2);
+                        request.setAttribute("gradeList", gradeList2);
                         request.setAttribute("options", options);
+
+                        // If question has lesson, load the full hierarchy
+                        if (question.getLesson_id() > 0) {
+                            try {
+                                Lesson lesson = lessonDAO.getLessonById(question.getLesson_id());
+                                if (lesson != null) {
+                                    Chapter chapter = chapterDAO.findChapterById(lesson.getChapter_id());
+                                    if (chapter != null) {
+                                        Subject subject = subjectDAO.findById(chapter.getSubject_id());
+                                        if (subject != null) {
+                                            Grade grade = gradeDAO.getGradeById(subject.getGrade_id());
+
+                                            request.setAttribute("selectedGrade", grade);
+                                            request.setAttribute("selectedSubject", subject);
+                                            request.setAttribute("selectedChapter", chapter);
+                                            request.setAttribute("selectedLesson", lesson);
+
+                                            // Load related data for dropdowns
+                                            List<Subject> subjectList = subjectDAO.findAll();
+                                            List<Chapter> chapterList = chapterDAO.getChapter("SELECT * FROM chapter WHERE subject_id = " + subject.getId());
+                                            List<Lesson> lessonList = lessonDAO.getAllLessons();
+
+                                            request.setAttribute("subjectList", subjectList);
+                                            request.setAttribute("chapterList", chapterList);
+                                            request.setAttribute("lessonList", lessonList);
+                                        }
+                                    }
+                                }
+                            } catch (Exception e) {
+                                System.out.println("Warning: Could not load complete hierarchy for question " + id + ": " + e.getMessage());
+                                // Continue with partial data
+                            }
+                        }
+
                         request.getRequestDispatcher("question/updateQuestion.jsp").forward(request, response);
                         return;
                     }
@@ -82,6 +113,22 @@ public class QuestionController extends HttpServlet {
                     questionOptionDAO.deleteOptionsByQuestion(delId);
                     questionDAO.delete(delId);
                     response.sendRedirect("Question");
+                    return;
+
+                case "ai":
+                    response.sendRedirect("/ai-question?action=form");
+                    return;
+
+                case "getSubjectsByGrade":
+                    handleGetSubjectsByGrade(request, response);
+                    return;
+
+                case "getChaptersBySubject":
+                    handleGetChaptersBySubject(request, response);
+                    return;
+
+                case "getLessonsByChapter":
+                    handleGetLessonsByChapter(request, response);
                     return;
 
                 default:
@@ -115,10 +162,95 @@ public class QuestionController extends HttpServlet {
         request.getRequestDispatcher("question/questionList.jsp").forward(request, response);
     }
 
+    // AJAX handlers for hierarchical data loading
+    private void handleGetSubjectsByGrade(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        try {
+            int gradeId = Integer.parseInt(request.getParameter("gradeId"));
+            List<Subject> subjects = subjectDAO.findAll();
+
+            StringBuilder json = new StringBuilder("[");
+            boolean first = true;
+            for (Subject subject : subjects) {
+                if (subject.getGrade_id() == gradeId) {
+                    if (!first) {
+                        json.append(",");
+                    }
+                    json.append("{\"id\":").append(subject.getId())
+                            .append(",\"name\":\"").append(subject.getName().replace("\"", "\\\"")).append("\"}");
+                    first = false;
+                }
+            }
+            json.append("]");
+
+            response.getWriter().write(json.toString());
+        } catch (Exception e) {
+            response.getWriter().write("[]");
+        }
+    }
+
+    private void handleGetChaptersBySubject(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        try {
+            int subjectId = Integer.parseInt(request.getParameter("subjectId"));
+            List<Chapter> chapters = chapterDAO.findChapterBySubjectId(subjectId);
+
+            StringBuilder json = new StringBuilder("[");
+            for (int i = 0; i < chapters.size(); i++) {
+                if (i > 0) {
+                    json.append(",");
+                }
+                Chapter chapter = chapters.get(i);
+                json.append("{\"id\":").append(chapter.getId())
+                        .append(",\"name\":\"").append(chapter.getName().replace("\"", "\\\"")).append("\"}");
+            }
+            json.append("]");
+
+            response.getWriter().write(json.toString());
+        } catch (Exception e) {
+            response.getWriter().write("[]");
+        }
+    }
+
+    private void handleGetLessonsByChapter(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        try {
+            int chapterId = Integer.parseInt(request.getParameter("chapterId"));
+            List<Lesson> allLessons = lessonDAO.getAllLessons();
+
+            StringBuilder json = new StringBuilder("[");
+            boolean first = true;
+            for (Lesson lesson : allLessons) {
+                if (lesson.getChapter_id() == chapterId) {
+                    if (!first) {
+                        json.append(",");
+                    }
+                    json.append("{\"id\":").append(lesson.getId())
+                            .append(",\"name\":\"").append(lesson.getName().replace("\"", "\\\"")).append("\"}");
+                    first = false;
+                }
+            }
+            json.append("]");
+
+            response.getWriter().write(json.toString());
+        } catch (Exception e) {
+            response.getWriter().write("[]");
+        }
+    }
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-       if (!AuthUtil.hasRole(request, RoleConstants.ADMIN) && !AuthUtil.hasRole(request, RoleConstants.TEACHER)&& !AuthUtil.hasRole(request, RoleConstants.STUDENT)) {
+        if (!AuthUtil.hasRole(request, RoleConstants.ADMIN) && !AuthUtil.hasRole(request, RoleConstants.TEACHER) && !AuthUtil.hasRole(request, RoleConstants.STUDENT)) {
             response.sendRedirect("/error.jsp");
             return;
         }
@@ -158,9 +290,13 @@ public class QuestionController extends HttpServlet {
                 if ("SINGLE".equals(questionType)) {
                     int correctIndex = -1;
                     String correctOption = request.getParameter("correctOption");
-                    if (correctOption != null) correctIndex = Integer.parseInt(correctOption);
+                    if (correctOption != null) {
+                        correctIndex = Integer.parseInt(correctOption);
+                    }
                     correctArr = new boolean[optionContents.length];
-                    for (int i = 0; i < correctArr.length; i++) correctArr[i] = (i == correctIndex);
+                    for (int i = 0; i < correctArr.length; i++) {
+                        correctArr[i] = (i == correctIndex);
+                    }
                 } else {
                     correctArr = new boolean[optionContents.length];
                     for (int i = 0; i < correctArr.length; i++) {
@@ -177,6 +313,13 @@ public class QuestionController extends HttpServlet {
                 }
             } else if ("update".equals(action)) {
                 int id = Integer.parseInt(request.getParameter("id"));
+
+                // Handle image update - keep existing image if no new image uploaded
+                Question existingQuestion = questionDAO.getQuestionById(id);
+                if (image_id == 0 && existingQuestion != null) {
+                    image_id = existingQuestion.getImage_id(); // Keep existing image
+                }
+
                 Question q = new Question(id, questionText, image_id, lesson_id, questionType);
                 questionDAO.update(q);
                 questionOptionDAO.deleteOptionsByQuestion(id);
@@ -185,9 +328,13 @@ public class QuestionController extends HttpServlet {
                 if ("SINGLE".equals(questionType)) {
                     int correctIndex = -1;
                     String correctOption = request.getParameter("correctOption");
-                    if (correctOption != null) correctIndex = Integer.parseInt(correctOption);
+                    if (correctOption != null) {
+                        correctIndex = Integer.parseInt(correctOption);
+                    }
                     correctArr = new boolean[optionContents.length];
-                    for (int i = 0; i < correctArr.length; i++) correctArr[i] = (i == correctIndex);
+                    for (int i = 0; i < correctArr.length; i++) {
+                        correctArr[i] = (i == correctIndex);
+                    }
                 } else {
                     correctArr = new boolean[optionContents.length];
                     for (int i = 0; i < correctArr.length; i++) {
@@ -201,6 +348,12 @@ public class QuestionController extends HttpServlet {
                     opt.setContent(optionContents[i]);
                     opt.setIs_correct(correctArr[i]);
                     questionOptionDAO.insertOption(opt);
+                }
+
+                // Log the learning path change for audit purposes
+                if (existingQuestion != null && existingQuestion.getLesson_id() != lesson_id) {
+                    System.out.println("Question " + id + " learning path changed from lesson "
+                            + existingQuestion.getLesson_id() + " to lesson " + lesson_id);
                 }
             }
         } catch (Exception e) {

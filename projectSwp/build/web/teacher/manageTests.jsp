@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="/assets/css/style.css">
     <style>
         body { background: #f9f9f9; padding-top: 80px; }
-        .container { background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 30px; margin-top: 30px; }
+        .container { padding: 30px; margin-top: 30px; }
         h2 { color: #333; border-bottom: 2px solid #007BFF; padding-bottom: 8px; margin-bottom: 20px; }
         .add-link { margin-bottom: 15px; display: inline-block; background: #007BFF; color: #fff; padding: 8px 16px; border-radius: 4px; text-decoration: none; }
         .add-link:hover { background: #0056b3; }
@@ -21,7 +21,7 @@
     </style>
 </head>
 <body>
-<jsp:include page="/Test/header.jsp" />
+<jsp:include page="../header.jsp" />
 <div class="container">
     <h2>Quản lý bài Test</h2>
     
@@ -68,6 +68,6 @@
         </tbody>
     </table>
 </div>
-<jsp:include page="/Test/footer.jsp" />
+<jsp:include page="../footer.jsp" />
 </body>
 </html> 

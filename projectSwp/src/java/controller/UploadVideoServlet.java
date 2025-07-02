@@ -9,7 +9,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.UUID;
-
+import jakarta.servlet.annotation.WebServlet;
+@WebServlet("/upload-video")
 @MultipartConfig
 public class UploadVideoServlet extends HttpServlet {
 

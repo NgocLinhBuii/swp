@@ -18,9 +18,7 @@ public class CategoryDAO extends DBContext {
     public List<Category> getAllCategories() {
         List<Category> list = new ArrayList<>();
         String sql = "SELECT * FROM Category";
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 Category c = new Category(
                         rs.getInt("id"),
@@ -39,8 +37,7 @@ public class CategoryDAO extends DBContext {
     // Thêm category mới
     public boolean addCategory(Category c) {
         String sql = "INSERT INTO Category (name, num_questions, duration) VALUES (?, ?, ?)";
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, c.getName());
             ps.setInt(2, c.getNum_question());
             ps.setInt(3, c.getDuration());
@@ -54,8 +51,7 @@ public class CategoryDAO extends DBContext {
     // Cập nhật category
     public boolean updateCategory(Category c) {
         String sql = "UPDATE Category SET name = ?, num_questions = ?, duration = ? WHERE id = ?";
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, c.getName());
             ps.setInt(2, c.getNum_question());
             ps.setInt(3, c.getDuration());
@@ -70,8 +66,7 @@ public class CategoryDAO extends DBContext {
     // Kiểm tra category có đang được sử dụng không
     public boolean isCategoryInUse(int categoryId) {
         String sql = "SELECT COUNT(*) FROM test WHERE category_id = ?";
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, categoryId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -90,10 +85,9 @@ public class CategoryDAO extends DBContext {
         if (isCategoryInUse(id)) {
             return false; // Không thể xóa vì đang được sử dụng
         }
-        
+
         String sql = "DELETE FROM Category WHERE id = ?";
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -105,8 +99,7 @@ public class CategoryDAO extends DBContext {
     // Lấy category theo ID
     public Category getCategoryById(int id) {
         String sql = "SELECT * FROM Category WHERE id = ?";
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -125,44 +118,42 @@ public class CategoryDAO extends DBContext {
     }
 
     // Tìm kiếm category theo tên (tương đối, không phân biệt hoa thường)
-public List<Category> findByName(String name) {
-    List<Category> list = new ArrayList<>();
-    String sql = "SELECT * FROM Category WHERE LOWER(name) LIKE ?";
-    try (Connection conn = getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-        ps.setString(1, "%" + name.toLowerCase() + "%");
-        try (ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                Category c = new Category(
-                        rs.getInt("id"),
-                        rs.getString("name"),
-                        rs.getInt("num_questions"),
-                        rs.getInt("duration")
-                );
-                list.add(c);
+    public List<Category> findByName(String name) {
+        List<Category> list = new ArrayList<>();
+        String sql = "SELECT * FROM Category WHERE LOWER(name) LIKE ?";
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, "%" + name.toLowerCase() + "%");
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Category c = new Category(
+                            rs.getInt("id"),
+                            rs.getString("name"),
+                            rs.getInt("num_questions"),
+                            rs.getInt("duration")
+                    );
+                    list.add(c);
+                }
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-    } catch (SQLException e) {
-        e.printStackTrace();
+        return list;
     }
-    return list;
-}
 
 // Đếm số lượng test trong mỗi category
-public int countTestsInCategory(int categoryId) {
-    String sql = "SELECT COUNT(*) FROM test WHERE category_id = ?";
-    try (Connection conn = getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-        ps.setInt(1, categoryId);
-        try (ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                return rs.getInt(1);
+    public int countTestsInCategory(int categoryId) {
+        String sql = "SELECT COUNT(*) FROM test WHERE category_id = ?";
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, categoryId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-    } catch (SQLException e) {
-        e.printStackTrace();
+        return 0;
     }
-    return 0;
-}
 
 }

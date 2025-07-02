@@ -23,10 +23,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import model.Account;
 import model.Image;
+import jakarta.servlet.http.HttpSession;
+import util.AuthUtil;
+import util.RoleConstants;
 
 /**
- *
- * @author BuiNgocLinh
+ * Controller for Account management operations Dashboard functionality has been
+ * moved to DashboardController for better security
  */
 @MultipartConfig
 @WebServlet(name = "AccountController", urlPatterns = {"/admin"})
@@ -38,16 +41,17 @@ public class AccountController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        // Security check for admin access
+        if (!AuthUtil.hasRole(request, RoleConstants.ADMIN)) {
+            response.sendRedirect("/error.jsp");
+            return;
+        }
+
         String action = request.getParameter("action");
         if (action == null) {
-            List<Account> accountList = null;
-            try {
-                accountList = accountDAO.findAll();
-            } catch (SQLException ex) {
-                Logger.getLogger(AccountController.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            request.setAttribute("accountList", accountList);
-            request.getRequestDispatcher("/admin/home.jsp").forward(request, response);
+            // Default action: redirect to admin dashboard instead of showing account list
+            response.sendRedirect("dashboard?action=admin");
             return;
         }
 
@@ -72,7 +76,8 @@ public class AccountController extends HttpServlet {
                     searchAccount(request, response);
                     break;
                 default:
-                    response.sendRedirect("/index.html");
+                    // Redirect unknown actions to dashboard
+                    response.sendRedirect("dashboard?action=admin");
                     break;
             }
         } catch (SQLException e) {
@@ -83,6 +88,13 @@ public class AccountController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        // Security check for admin access
+        if (!AuthUtil.hasRole(request, RoleConstants.ADMIN)) {
+            response.sendRedirect("/error.jsp");
+            return;
+        }
+
         String action = request.getParameter("action");
         if (action == null) {
             response.sendRedirect("admin");
@@ -95,6 +107,9 @@ public class AccountController extends HttpServlet {
                     break;
                 case "editAccount":
                     updateAccount(request, response);
+                    break;
+                case "changePassword":
+                    changePassword(request, response);
                     break;
                 default:
                     response.sendRedirect("admin");
@@ -187,9 +202,23 @@ public class AccountController extends HttpServlet {
 
     private void updateAccount(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, IOException, ServletException {
+        Account oldAccount = accountDAO.findById(Integer.parseInt(request.getParameter("id")));
         Account account = getAccountFromRequest(request);
         String avatarName = "avatar_" + System.currentTimeMillis();
         String imgURL = FileUploadUlti.uploadAvatarImage(request, avatarName);
+
+        // Validate old password if provided (edit mode)
+        String oldPassword = request.getParameter("oldPassword");
+        if (oldPassword != null && !oldPassword.isEmpty()) {
+            if (!accountDAO.validatePassword(oldAccount, oldPassword)) {
+                request.setAttribute("passwordError", "Current password is incorrect");
+                Image image = ImageDAO.findImageById(oldAccount.getImage_id());
+                request.setAttribute("account", oldAccount);
+                request.setAttribute("image", image);
+                request.getRequestDispatcher("/accountForm.jsp").forward(request, response);
+                return;
+            }
+        }
 
         if (imgURL != null) {
             Image image = new Image();
@@ -200,14 +229,18 @@ public class AccountController extends HttpServlet {
             if (imageId > 0) {
                 account.setImage_id(imageId);
             } else {
-                // Nếu lưu ảnh mới thất bại, giữ image cũ
-                Account oldAccount = accountDAO.findById(account.getId());
                 account.setImage_id(oldAccount.getImage_id());
             }
         } else {
-            Account oldAccount = accountDAO.findById(account.getId());
             account.setImage_id(oldAccount.getImage_id());
         }
+
+        // If new password is empty, keep the old password
+        String newPassword = request.getParameter("password");
+        if (newPassword == null || newPassword.isEmpty()) {
+            account.setPassword(oldAccount.getPassword());
+        }
+
         accountDAO.update(account);
         response.sendRedirect("admin?action=viewProfile&id=" + account.getId());
     }
@@ -215,7 +248,8 @@ public class AccountController extends HttpServlet {
     private void deleteAccount(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, IOException {
         int id = Integer.parseInt(request.getParameter("id"));
-//        accountDAO.deleteAccount(id);
+        // Note: Delete functionality is commented out for safety
+        // accountDAO.deleteAccount(id);
         response.sendRedirect("/accountList.jsp");
     }
 
@@ -235,6 +269,44 @@ public class AccountController extends HttpServlet {
         request.setAttribute("imageList", imageList);
         request.setAttribute("accountList", accountList);
         request.getRequestDispatcher("/accountList.jsp").forward(request, response);
+    }
+
+    private void changePassword(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, IOException, ServletException {
+        int id = Integer.parseInt(request.getParameter("id"));
+        String oldPassword = request.getParameter("oldPassword");
+        String newPassword = request.getParameter("newPassword");
+        Account account = accountDAO.findById(id);
+        if (account == null) {
+            request.setAttribute("passwordError", "Account not found.");
+            List<Image> imageList = ImageDAO.findAll();
+            request.setAttribute("imageList", imageList);
+            request.setAttribute("view", account);
+            request.getRequestDispatcher("profileAccount.jsp").forward(request, response);
+            return;
+        } else if (!accountDAO.validatePassword(account, oldPassword)) {
+            request.setAttribute("passwordError", "Current password is incorrect.");
+            List<Image> imageList = ImageDAO.findAll();
+            request.setAttribute("imageList", imageList);
+            request.setAttribute("view", account);
+            request.getRequestDispatcher("profileAccount.jsp").forward(request, response);
+            return;
+        } else if (newPassword == null || newPassword.length() < 6) {
+            request.setAttribute("passwordError", "New password must be at least 6 characters.");
+            List<Image> imageList = ImageDAO.findAll();
+            request.setAttribute("imageList", imageList);
+            request.setAttribute("view", account);
+            request.getRequestDispatcher("profileAccount.jsp").forward(request, response);
+            return;
+        } else {
+            account.setPassword(newPassword);
+            accountDAO.update(account);
+            request.setAttribute("passwordSuccess", "Password changed successfully.");
+            List<Image> imageList = ImageDAO.findAll();
+            request.setAttribute("imageList", imageList);
+            request.setAttribute("view", account);
+            request.getRequestDispatcher("profileAccount.jsp").forward(request, response);
+        }
     }
 
     private Account getAccountFromRequest(HttpServletRequest request) {

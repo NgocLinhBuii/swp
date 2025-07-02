@@ -59,7 +59,7 @@
     <body>
 
         <div class="page-wrapper">
-            <jsp:include page="/lesson/header.jsp" />
+            <jsp:include page="/header.jsp" />
 
             <main class="container py-5">
                 <div class="row justify-content-center">
@@ -128,7 +128,7 @@
                 </div>
             </main>
 
-            <jsp:include page="/lesson/footer.jsp" />
+            <jsp:include page="/footer.jsp" />
         </div>
 
         <script>

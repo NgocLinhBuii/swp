@@ -46,7 +46,10 @@ public class StudentController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        if (!AuthUtil.hasRole(request, RoleConstants.ADMIN) && !AuthUtil.hasRole(request, RoleConstants.TEACHER) && !AuthUtil.hasRole(request, RoleConstants.STUDENT) && !AuthUtil.hasRole(request, RoleConstants.PARENT)) {
+        if (!AuthUtil.hasRole(request, RoleConstants.ADMIN)
+                && !AuthUtil.hasRole(request, RoleConstants.TEACHER)
+                && !AuthUtil.hasRole(request, RoleConstants.STUDENT)
+                && !AuthUtil.hasRole(request, RoleConstants.PARENT)) {
             response.sendRedirect("/error.jsp");
             return;
         }
@@ -73,6 +76,9 @@ public class StudentController extends HttpServlet {
                 case "delete":
                     deleteStudent(request, response);
                     break;
+                case "getByParent":
+                    getStudentsByParentAjax(request, response);
+                    return;
                 default:
                     listStudents(request, response);
                     break;
@@ -85,7 +91,10 @@ public class StudentController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        if (!AuthUtil.hasRole(request, RoleConstants.ADMIN) && !AuthUtil.hasRole(request, RoleConstants.TEACHER) && !AuthUtil.hasRole(request, RoleConstants.STUDENT) && !AuthUtil.hasRole(request, RoleConstants.PARENT)) {
+        if (!AuthUtil.hasRole(request, RoleConstants.ADMIN)
+                && !AuthUtil.hasRole(request, RoleConstants.TEACHER)
+                && !AuthUtil.hasRole(request, RoleConstants.STUDENT)
+                && !AuthUtil.hasRole(request, RoleConstants.PARENT)) {
             response.sendRedirect("/error.jsp");
             return;
         }
@@ -108,7 +117,7 @@ public class StudentController extends HttpServlet {
     private void listStudents(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, ServletException, IOException {
         int page = 1;
-        int recordsPerPage = 1;
+        int recordsPerPage = 5;
 
         String pageParam = request.getParameter("page");
         if (pageParam != null) {
@@ -192,7 +201,7 @@ public class StudentController extends HttpServlet {
             }
         }
         studentDAO.insert(student);
-        
+
         // Kiểm tra nếu là parent tạo thì chuyển về trang My Children
         HttpSession session = request.getSession();
         Account account = (Account) session.getAttribute("account");
@@ -204,43 +213,9 @@ public class StudentController extends HttpServlet {
     }
 
     private void updateStudent(HttpServletRequest request, HttpServletResponse response)
-            throws SQLException, IOException, ServletException {
+            throws SQLException, IOException {
 
-        int id = Integer.parseInt(request.getParameter("id"));
-        Student oldStudent = studentDAO.findById(id);
-        
-        // Validate old password if provided
-        String oldPassword = request.getParameter("oldPassword");
-        if (oldPassword != null && !oldPassword.isEmpty()) {
-            // Check if old password matches
-            if (!studentDAO.validatePassword(oldStudent, oldPassword)) {
-                // Password doesn't match, return to form with error
-                request.setAttribute("passwordError", "Current password is incorrect");
-                
-                // Re-populate form data
-                List<Grade> gradeList = gradeDAO.findAllFromGrade();
-                List<Account> accList = accountDAO.findAll();
-                Image image = ImageDAO.findImageById(oldStudent.getImage_id());
-                request.setAttribute("student", oldStudent);
-                request.setAttribute("image", image);
-                request.setAttribute("gradeList", gradeList);
-                request.setAttribute("accList", accList);
-                
-                request.getRequestDispatcher("/student/form.jsp").forward(request, response);
-                return;
-            }
-        }
-        
-        // Get updated student data
         Student student = getStudentFromRequest(request);
-        
-        // If new password is empty, keep the old password
-        String newPassword = request.getParameter("password");
-        if (newPassword == null || newPassword.isEmpty()) {
-            student.setPassword(oldStudent.getPassword());
-        }
-        
-        // Handle avatar upload
         String avatarName = "avatar_" + System.currentTimeMillis();
         String imgURL = FileUploadUlti.uploadAvatarImage(request, avatarName);
 
@@ -254,9 +229,9 @@ public class StudentController extends HttpServlet {
                 student.setImage_id(imageId);
             }
         } else {
+            Student oldStudent = studentDAO.findById(student.getId());
             student.setImage_id(oldStudent.getImage_id());
         }
-        
         studentDAO.update(student);
         response.sendRedirect("student");
     }
@@ -289,7 +264,10 @@ public class StudentController extends HttpServlet {
     }
 
     private Student getStudentFromRequest(HttpServletRequest request) {
-        int id = Integer.parseInt(request.getParameter("id"));
+        int id = 0;
+        if (request.getParameter("id") != null) {
+            id = Integer.parseInt(request.getParameter("id"));
+        }
         int gradeId = Integer.parseInt(request.getParameter("grade_id"));
         int parentId = Integer.parseInt(request.getParameter("parent_id"));
         String username = request.getParameter("username");
@@ -317,4 +295,59 @@ public class StudentController extends HttpServlet {
         request.getRequestDispatcher("student/viewProfile.jsp").forward(request, response);
     }
 
+    private void getStudentsByParentAjax(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        try {
+            int parentId = Integer.parseInt(request.getParameter("parentId"));
+            List<Student> students = studentDAO.getStudentsByParentId(parentId);
+            List<Grade> gradeList = gradeDAO.findAllFromGrade();
+
+            // Create JSON response manually
+            StringBuilder json = new StringBuilder("[");
+            for (int i = 0; i < students.size(); i++) {
+                if (i > 0) {
+                    json.append(",");
+                }
+                Student student = students.get(i);
+
+                // Find grade name
+                String gradeName = "Unknown";
+                for (Grade grade : gradeList) {
+                    if (grade.getId() == student.getGrade_id()) {
+                        gradeName = grade.getName();
+                        break;
+                    }
+                }
+
+                json.append("{")
+                        .append("\"id\":").append(student.getId())
+                        .append(",\"full_name\":\"").append(escapeJson(student.getFull_name())).append("\"")
+                        .append(",\"username\":\"").append(escapeJson(student.getUsername())).append("\"")
+                        .append(",\"grade_name\":\"").append(escapeJson(gradeName)).append("\"")
+                        .append("}");
+            }
+            json.append("]");
+
+            response.getWriter().write(json.toString());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.getWriter().write("[]");
+        }
+    }
+
+    // Helper method để escape JSON strings
+    private String escapeJson(String input) {
+        if (input == null) {
+            return "";
+        }
+        return input.replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r")
+                .replace("\t", "\\t");
+    }
 }

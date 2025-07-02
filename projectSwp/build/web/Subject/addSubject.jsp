@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html; charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <html>
@@ -86,7 +86,7 @@
 <body>
 
 <div class="page-wrapper">
-    <jsp:include page="/Subject/header.jsp" />
+    <%@include file="../header.jsp" %>
 
     <div class="container">
         <h2>Add New Subject</h2>
@@ -114,7 +114,7 @@
         </form>
     </div>
 
-    <jsp:include page="/Subject/footer.jsp" />
+    <%@include file="../footer.jsp" %>
 </div>
 
    <script src="${pageContext.request.contextPath}/assets/js/vendor/modernizr-3.5.0.min.js"></script>

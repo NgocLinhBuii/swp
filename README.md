@@ -15,7 +15,7 @@ Already a pro? Just edit this README.md and make it your own. Want to make it ea
 
 ```
 cd existing_repo
-git remote add origin https://gitlab.com/summer20241/summer251/se1913-net/g06/projectswp-group6.git
+git remote add origin https://github.com/NgocLinhBuii/swp
 git branch -M main
 git push -uf origin main
 ```
